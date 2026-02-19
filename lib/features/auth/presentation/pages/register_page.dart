@@ -1,3 +1,4 @@
+import 'package:complaint_resolution_app/core/routes/route_names.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../injection_container.dart';
@@ -46,7 +47,8 @@ class _RegisterPageState extends State<RegisterPage> {
                 );
 
                 // TODO: Navigate to home page
-                // Navigator.pushReplacement(...)
+                Navigator.pushNamed(context, RouteNames.login);
+
               }
 
               if (state is AuthError) {

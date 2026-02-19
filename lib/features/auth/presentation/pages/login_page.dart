@@ -1,3 +1,4 @@
+import 'package:complaint_resolution_app/core/routes/route_names.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../injection_container.dart';
@@ -45,7 +46,7 @@ class _LoginPageState extends State<LoginPage> {
                 );
 
                 // TODO: Navigate to home page
-                // Navigator.pushReplacement(...)
+                Navigator.pushReplacementNamed(context, RouteNames.home);
               }
 
               if (state is AuthError) {
@@ -177,13 +178,7 @@ class _LoginPageState extends State<LoginPage> {
                           Center(
                             child: TextButton(
                               onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) =>
-                                        const RegisterPage(),
-                                  ),
-                                );
+                                Navigator.pushNamed(context, RouteNames.register);
                               },
                               child: const Text(
                                 "Don’t have an account? Register",
