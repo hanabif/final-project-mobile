@@ -1,7 +1,7 @@
 import 'package:complaint_resolution_app/features/auth/domain/entities/user.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../domain/usecases/login_usecase.dart';
-import '../../domain/usecases/register_usecase.dart';
+import '../../../domain/usecases/login_usecase.dart';
+import '../../../domain/usecases/register_usecase.dart';
 import 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
