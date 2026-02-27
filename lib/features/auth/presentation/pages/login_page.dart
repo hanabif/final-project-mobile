@@ -97,6 +97,10 @@ class _LoginPageState extends State<LoginPage> {
                               if (value == null || value.isEmpty) {
                                 return "Email is required";
                               }
+                              final emailReg = RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}");
+                              if (!emailReg.hasMatch(value.trim())) {
+                                return "Enter a valid email";
+                              }
                               return null;
                             },
                           ),
@@ -120,6 +124,9 @@ class _LoginPageState extends State<LoginPage> {
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return "Password is required";
+                              }
+                              if (value.length < 6) {
+                                return "Password must be at least 6 characters";
                               }
                               return null;
                             },

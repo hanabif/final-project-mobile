@@ -99,6 +99,10 @@ class _RegisterPageState extends State<RegisterPage> {
                               if (value == null || value.isEmpty) {
                                 return "Email is required";
                               }
+                              final emailReg = RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}");
+                              if (!emailReg.hasMatch(value.trim())) {
+                                return "Enter a valid email";
+                              }
                               return null;
                             },
                           ),
@@ -143,7 +147,10 @@ class _RegisterPageState extends State<RegisterPage> {
                             icon: Icons.lock_outline,
                             obscure: true,
                             validator: (value) {
-                              if (value == null || value.length < 6) {
+                              if (value == null || value.isEmpty) {
+                                return "Password is required";
+                              }
+                              if (value.length < 6) {
                                 return "Minimum 6 characters";
                               }
                               return null;
