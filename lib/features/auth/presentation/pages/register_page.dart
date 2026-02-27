@@ -41,20 +41,17 @@ class _RegisterPageState extends State<RegisterPage> {
             listener: (context, state) {
               if (state is AuthAuthenticated) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("Registration successful"),
-                  ),
+                  const SnackBar(content: Text("Registration successful")),
                 );
 
                 // TODO: Navigate to home page
                 Navigator.pushNamed(context, RouteNames.login);
-
               }
 
               if (state is AuthError) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(state.message)),
-                );
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(state.message)));
               }
             },
             child: BlocBuilder<AuthCubit, AuthState>(
@@ -99,7 +96,9 @@ class _RegisterPageState extends State<RegisterPage> {
                               if (value == null || value.isEmpty) {
                                 return "Email is required";
                               }
-                              final emailReg = RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}");
+                              final emailReg = RegExp(
+                                r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}",
+                              );
                               if (!emailReg.hasMatch(value.trim())) {
                                 return "Enter a valid email";
                               }
@@ -166,10 +165,10 @@ class _RegisterPageState extends State<RegisterPage> {
                             onPressed: () {
                               if (_formKey.currentState!.validate()) {
                                 context.read<AuthCubit>().register(
-                                      _nameController.text.trim(),
-                                      _emailController.text.trim(),
-                                      _passwordController.text.trim(),
-                                    );
+                                  _nameController.text.trim(),
+                                  _emailController.text.trim(),
+                                  _passwordController.text.trim(),
+                                );
                               }
                             },
                           ),

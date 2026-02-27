@@ -40,9 +40,7 @@ class _LoginPageState extends State<LoginPage> {
             listener: (context, state) {
               if (state is AuthAuthenticated) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("Login successful"),
-                  ),
+                  const SnackBar(content: Text("Login successful")),
                 );
 
                 // TODO: Navigate to home page
@@ -50,9 +48,9 @@ class _LoginPageState extends State<LoginPage> {
               }
 
               if (state is AuthError) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(state.message)),
-                );
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(state.message)));
               }
             },
             child: BlocBuilder<AuthCubit, AuthState>(
@@ -97,7 +95,9 @@ class _LoginPageState extends State<LoginPage> {
                               if (value == null || value.isEmpty) {
                                 return "Email is required";
                               }
-                              final emailReg = RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}");
+                              final emailReg = RegExp(
+                                r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}",
+                              );
                               if (!emailReg.hasMatch(value.trim())) {
                                 return "Enter a valid email";
                               }
@@ -165,9 +165,9 @@ class _LoginPageState extends State<LoginPage> {
                             onPressed: () {
                               if (_formKey.currentState!.validate()) {
                                 context.read<AuthCubit>().login(
-                                      _emailController.text.trim(),
-                                      _passwordController.text.trim(),
-                                    );
+                                  _emailController.text.trim(),
+                                  _passwordController.text.trim(),
+                                );
                               }
                             },
                           ),
@@ -175,9 +175,7 @@ class _LoginPageState extends State<LoginPage> {
                           const SizedBox(height: 30),
 
                           /// Divider
-                          const Divider(
-                            thickness: 1,
-                          ),
+                          const Divider(thickness: 1),
 
                           const SizedBox(height: 20),
 
@@ -185,7 +183,10 @@ class _LoginPageState extends State<LoginPage> {
                           Center(
                             child: TextButton(
                               onPressed: () {
-                                Navigator.pushNamed(context, RouteNames.register);
+                                Navigator.pushNamed(
+                                  context,
+                                  RouteNames.register,
+                                );
                               },
                               child: const Text(
                                 "Don’t have an account? Register",
