@@ -25,7 +25,10 @@ Future<void> init() async {
   // Auth - Use cases
   sl.registerLazySingleton(() => LoginUseCase(sl()));
   sl.registerLazySingleton(() => RegisterUseCase(sl()));
+  sl.registerLazySingleton(() => ResetPasswordUseCase(sl()));
+  sl.registerLazySingleton(() => VerifyCodeUseCase(sl()));
+  sl.registerLazySingleton(() => ForgotPasswordUseCase(sl()));
 
   // Auth - Presentation
-  sl.registerFactory(() => AuthCubit(loginUseCase: sl(), registerUseCase: sl()));
+  sl.registerFactory(() => AuthCubit(loginUseCase: sl(), registerUseCase: sl(), resetPasswordUseCase: sl(), verifyCodeUseCase: sl(), forgotPasswordUseCase: sl()));
 }
