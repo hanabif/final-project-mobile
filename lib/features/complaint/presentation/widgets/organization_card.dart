@@ -25,9 +25,10 @@ class OrganizationCard extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
+              Image.asset(
                 logo,
-                style: const TextStyle(fontSize: 40),
+                height: 60,
+                fit: BoxFit.contain,
               ),
               const SizedBox(height: 12),
               Text(

@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/routes/route_names.dart';
 import '../../domain/entities/complaint.dart';
 import '../cubits/complaint_cubit.dart';
 import '../cubits/complaint_state.dart';
@@ -29,11 +30,11 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
 
   String? _selectedOrganization;
   final List<String> _organizations = [
-    'City Council',
-    'Water Department',
-    'Road Authority',
-    'Electricity Board',
-    'Health Department'
+    'Ethiopian Electric Utility',
+    'Ethiopian Roads Administration',
+    'A.A Water and Sewerage Authority',
+    'Health Department',
+    'City Council'
   ];
 
   File? _selectedImage;
@@ -183,10 +184,9 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
              );
              // In a real app we'd get the actual ID from the state/response if it's generated on backend
              // For now we'll just pass a generated one.
-             Navigator.of(context).pushReplacement(
-               MaterialPageRoute(
-                 builder: (_) => ComplaintSuccessScreen(complaintId: const Uuid().v4().substring(0, 8).toUpperCase()),
-               ),
+             Navigator.of(context).pushReplacementNamed(
+               RouteNames.complaintSuccess,
+               arguments: const Uuid().v4().substring(0, 8).toUpperCase(),
              );
           } else if (state is ComplaintFailure) {
             ScaffoldMessenger.of(context).showSnackBar(

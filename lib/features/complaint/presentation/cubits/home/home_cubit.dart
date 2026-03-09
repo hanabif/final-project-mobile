@@ -21,17 +21,17 @@ class HomeCubit extends Cubit<HomeState> {
         {
           'id': 'org1',
           'name': 'Ethiopian Electric Utility',
-          'logo': '⚡', // using emoji as a placeholder logo for now
+          'logo': 'assets/images/Property 1=electric.png',
         },
         {
           'id': 'org2',
           'name': 'Ethiopian Roads Administration',
-          'logo': '🛣️',
+          'logo': 'assets/images/Property 1=road.png',
         },
         {
           'id': 'org3',
           'name': 'A.A Water and Sewerage Authority',
-          'logo': '💧',
+          'logo': 'assets/images/Property 1=water.png',
         },
       ];
 

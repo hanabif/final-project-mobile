@@ -1,0 +1,97 @@
+import 'package:get_it/get_it.dart';
+import 'package:dio/dio.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:geolocator/geolocator.dart';
+
+import '../network/api_client.dart';
+import '../utils/secure_storage.dart';
+import '../../../features/auth/data/datasources/auth_remote_datasource.dart';
+import '../../../features/auth/data/repositories/auth_repository_impl.dart';
+import '../../../features/auth/data/repositories/session_repository_impl.dart';
+import '../../../features/auth/domain/repositories/auth_repository.dart';
+import '../../../features/auth/domain/repositories/session_repository.dart';
+import '../../../features/auth/domain/usecases/login_usecase.dart';
+import '../../../features/auth/domain/usecases/register_usecase.dart';
+import '../../../features/auth/domain/usecases/reset_password_usecase.dart';
+import '../../../features/auth/domain/usecases/verify_code_usecase.dart';
+import '../../../features/auth/domain/usecases/forgot_password_usecase.dart';
+import '../../../features/auth/domain/usecases/save_token_usecase.dart';
+import '../../../features/auth/domain/usecases/get_token_usecase.dart';
+import '../../../features/auth/domain/usecases/logout_usecase.dart';
+import '../../../features/auth/domain/usecases/is_session_valid_usecase.dart';
+import '../../../features/auth/presentation/cubit/auth/auth_cubit.dart';
+import '../../../features/auth/presentation/cubit/password_reset/password_reset_cubit.dart';
+
+import '../../../features/complaint/data/datasources/complaint_remote_datasource.dart';
+import '../../../features/complaint/data/repositories/complaint_repository_impl.dart';
+import '../../../features/complaint/domain/repositories/complaint_repository.dart';
+import '../../../features/complaint/domain/usecases/submit_complaint_usecase.dart';
+import '../../../features/complaint/domain/usecases/get_complaint_status_usecase.dart';
+import '../../../features/complaint/presentation/cubits/complaint_cubit.dart';
+import '../../../features/complaint/presentation/cubits/home/home_cubit.dart';
+
+final sl = GetIt.instance;
+
+Future<void> init() async {
+  // External
+  sl.registerLazySingleton(() => Dio());
+  sl.registerLazySingleton(() => ImagePicker());
+
+  // Core
+  sl.registerLazySingleton<SecureStorageService>(() => SecureStorageService());
+  sl.registerLazySingleton<SessionRepository>(
+    () => SessionRepositoryImpl(sl()),
+  );
+  sl.registerLazySingleton<ApiClient>(() => ApiClient(sl()));
+
+  // Auth - Data sources
+  sl.registerLazySingleton<AuthRemoteDataSource>(
+    () => AuthRemoteDataSourceImpl(sl()),
+  );
+
+  // Complaint - Data sources
+  sl.registerLazySingleton<ComplaintRemoteDataSource>(
+    () => ComplaintRemoteDataSourceImpl(apiClient: sl()),
+  );
+
+  // Auth - Repository
+  sl.registerLazySingleton<AuthRepository>(
+    () => AuthRepositoryImpl(sl(), sl()),
+  );
+
+  // Complaint - Repository
+  sl.registerLazySingleton<ComplaintRepository>(
+    () => ComplaintRepositoryImpl(remoteDataSource: sl()),
+  );
+
+  // Auth - Use cases
+  sl.registerLazySingleton(() => LoginUseCase(sl()));
+  sl.registerLazySingleton(() => RegisterUseCase(sl()));
+  sl.registerLazySingleton(() => ResetPasswordUseCase(sl()));
+  sl.registerLazySingleton(() => VerifyCodeUseCase(sl()));
+  sl.registerLazySingleton(() => ForgotPasswordUseCase(sl()));
+  sl.registerLazySingleton(() => SaveTokenUseCase(sl()));
+  sl.registerLazySingleton(() => GetTokenUseCase(sl()));
+  sl.registerLazySingleton(() => LogoutUseCase(sl()));
+  sl.registerLazySingleton(() => IsSessionValidUseCase(sl()));
+
+  // Complaint - Use cases
+  sl.registerLazySingleton(() => SubmitComplaintUseCase(sl()));
+  sl.registerLazySingleton(() => GetComplaintStatusUseCase(sl()));
+
+  // Auth - Presentation
+  sl.registerFactory(
+    () => AuthCubit(loginUseCase: sl(), registerUseCase: sl()),
+  );
+  sl.registerFactory(
+    () => PasswordResetCubit(
+      forgotPasswordUseCase: sl(),
+      verifyCodeUseCase: sl(),
+      resetPasswordUseCase: sl(),
+    ),
+  );
+
+  // Complaint - Presentation
+  sl.registerFactory(() => HomeCubit());
+  sl.registerFactory(() => ComplaintCubit(submitComplaintUseCase: sl()));
+}

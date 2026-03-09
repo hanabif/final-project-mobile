@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../core/routes/route_names.dart';
 import '../cubits/home/home_cubit.dart';
 import '../cubits/home/home_state.dart';
 import '../widgets/stat_card.dart';
@@ -25,12 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void _onItemTapped(int index) {
     if (index == 1) {
       // Navigate to Report (Complaint Form)
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const ComplaintFormScreen(),
-        ),
-      );
+      Navigator.pushNamed(context, RouteNames.complaintForm);
     } else if (index == 2) {
       // Navigate to Profile
       // Placeholder for now
@@ -49,19 +45,10 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          children: [
-            // Placeholder logo
-            const Icon(Icons.location_city, color: Colors.blue),
-            const SizedBox(width: 8),
-            const Text(
-              'CITYVOICE',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                letterSpacing: 1.2,
-              ),
-            ),
-          ],
+        title: Image.asset(
+          'assets/images/logo (1).png',
+          height: 40,
+          fit: BoxFit.contain,
         ),
         actions: [
           IconButton(
@@ -134,13 +121,10 @@ class _HomeScreenState extends State<HomeScreen> {
                           name: org['name']!,
                           logo: org['logo']!,
                           onTap: () {
-                            Navigator.push(
+                            Navigator.pushNamed(
                               context,
-                              MaterialPageRoute(
-                                builder: (_) => ComplaintFormScreen(
-                                  organizationId: org['name'], // Note: Passing name as ID based on current dropdown values in the form
-                                ),
-                              ),
+                              RouteNames.complaintForm,
+                              arguments: org['name'],
                             );
                           },
                         );
@@ -156,12 +140,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => const ComplaintFormScreen(),
-            ),
-          );
+          Navigator.pushNamed(context, RouteNames.complaintForm);
         },
         child: const Icon(Icons.add),
       ),

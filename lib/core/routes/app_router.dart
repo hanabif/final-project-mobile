@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
-import '../../features/auth/presentation/pages/register_page.dart';
+import '../../features/complaint/presentation/screens/home_screen.dart';
+import '../../features/complaint/presentation/screens/complaint_form_screen.dart';
+import '../../features/complaint/presentation/screens/complaint_success_screen.dart';
+import '../../features/complaint/presentation/screens/complaint_status_screen.dart';
 import 'route_names.dart';
 
 class AppRouter {
@@ -14,6 +17,35 @@ class AppRouter {
       case RouteNames.register:
         return MaterialPageRoute(
           builder: (_) => const RegisterPage(),
+        );
+
+      case RouteNames.home:
+        return MaterialPageRoute(
+          builder: (_) => const HomeScreen(),
+        );
+
+      case RouteNames.complaintForm:
+        final organizationId = settings.arguments as String?;
+        return MaterialPageRoute(
+          builder: (_) => ComplaintFormScreen(organizationId: organizationId),
+        );
+
+      case RouteNames.complaintSuccess:
+        final complaintId = settings.arguments as String;
+        return MaterialPageRoute(
+          builder: (_) => ComplaintSuccessScreen(complaintId: complaintId),
+        );
+
+      case RouteNames.complaintStatus:
+        final complaintId = settings.arguments as String;
+        return MaterialPageRoute(
+          builder: (_) => ComplaintStatusScreen(complaintId: complaintId),
+        );
+
+      case RouteNames.profile:
+        return MaterialPageRoute(
+          builder: (_) =>
+              const Scaffold(body: Center(child: Text('Profile Screen'))),
         );
 
       default:
