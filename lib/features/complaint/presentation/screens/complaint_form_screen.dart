@@ -11,7 +11,12 @@ import '../cubits/complaint_state.dart';
 import 'complaint_success_screen.dart';
 
 class ComplaintFormScreen extends StatefulWidget {
-  const ComplaintFormScreen({super.key});
+  final String? organizationId;
+
+  const ComplaintFormScreen({
+    super.key,
+    this.organizationId,
+  });
 
   @override
   State<ComplaintFormScreen> createState() => _ComplaintFormScreenState();
@@ -38,6 +43,9 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
   @override
   void initState() {
     super.initState();
+    if (widget.organizationId != null && _organizations.contains(widget.organizationId)) {
+      _selectedOrganization = widget.organizationId;
+    }
     _getCurrentLocation();
   }
 
