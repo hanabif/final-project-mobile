@@ -1,7 +1,6 @@
 import 'package:get_it/get_it.dart';
 import 'package:dio/dio.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:geolocator/geolocator.dart';
 
 import '../network/api_client.dart';
 import '../utils/secure_storage.dart';

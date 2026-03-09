@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../core/routes/route_names.dart';
+import '../../../../core/routes/route_names.dart';
 import '../cubits/home/home_cubit.dart';
 import '../cubits/home/home_state.dart';
 import '../widgets/stat_card.dart';
 import '../widgets/organization_card.dart';
-import 'complaint_form_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -89,11 +88,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(height: 16),
                     Row(
                       children: [
-                        Expanded(child: StatCard(title: 'Total\\nComplaints', number: state.totalComplaints.toString())),
+                        Expanded(child: StatCard(title: 'Total Complaints', number: state.totalComplaints.toString())),
                         const SizedBox(width: 12),
-                        Expanded(child: StatCard(title: 'Resolved\\nCases', number: state.resolvedComplaints.toString())),
+                        Expanded(child: StatCard(title: 'Resolved Cases', number: state.resolvedComplaints.toString())),
                         const SizedBox(width: 12),
-                        Expanded(child: StatCard(title: 'Pending\\nCases', number: state.pendingComplaints.toString())),
+                        Expanded(child: StatCard(title: 'Pending Cases', number: state.pendingComplaints.toString())),
                       ],
                     ),
                     const SizedBox(height: 32),

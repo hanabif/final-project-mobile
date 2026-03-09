@@ -1,5 +1,5 @@
-import 'dart:io';
-import 'package:dio/dio.dart';
+// import 'dart:io';
+// import 'package:dio/dio.dart';
 import '../../../../core/network/api_client.dart';
 import '../models/complaint_model.dart';
 
@@ -15,6 +15,13 @@ class ComplaintRemoteDataSourceImpl implements ComplaintRemoteDataSource {
 
   @override
   Future<void> submitComplaint(ComplaintModel complaint) async {
+    // Artificial delay to simulate network request
+    await Future.delayed(const Duration(seconds: 2));
+
+    // For testing, always succeed
+    return;
+    
+    /*
     try {
       final formData = FormData.fromMap({
         'title': complaint.title,
@@ -43,45 +50,64 @@ class ComplaintRemoteDataSourceImpl implements ComplaintRemoteDataSource {
       );
 
       if (response.statusCode != 200 && response.statusCode != 201) {
-        throw Exception('Server error: \${response.statusCode}');
+        throw Exception('Server error: ${response.statusCode}');
       }
     } on DioException catch (e) {
       if (e.type == DioExceptionType.connectionTimeout || 
           e.type == DioExceptionType.receiveTimeout || 
           e.type == DioExceptionType.unknown) {
-        throw Exception('Network error: \${e.message}');
+        throw Exception('Network error: ${e.message}');
       } else if (e.response != null) {
-        throw Exception('Server error: \${e.response?.statusCode} - \${e.response?.statusMessage}');
+        throw Exception('Server error: ${e.response?.statusCode} - ${e.response?.statusMessage}');
       } else {
         throw Exception('Unknown error occurred');
       }
     } catch (e) {
-      throw Exception('Failed to submit complaint: \$e');
+      throw Exception('Failed to submit complaint: $e');
     }
+    */
   }
 
   @override
   Future<ComplaintModel> getComplaintStatus(String complaintId) async {
+    // Artificial delay
+    await Future.delayed(const Duration(seconds: 1));
+
+    // Return dummy status for testing
+    return ComplaintModel(
+      id: complaintId,
+      title: 'Mock Complaint',
+      description: 'This is a mock description for testing.',
+      imageUrl: '',
+      latitude: 0.0,
+      longitude: 0.0,
+      organizationId: 'Ethiopian Electric Utility',
+      status: 'In Progress',
+      createdAt: DateTime.now(),
+    );
+
+    /*
     try {
-      final response = await apiClient.dio.get('/complaints/\$complaintId');
+      final response = await apiClient.dio.get('/complaints/$complaintId');
 
       if (response.statusCode == 200) {
         return ComplaintModel.fromJson(response.data);
       } else {
-         throw Exception('Server error: \${response.statusCode}');
+         throw Exception('Server error: ${response.statusCode}');
       }
     } on DioException catch (e) {
       if (e.type == DioExceptionType.connectionTimeout || 
           e.type == DioExceptionType.receiveTimeout || 
           e.type == DioExceptionType.unknown) {
-        throw Exception('Network error: \${e.message}');
+        throw Exception('Network error: ${e.message}');
       } else if (e.response != null) {
-        throw Exception('Server error: \${e.response?.statusCode} - \${e.response?.statusMessage}');
+        throw Exception('Server error: ${e.response?.statusCode} - ${e.response?.statusMessage}');
       } else {
         throw Exception('Unknown error occurred');
       }
     } catch (e) {
-      throw Exception('Failed to get complaint status: \$e');
+      throw Exception('Failed to get complaint status: $e');
     }
+    */
   }
 }

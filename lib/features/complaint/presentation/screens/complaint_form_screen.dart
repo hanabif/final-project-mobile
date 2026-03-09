@@ -9,7 +9,6 @@ import '../../../../core/routes/route_names.dart';
 import '../../domain/entities/complaint.dart';
 import '../cubits/complaint_cubit.dart';
 import '../cubits/complaint_state.dart';
-import 'complaint_success_screen.dart';
 
 class ComplaintFormScreen extends StatefulWidget {
   final String? organizationId;
@@ -246,7 +245,7 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
                       labelText: 'Select Organization',
                       border: OutlineInputBorder(),
                     ),
-                    value: _selectedOrganization,
+                    initialValue: _selectedOrganization,
                     items: _organizations.map((org) {
                       return DropdownMenuItem(
                         value: org,

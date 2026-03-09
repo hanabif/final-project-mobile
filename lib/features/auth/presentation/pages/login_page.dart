@@ -6,7 +6,6 @@ import '../cubit/auth/auth_cubit.dart';
 import '../cubit/auth/auth_state.dart';
 import '../widgets/auth_text_field.dart';
 import '../widgets/primary_button.dart';
-import 'register_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
