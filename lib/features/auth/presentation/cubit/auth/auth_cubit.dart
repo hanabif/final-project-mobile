@@ -16,17 +16,17 @@ class AuthCubit extends Cubit<AuthState> {
       final user = await loginUseCase(email, password);
       emit(AuthAuthenticated(user));
     } catch (e) {
-      emit(AuthError("Login failed"));
+      emit(AuthError(e.toString()));
     }
   }
 
   Future<void> register(String name, String email, String password) async {
     emit(AuthLoading());
     try {
-      final user = await registerUseCase(name, email, password);
+      final user = await registerUseCase(name, email, password, 'Citizen');
       emit(AuthAuthenticated(user));
     } catch (e) {
-      emit(AuthError("Registration failed"));
+      emit(AuthError(e.toString()));
     }
   }
 }

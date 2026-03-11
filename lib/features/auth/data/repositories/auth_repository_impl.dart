@@ -18,8 +18,18 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<User> register(String name, String email, String password) async {
-    final authResponse = await remoteDataSource.register(name, email, password);
+  Future<User> register(
+    String name,
+    String email,
+    String password,
+    String role,
+  ) async {
+    final authResponse = await remoteDataSource.register(
+      name,
+      email,
+      password,
+      role,
+    );
     await sessionRepository.saveToken(authResponse.token);
     return authResponse.user;
   }

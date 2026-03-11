@@ -8,6 +8,7 @@ abstract class AuthRemoteDataSource {
     String name,
     String email,
     String password,
+    String role,
   );
   Future<void> forgotPassword(String email);
   Future<void> verifyCode(String email, String code);
@@ -22,7 +23,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<AuthResponseModel> login(String email, String password) async {
     final response = await apiClient.dio.post(
-      '/login',
+      '/auth/login',
       data: {"email": email, "password": password},
     );
 
@@ -34,10 +35,16 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     String name,
     String email,
     String password,
+    String role,
   ) async {
     final response = await apiClient.dio.post(
-      '/register',
-      data: {"name": name, "email": email, "password": password},
+      '/auth/register',
+      data: {
+        "fullname": name,
+        "email": email,
+        "password": password,
+        "role": role,
+      },
     );
 
     return AuthResponseModel.fromJson(response.data);
