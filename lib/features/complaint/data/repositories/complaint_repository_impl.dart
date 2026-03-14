@@ -29,4 +29,25 @@ class ComplaintRepositoryImpl implements ComplaintRepository {
       rethrow;
     }
   }
+
+  @override
+  Future<List<Complaint>> getUserComplaints() async {
+    try {
+      final models = await remoteDataSource.getUserComplaints();
+      // ComplaintModel extends Complaint, so the cast is safe.
+      return models.cast<Complaint>();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<Complaint> getComplaintDetail(String complaintId) async {
+    try {
+      final model = await remoteDataSource.getComplaintDetail(complaintId);
+      return model;
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

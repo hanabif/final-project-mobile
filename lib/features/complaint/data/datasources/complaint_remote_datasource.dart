@@ -6,6 +6,8 @@ import '../models/complaint_model.dart';
 abstract class ComplaintRemoteDataSource {
   Future<void> submitComplaint(ComplaintModel complaint);
   Future<ComplaintModel> getComplaintStatus(String complaintId);
+  Future<List<ComplaintModel>> getUserComplaints();
+  Future<ComplaintModel> getComplaintDetail(String complaintId);
 }
 
 class ComplaintRemoteDataSourceImpl implements ComplaintRemoteDataSource {
@@ -107,6 +109,110 @@ class ComplaintRemoteDataSourceImpl implements ComplaintRemoteDataSource {
       }
     } catch (e) {
       throw Exception('Failed to get complaint status: $e');
+    }
+    */
+  }
+
+  @override
+  Future<List<ComplaintModel>> getUserComplaints() async {
+    // Artificial delay to simulate network request
+    await Future.delayed(const Duration(seconds: 1));
+
+    // Return mock data for testing
+    return [
+      ComplaintModel(
+        id: 'complaint-001',
+        title: 'Power Outage',
+        description: 'No electricity in the neighborhood since yesterday.',
+        imageUrl: null,
+        latitude: 9.0248,
+        longitude: 38.7469,
+        organizationId: 'Ethiopian Electric Utility',
+        status: 'Pending',
+        createdAt: DateTime.now().subtract(const Duration(days: 1)),
+      ),
+      ComplaintModel(
+        id: 'complaint-002',
+        title: 'Water Supply Issue',
+        description: 'Water has been cut off for three days.',
+        imageUrl: null,
+        latitude: 9.0300,
+        longitude: 38.7500,
+        organizationId: 'Addis Ababa Water Authority',
+        status: 'In Progress',
+        createdAt: DateTime.now().subtract(const Duration(days: 3)),
+      ),
+    ];
+
+    /*
+    try {
+      final response = await apiClient.dio.get('/complaints');
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = response.data as List<dynamic>;
+        return data
+            .map((item) => ComplaintModel.fromJson(item as Map<String, dynamic>))
+            .toList();
+      } else {
+        throw Exception('Server error: \${response.statusCode}');
+      }
+    } on DioException catch (e) {
+      if (e.type == DioExceptionType.connectionTimeout ||
+          e.type == DioExceptionType.receiveTimeout ||
+          e.type == DioExceptionType.unknown) {
+        throw Exception('Network error: \${e.message}');
+      } else if (e.response != null) {
+        throw Exception(
+            'Server error: \${e.response?.statusCode} - \${e.response?.statusMessage}');
+      } else {
+        throw Exception('Unknown error occurred');
+      }
+    } catch (e) {
+      throw Exception('Failed to fetch complaints: \$e');
+    }
+    */
+  }
+
+  @override
+  Future<ComplaintModel> getComplaintDetail(String complaintId) async {
+    // Artificial delay to simulate network request
+    await Future.delayed(const Duration(seconds: 1));
+
+    // Return mock detail for testing
+    return ComplaintModel(
+      id: complaintId,
+      title: 'Mock Complaint Detail',
+      description: 'Detailed description for complaint $complaintId.',
+      imageUrl: null,
+      latitude: 9.0248,
+      longitude: 38.7469,
+      organizationId: 'Ethiopian Electric Utility',
+      status: 'Pending',
+      createdAt: DateTime.now().subtract(const Duration(hours: 5)),
+    );
+
+    /*
+    try {
+      final response = await apiClient.dio.get('/complaints/\$complaintId');
+
+      if (response.statusCode == 200) {
+        return ComplaintModel.fromJson(response.data as Map<String, dynamic>);
+      } else {
+        throw Exception('Server error: \${response.statusCode}');
+      }
+    } on DioException catch (e) {
+      if (e.type == DioExceptionType.connectionTimeout ||
+          e.type == DioExceptionType.receiveTimeout ||
+          e.type == DioExceptionType.unknown) {
+        throw Exception('Network error: \${e.message}');
+      } else if (e.response != null) {
+        throw Exception(
+            'Server error: \${e.response?.statusCode} - \${e.response?.statusMessage}');
+      } else {
+        throw Exception('Unknown error occurred');
+      }
+    } catch (e) {
+      throw Exception('Failed to fetch complaint detail: \$e');
     }
     */
   }
