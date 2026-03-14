@@ -88,11 +88,23 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(height: 16),
                     Row(
                       children: [
-                        Expanded(child: StatCard(title: 'Total Complaints', number: state.totalComplaints.toString())),
+                        Expanded(child: StatCard(
+                          title: 'Total Complaints', 
+                          number: state.totalComplaints.toString(),
+                          onTap: () => Navigator.pushNamed(context, RouteNames.complaintList),
+                        )),
                         const SizedBox(width: 12),
-                        Expanded(child: StatCard(title: 'Resolved Cases', number: state.resolvedComplaints.toString())),
+                        Expanded(child: StatCard(
+                          title: 'Resolved Cases', 
+                          number: state.resolvedComplaints.toString(),
+                          onTap: () => Navigator.pushNamed(context, RouteNames.complaintList),
+                        )),
                         const SizedBox(width: 12),
-                        Expanded(child: StatCard(title: 'Pending Cases', number: state.pendingComplaints.toString())),
+                        Expanded(child: StatCard(
+                          title: 'Pending Cases', 
+                          number: state.pendingComplaints.toString(),
+                          onTap: () => Navigator.pushNamed(context, RouteNames.complaintList),
+                        )),
                       ],
                     ),
                     const SizedBox(height: 32),

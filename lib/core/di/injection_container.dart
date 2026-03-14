@@ -26,7 +26,11 @@ import '../../../features/complaint/data/repositories/complaint_repository_impl.
 import '../../../features/complaint/domain/repositories/complaint_repository.dart';
 import '../../../features/complaint/domain/usecases/submit_complaint_usecase.dart';
 import '../../../features/complaint/domain/usecases/get_complaint_status_usecase.dart';
+import '../../../features/complaint/domain/usecases/get_user_complaints_usecase.dart';
+import '../../../features/complaint/domain/usecases/get_complaint_detail_usecase.dart';
 import '../../../features/complaint/presentation/cubits/complaint_cubit.dart';
+import '../../../features/complaint/presentation/cubits/complaint_list_cubit.dart';
+import '../../../features/complaint/presentation/cubits/complaint_detail_cubit.dart';
 import '../../../features/complaint/presentation/cubits/home/home_cubit.dart';
 
 final sl = GetIt.instance;
@@ -77,6 +81,8 @@ Future<void> init() async {
   // Complaint - Use cases
   sl.registerLazySingleton(() => SubmitComplaintUseCase(sl()));
   sl.registerLazySingleton(() => GetComplaintStatusUseCase(sl()));
+  sl.registerLazySingleton(() => GetUserComplaintsUseCase(sl()));
+  sl.registerLazySingleton(() => GetComplaintDetailUseCase(sl()));
 
   // Auth - Presentation
   sl.registerFactory(
@@ -93,4 +99,8 @@ Future<void> init() async {
   // Complaint - Presentation
   sl.registerFactory(() => HomeCubit());
   sl.registerFactory(() => ComplaintCubit(submitComplaintUseCase: sl()));
+  sl.registerFactory(() => ComplaintListCubit(getUserComplaintsUseCase: sl()));
+  sl.registerFactory(
+    () => ComplaintDetailCubit(getComplaintDetailUseCase: sl()),
+  );
 }

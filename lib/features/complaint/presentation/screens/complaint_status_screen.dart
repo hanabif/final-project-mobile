@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/di/injection_container.dart';
+import '../cubits/complaint_detail_cubit.dart';
+import '../cubits/complaint_detail_state.dart';
+import '../widgets/status_stepper.dart';
 
 class ComplaintStatusScreen extends StatelessWidget {
   final String complaintId;
@@ -10,110 +15,216 @@ class ComplaintStatusScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Note: In a real app, we'd use GetComplaintStatusUseCase via a Cubit
-    // For now, this is a placeholder UI showing the status.
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Complaint Status'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Complaint Details',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 24),
-            StatusItem(label: 'Complaint ID', value: complaintId),
-            const StatusItem(label: 'Status', value: 'Submitted', valueColor: Colors.blue),
-            const StatusItem(label: 'Date', value: 'March 9, 2026'),
-            const StatusItem(label: 'Category', value: 'Infrastructure'),
-            const SizedBox(height: 32),
-            const Text(
-              'Timeline',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
-            const TimelineItem(
-              title: 'Complaint Submitted',
-              subtitle: 'Your complaint has been received and is being processed.',
-              isLast: true,
-            ),
-          ],
+    return BlocProvider(
+      create: (context) => sl<ComplaintDetailCubit>()..fetchComplaintDetail(complaintId),
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF9FAFB),
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
+            onPressed: () => Navigator.pop(context),
+          ),
+          title: const Text(
+            'Complaint Details',
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          ),
+          centerTitle: true,
+        ),
+        body: BlocBuilder<ComplaintDetailCubit, ComplaintDetailState>(
+          builder: (context, state) {
+            if (state is ComplaintDetailLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is ComplaintDetailError) {
+              return Center(child: Text(state.message));
+            } else if (state is ComplaintDetailLoaded) {
+              final complaint = state.complaint;
+              return SingleChildScrollView(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Header Section
+                    _buildSectionContainer(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  complaint.title,
+                                  style: const TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              _buildUrgencyTag('Urgent'), // Mocked as per design
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            complaint.organizationId,
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Status Stepper
+                    StatusStepper(status: complaint.status),
+                    const SizedBox(height: 20),
+
+                    // Issue Description
+                    _buildSectionContainer(
+                      title: 'Issue Description',
+                      child: Text(
+                        complaint.description,
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: Colors.grey.shade700,
+                          height: 1.5,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Photos Section
+                    const Text(
+                      'Photos',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      height: 150,
+                      child: ListView(
+                        scrollDirection: Axis.horizontal,
+                        children: [
+                          _buildPhotoPlaceholder('assets/images/Property 1=road.png'),
+                          _buildPhotoPlaceholder('assets/images/Property 1=road.png'),
+                          _buildPhotoPlaceholder('assets/images/Property 1=road.png'),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Map Location
+                    const Text(
+                      'Map Location',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    _buildSectionContainer(
+                      padding: EdgeInsets.zero,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: Stack(
+                          children: [
+                            AspectRatio(
+                              aspectRatio: 16 / 9,
+                              child: Container(
+                                color: Colors.grey.shade200,
+                                child: const Icon(Icons.map_outlined, size: 50, color: Colors.grey),
+                              ),
+                            ),
+                            // Map Pin Overlay mockup
+                            const Positioned.fill(
+                              child: Center(
+                                child: Icon(Icons.location_on, color: Colors.red, size: 40),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+            return const SizedBox.shrink();
+          },
         ),
       ),
     );
   }
-}
 
-class StatusItem extends StatelessWidget {
-  final String label;
-  final String value;
-  final Color? valueColor;
-
-  const StatusItem({
-    super.key,
-    required this.label,
-    required this.value,
-    this.valueColor,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  Widget _buildSectionContainer({Widget? child, String? title, EdgeInsetsGeometry? padding}) {
+    return Container(
+      width: double.infinity,
+      padding: padding ?? const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: const TextStyle(color: Colors.grey, fontSize: 16)),
-          Text(value, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: valueColor)),
+          if (title != null) ...[
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
+          if (child != null) child,
         ],
       ),
     );
   }
-}
 
-class TimelineItem extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final bool isLast;
-
-  const TimelineItem({
-    super.key,
-    required this.title,
-    required this.subtitle,
-    required this.isLast,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Column(
-          children: [
-            const Icon(Icons.check_circle, color: Colors.green, size: 20),
-            if (!isLast)
-              Container(
-                width: 2,
-                height: 40,
-                color: Colors.green,
-              ),
-          ],
+  Widget _buildUrgencyTag(String label) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFEBEE),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        label,
+        style: const TextStyle(
+          color: Color(0xFFC62828),
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
         ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-              Text(subtitle, style: const TextStyle(color: Colors.grey, fontSize: 12)),
-            ],
-          ),
+      ),
+    );
+  }
+
+  Widget _buildPhotoPlaceholder(String assetPath) {
+    return Container(
+      width: 150,
+      margin: const EdgeInsets.only(right: 12),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        image: DecorationImage(
+          image: AssetImage(assetPath),
+          fit: BoxFit.cover,
         ),
-      ],
+      ),
     );
   }
 }
+

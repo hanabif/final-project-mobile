@@ -5,6 +5,7 @@ import '../../features/complaint/presentation/screens/home_screen.dart';
 import '../../features/complaint/presentation/screens/complaint_form_screen.dart';
 import '../../features/complaint/presentation/screens/complaint_success_screen.dart';
 import '../../features/complaint/presentation/screens/complaint_status_screen.dart';
+import '../../features/complaint/presentation/screens/complaint_list_screen.dart';
 import 'route_names.dart';
 
 class AppRouter {
@@ -41,6 +42,11 @@ class AppRouter {
         final complaintId = settings.arguments as String;
         return MaterialPageRoute(
           builder: (_) => ComplaintStatusScreen(complaintId: complaintId),
+        );
+
+      case RouteNames.complaintList:
+        return MaterialPageRoute(
+          builder: (_) => const ComplaintListScreen(),
         );
 
       case RouteNames.profile:
