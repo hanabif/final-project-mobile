@@ -6,6 +6,7 @@ import '../../features/complaint/presentation/screens/complaint_form_screen.dart
 import '../../features/complaint/presentation/screens/complaint_success_screen.dart';
 import '../../features/complaint/presentation/screens/complaint_status_screen.dart';
 import '../../features/complaint/presentation/screens/complaint_list_screen.dart';
+import '../../features/settings/presentation/screens/profile_screen.dart';
 import 'route_names.dart';
 
 class AppRouter {
@@ -51,8 +52,7 @@ class AppRouter {
 
       case RouteNames.profile:
         return MaterialPageRoute(
-          builder: (_) =>
-              const Scaffold(body: Center(child: Text('Profile Screen'))),
+          builder: (_) => const ProfileScreen(),
         );
 
       default:

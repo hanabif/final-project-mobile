@@ -28,10 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
       Navigator.pushNamed(context, RouteNames.complaintForm);
     } else if (index == 2) {
       // Navigate to Profile
-      // Placeholder for now
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Profile Screen - Coming Soon')),
-      );
+      Navigator.pushNamed(context, RouteNames.profile);
     } else {
       // Home
       setState(() {

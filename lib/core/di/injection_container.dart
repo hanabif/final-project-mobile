@@ -32,6 +32,12 @@ import '../../../features/complaint/presentation/cubits/complaint_cubit.dart';
 import '../../../features/complaint/presentation/cubits/complaint_list_cubit.dart';
 import '../../../features/complaint/presentation/cubits/complaint_detail_cubit.dart';
 import '../../../features/complaint/presentation/cubits/home/home_cubit.dart';
+import '../../../features/settings/data/datasources/settings_remote_datasource.dart';
+import '../../../features/settings/data/repositories/settings_repository_impl.dart';
+import '../../../features/settings/domain/repositories/settings_repository.dart';
+import '../../../features/settings/domain/usecases/get_settings_usecase.dart';
+import '../../../features/settings/domain/usecases/update_settings_usecase.dart';
+import '../../../features/settings/presentation/cubits/settings_cubit.dart';
 
 final sl = GetIt.instance;
 
@@ -103,4 +109,16 @@ Future<void> init() async {
   sl.registerFactory(
     () => ComplaintDetailCubit(getComplaintDetailUseCase: sl()),
   );
+
+  // Settings
+  sl.registerFactory(() => SettingsCubit(
+        getSettingsUseCase: sl(),
+        updateSettingsUseCase: sl(),
+      ));
+  sl.registerLazySingleton(() => GetSettingsUseCase(sl()));
+  sl.registerLazySingleton(() => UpdateSettingsUseCase(sl()));
+  sl.registerLazySingleton<SettingsRepository>(
+      () => SettingsRepositoryImpl(remoteDataSource: sl()));
+  sl.registerLazySingleton<SettingsRemoteDataSource>(
+      () => SettingsRemoteDataSourceImpl());
 }
