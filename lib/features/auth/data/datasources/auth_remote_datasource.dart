@@ -1,5 +1,6 @@
 import '../../../../core/network/api_client.dart';
 import '../models/auth_response_model.dart';
+import '../models/user_model.dart';
 
 abstract class AuthRemoteDataSource {
   /// returns both user info and auth token returned by the backend
@@ -22,12 +23,28 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<AuthResponseModel> login(String email, String password) async {
+    // Artificial delay to simulate network request
+    await Future.delayed(const Duration(seconds: 1));
+
+    // Return mock successful response for testing
+    return AuthResponseModel(
+      user: UserModel(
+        id: 123,
+        name: 'Test User',
+        email: 'test@cityvoice.com',
+      ),
+      token: 'mock_jwt_token_for_testing_purposes',
+    );
+    
+    /* 
+    // Original implementation for reference
     final response = await apiClient.dio.post(
       '/auth/login',
       data: {"email": email, "password": password},
     );
 
     return AuthResponseModel.fromJson(response.data);
+    */
   }
 
   @override
