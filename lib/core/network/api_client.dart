@@ -1,9 +1,10 @@
-import 'dart:io';
 import 'package:dio/dio.dart';
-import 'package:dio/io.dart';
 import '../utils/app_config.dart';
 import '../../features/auth/domain/repositories/session_repository.dart';
 import '../error/exceptions.dart';
+// Conditional import for HttpClientAdapter
+import 'api_client_adapter_stub.dart'
+    if (dart.library.io) 'api_client_adapter_io.dart';
 
 class ApiClient {
   final Dio dio;
@@ -46,13 +47,8 @@ class ApiClient {
       ),
     );
 
-    // Bypass SSL certificate validation for debugging common Android/OnRender issues
-    if (dio.httpClientAdapter is IOHttpClientAdapter) {
-      (dio.httpClientAdapter as IOHttpClientAdapter).onHttpClientCreate = (client) {
-        client.badCertificateCallback = (X509Certificate cert, String host, int port) => true;
-        return client;
-      };
-    }
+    // Platform-specific adapter configuration
+    configureAdapter(dio);
 
     // Optional: Add logging interceptor in debug mode
     dio.interceptors.add(LogInterceptor(

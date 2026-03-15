@@ -28,10 +28,11 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
     // Return mock successful response for testing
     return AuthResponseModel(
-      user: UserModel(
+      user: const UserModel(
         id: 123,
         name: 'Test User',
         email: 'test@cityvoice.com',
+        role: 'Citizen',
       ),
       token: 'mock_jwt_token_for_testing_purposes',
     );
@@ -54,6 +55,20 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     String password,
     String role,
   ) async {
+    // Artificial delay to simulate network request
+    await Future.delayed(const Duration(seconds: 1));
+
+    return AuthResponseModel(
+      user: UserModel(
+        id: 124,
+        name: name,
+        email: email,
+        role: role,
+      ),
+      token: 'mock_jwt_token_for_testing_purposes',
+    );
+
+    /*
     final response = await apiClient.dio.post(
       '/auth/register',
       data: {
@@ -65,26 +80,24 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     );
 
     return AuthResponseModel.fromJson(response.data);
+    */
   }
 
   @override
   Future<void> forgotPassword(String email) async {
-    await apiClient.dio.post('/forgot-password', data: {"email": email});
+    await Future.delayed(const Duration(seconds: 1));
+    // Mock success
   }
 
   @override
   Future<void> verifyCode(String email, String code) async {
-    await apiClient.dio.post(
-      '/verify-code',
-      data: {"email": email, "code": code},
-    );
+    await Future.delayed(const Duration(seconds: 1));
+    // Mock success
   }
 
   @override
   Future<void> resetPassword(String email, String newPassword) async {
-    await apiClient.dio.post(
-      '/reset-password',
-      data: {"email": email, "password": newPassword},
-    );
+    await Future.delayed(const Duration(seconds: 1));
+    // Mock success
   }
 }

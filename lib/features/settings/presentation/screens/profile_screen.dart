@@ -110,17 +110,17 @@ class ProfileScreen extends StatelessWidget {
                         children: [
                           const Row(
                             children: [
-                              Expanded(child: _StatWidget(title: 'Total', value: '15')),
-                              VerticalDivider(height: 40),
-                              Expanded(child: _StatWidget(title: 'Resolved', value: '8')),
+                              const Expanded(child: _StatWidget(title: 'Total', value: '15')),
+                              const SizedBox(height: 40, child: VerticalDivider()),
+                              const Expanded(child: _StatWidget(title: 'Resolved', value: '8')),
                             ],
                           ),
                           const Divider(height: 32),
                           const Row(
                             children: [
-                              Expanded(child: _StatWidget(title: 'In Progress', value: '5')),
-                              VerticalDivider(height: 40),
-                              Expanded(child: _StatWidget(title: 'Pending', value: '2')),
+                              const Expanded(child: _StatWidget(title: 'In Progress', value: '5')),
+                              const SizedBox(height: 40, child: VerticalDivider()),
+                              const Expanded(child: _StatWidget(title: 'Pending', value: '2')),
                             ],
                           ),
                           const SizedBox(height: 24),

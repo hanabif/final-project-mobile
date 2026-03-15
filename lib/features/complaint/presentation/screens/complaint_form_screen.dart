@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -6,6 +6,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../core/routes/route_names.dart';
+import '../../../../core/widgets/platform_image.dart';
 import '../../domain/entities/complaint.dart';
 import '../cubits/complaint_cubit.dart';
 import '../cubits/complaint_state.dart';
@@ -36,7 +37,7 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
     'City Council'
   ];
 
-  File? _selectedImage;
+  XFile? _selectedImage;
   Position? _currentPosition;
   bool _isGettingLocation = false;
 
@@ -110,7 +111,7 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error getting location: \${e.toString()}')),
+          SnackBar(content: Text('Error getting location: ${e.toString()}')),
         );
       }
       setState(() => _isGettingLocation = false);
@@ -123,13 +124,13 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
       final pickedFile = await picker.pickImage(source: source);
       if (pickedFile != null) {
         setState(() {
-          _selectedImage = File(pickedFile.path);
+          _selectedImage = pickedFile;
         });
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error picking image: \${e.toString()}')),
+          SnackBar(content: Text('Error picking image: ${e.toString()}')),
         );
       }
     }
@@ -288,8 +289,8 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
                         const SizedBox(height: 8),
                         ClipRRect(
                           borderRadius: BorderRadius.circular(8),
-                          child: Image.file(
-                            _selectedImage!,
+                          child: PlatformImage(
+                            path: _selectedImage!.path,
                             height: 200,
                             width: double.infinity,
                             fit: BoxFit.cover,
