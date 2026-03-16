@@ -4,6 +4,7 @@ import 'core/theme/app_theme.dart';
 import 'core/di/injection_container.dart';
 import 'core/routes/app_router.dart';
 import 'core/routes/route_names.dart';
+import 'core/utils/scaffold_messenger_key.dart';
 import 'features/complaint/presentation/cubits/complaint_cubit.dart';
 import 'features/complaint/presentation/cubits/home/home_cubit.dart';
 
@@ -21,6 +22,7 @@ class ComplaintResolutionApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'CityVoice',
         theme: AppTheme.lightTheme,
+        scaffoldMessengerKey: scaffoldMessengerKey,
         initialRoute: RouteNames.login,
         onGenerateRoute: AppRouter.generateRoute,
       ),
