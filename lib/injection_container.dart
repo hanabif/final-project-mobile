@@ -18,6 +18,9 @@ import 'features/auth/domain/usecases/logout_usecase.dart';
 import 'features/auth/domain/usecases/is_session_valid_usecase.dart';
 import 'features/auth/presentation/cubit/auth/auth_cubit.dart';
 import 'features/notification/presentation/services/firebase_notification_service.dart';
+import 'features/notification/data/datasources/notification_remote_datasource.dart';
+import 'features/notification/data/repositories/notification_repository_impl.dart';
+import 'features/notification/domain/repositories/notification_repository.dart';
 
 
 final sl = GetIt.instance;
@@ -32,7 +35,13 @@ Future<void> init() async {
 
   // Notifications
   sl.registerLazySingleton<FirebaseNotificationService>(
-    () => FirebaseNotificationService(),
+    () => FirebaseNotificationService(sl()),
+  );
+  sl.registerLazySingleton<NotificationRemoteDataSource>(
+    () => NotificationRemoteDataSourceImpl(sl()),
+  );
+  sl.registerLazySingleton<NotificationRepository>(
+    () => NotificationRepositoryImpl(sl()),
   );
 
 

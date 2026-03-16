@@ -1,8 +1,12 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
+import '../../domain/repositories/notification_repository.dart';
 
 class FirebaseNotificationService {
   final FirebaseMessaging _fcm = FirebaseMessaging.instance;
+  final NotificationRepository _repository;
+
+  FirebaseNotificationService(this._repository);
 
   Future<void> initialize() async {
     // Request permission
@@ -51,9 +55,15 @@ class FirebaseNotificationService {
     try {
       String? token = await _fcm.getToken();
       debugPrint("FCM Token: $token");
+      
+      if (token != null) {
+        await _repository.registerDeviceToken(token);
+        debugPrint("FCM Token registered with backend successfully");
+      }
+      
       return token;
     } catch (e) {
-      debugPrint("Error getting FCM token: $e");
+      debugPrint("Error getting or registering FCM token: $e");
       return null;
     }
   }
