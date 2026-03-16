@@ -17,6 +17,8 @@ import 'features/auth/domain/usecases/get_token_usecase.dart';
 import 'features/auth/domain/usecases/logout_usecase.dart';
 import 'features/auth/domain/usecases/is_session_valid_usecase.dart';
 import 'features/auth/presentation/cubit/auth/auth_cubit.dart';
+import 'features/notification/presentation/services/firebase_notification_service.dart';
+
 
 final sl = GetIt.instance;
 
@@ -27,6 +29,12 @@ Future<void> init() async {
     () => SessionRepositoryImpl(sl()),
   );
   sl.registerLazySingleton<ApiClient>(() => ApiClient(sl()));
+
+  // Notifications
+  sl.registerLazySingleton<FirebaseNotificationService>(
+    () => FirebaseNotificationService(),
+  );
+
 
   // Auth - Data sources
   sl.registerLazySingleton<AuthRemoteDataSource>(
