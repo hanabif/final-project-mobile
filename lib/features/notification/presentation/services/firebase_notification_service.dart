@@ -1,10 +1,11 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import '../../domain/repositories/notification_repository.dart';
 import '../../../../core/utils/scaffold_messenger_key.dart';
+import '../../../../core/utils/navigator_key.dart';
+import '../../../../core/routes/route_names.dart';
 
 class FirebaseNotificationService {
   final FirebaseMessaging _fcm = FirebaseMessaging.instance;
@@ -40,10 +41,7 @@ class FirebaseNotificationService {
       if (message.notification != null) {
         debugPrint('Message also contained a notification: ${message.notification}');
         
-        _showNotificationSnackbar(
-          message.notification?.title ?? "New Notification",
-          message.notification?.body ?? "",
-        );
+        _showNotificationSnackbar(message);
       }
     });
 
@@ -79,11 +77,23 @@ class FirebaseNotificationService {
 
   void _handleMessage(RemoteMessage message) {
     debugPrint("Handling notification message: ${message.messageId}");
-    // Add navigation or specific logic here
+    
+    final String? complaintId = message.data['complaintId'];
+    
+    if (complaintId != null && navigatorKey.currentState != null) {
+      debugPrint("Navigating to complaint status with ID: $complaintId");
+      navigatorKey.currentState!.pushNamed(
+        RouteNames.complaintStatus,
+        arguments: complaintId,
+      );
+    }
   }
 
-  void _showNotificationSnackbar(String title, String body) {
+  void _showNotificationSnackbar(RemoteMessage message) {
     if (scaffoldMessengerKey.currentState == null) return;
+
+    final String title = message.notification?.title ?? "New Notification";
+    final String body = message.notification?.body ?? "";
 
     scaffoldMessengerKey.currentState!.showSnackBar(
       SnackBar(
@@ -125,9 +135,7 @@ class FirebaseNotificationService {
         action: SnackBarAction(
           label: 'View',
           textColor: const Color(0xFF6C63FF),
-          onPressed: () {
-            // Add navigation logic if needed
-          },
+          onPressed: () => _handleMessage(message),
         ),
       ),
     );
