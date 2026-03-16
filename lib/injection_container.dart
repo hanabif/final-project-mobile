@@ -68,8 +68,13 @@ Future<void> init() async {
 
   // Auth - Presentation
   sl.registerFactory(
-    () => AuthCubit(loginUseCase: sl(), registerUseCase: sl()),
+    () => AuthCubit(
+      loginUseCase: sl(),
+      registerUseCase: sl(),
+      notificationService: sl(),
+    ),
   );
+
   sl.registerFactory(
     () => PasswordResetCubit(
       forgotPasswordUseCase: sl(),
