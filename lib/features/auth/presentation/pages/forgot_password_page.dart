@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../injection_container.dart';
+import '../../../../core/di/injection_container.dart';
 import '../../../../core/routes/route_names.dart';
 import '../cubit/password_reset/password_reset_cubit.dart';
 import '../cubit/password_reset/password_reset_state.dart';

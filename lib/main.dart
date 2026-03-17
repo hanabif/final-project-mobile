@@ -8,6 +8,7 @@ import 'features/notification/presentation/services/firebase_notification_servic
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   debugPrint('--- APP STARTING ---');
   try {
     debugPrint('Initializing Dependency Injection...');

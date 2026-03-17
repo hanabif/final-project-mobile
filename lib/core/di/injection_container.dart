@@ -32,12 +32,17 @@ import '../../../features/complaint/presentation/cubits/complaint_cubit.dart';
 import '../../../features/complaint/presentation/cubits/complaint_list_cubit.dart';
 import '../../../features/complaint/presentation/cubits/complaint_detail_cubit.dart';
 import '../../../features/complaint/presentation/cubits/home/home_cubit.dart';
+import '../../../features/settings/presentation/cubits/settings_cubit.dart';
+import '../../../features/notification/data/datasources/notification_remote_datasource.dart';
+import '../../../features/notification/data/repositories/notification_repository_impl.dart';
+import '../../../features/notification/domain/repositories/notification_repository.dart';
+import '../../../features/notification/presentation/services/firebase_notification_service.dart';
 import '../../../features/settings/data/datasources/settings_remote_datasource.dart';
 import '../../../features/settings/data/repositories/settings_repository_impl.dart';
 import '../../../features/settings/domain/repositories/settings_repository.dart';
 import '../../../features/settings/domain/usecases/get_settings_usecase.dart';
 import '../../../features/settings/domain/usecases/update_settings_usecase.dart';
-import '../../../features/settings/presentation/cubits/settings_cubit.dart';
+
 
 final sl = GetIt.instance;
 
@@ -63,6 +68,12 @@ Future<void> init() async {
     () => ComplaintRemoteDataSourceImpl(apiClient: sl()),
   );
 
+  // Notification - Data sources
+  sl.registerLazySingleton<NotificationRemoteDataSource>(
+    () => NotificationRemoteDataSourceImpl(sl()),
+  );
+
+
   // Auth - Repository
   sl.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(sl(), sl()),
@@ -72,6 +83,12 @@ Future<void> init() async {
   sl.registerLazySingleton<ComplaintRepository>(
     () => ComplaintRepositoryImpl(remoteDataSource: sl()),
   );
+
+  // Notification - Repository
+  sl.registerLazySingleton<NotificationRepository>(
+    () => NotificationRepositoryImpl(sl()),
+  );
+
 
   // Auth - Use cases
   sl.registerLazySingleton(() => LoginUseCase(sl()));
@@ -84,6 +101,12 @@ Future<void> init() async {
   sl.registerLazySingleton(() => LogoutUseCase(sl()));
   sl.registerLazySingleton(() => IsSessionValidUseCase(sl()));
 
+  // Notifications
+  sl.registerLazySingleton<FirebaseNotificationService>(
+    () => FirebaseNotificationService(sl()),
+  );
+
+
   // Complaint - Use cases
   sl.registerLazySingleton(() => SubmitComplaintUseCase(sl()));
   sl.registerLazySingleton(() => GetComplaintStatusUseCase(sl()));
@@ -92,8 +115,13 @@ Future<void> init() async {
 
   // Auth - Presentation
   sl.registerFactory(
-    () => AuthCubit(loginUseCase: sl(), registerUseCase: sl()),
+    () => AuthCubit(
+      loginUseCase: sl(),
+      registerUseCase: sl(),
+      notificationService: sl(),
+    ),
   );
+
   sl.registerFactory(
     () => PasswordResetCubit(
       forgotPasswordUseCase: sl(),

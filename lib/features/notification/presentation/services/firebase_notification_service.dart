@@ -14,6 +14,7 @@ class FirebaseNotificationService {
   FirebaseNotificationService(this._repository);
 
   Future<void> initialize() async {
+    debugPrint('🔔 [FirebaseNotificationService] Initializing notifications...');
     // Request permission
     NotificationSettings settings = await _fcm.requestPermission(
       alert: true,
@@ -61,7 +62,10 @@ class FirebaseNotificationService {
   Future<String?> getDeviceToken() async {
     try {
       String? token = await _fcm.getToken();
-      debugPrint("FCM Token: $token");
+      debugPrint("------------------------------------------------------------------");
+      debugPrint("🚀 [FirebaseNotificationService] FCM DEVICE TOKEN:");
+      debugPrint("$token");
+      debugPrint("------------------------------------------------------------------");
       
       if (token != null) {
         await _repository.registerDeviceToken(token);
