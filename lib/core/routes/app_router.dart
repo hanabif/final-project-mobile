@@ -7,6 +7,9 @@ import '../../features/complaint/presentation/screens/complaint_success_screen.d
 import '../../features/complaint/presentation/screens/complaint_status_screen.dart';
 import '../../features/complaint/presentation/screens/complaint_list_screen.dart';
 import '../../features/settings/presentation/screens/profile_screen.dart';
+import '../../features/auth/presentation/pages/forgot_password_page.dart';
+import '../../features/auth/presentation/pages/verify_code_page.dart';
+import '../../features/auth/presentation/pages/reset_password_page.dart';
 import 'route_names.dart';
 
 class AppRouter {
@@ -53,6 +56,21 @@ class AppRouter {
       case RouteNames.profile:
         return MaterialPageRoute(
           builder: (_) => const ProfileScreen(),
+        );
+      
+      case RouteNames.forgotPassword:
+        return MaterialPageRoute(
+          builder: (_) => const ForgotPasswordPage(),
+        );
+
+      case RouteNames.verifyCode:
+        return MaterialPageRoute(
+          builder: (_) => const VerifyCodePage(),
+        );
+
+      case RouteNames.resetPassword:
+        return MaterialPageRoute(
+          builder: (_) => const ResetPasswordPage(),
         );
 
       default:
