@@ -95,22 +95,6 @@ class ProfileScreen extends StatelessWidget {
                         _buildSectionContainer(
                           child: Column(
                             children: [
-                              Row(
-                                children: [
-                                  Expanded(child: _StatWidget(title: 'Total', value: stats.total.toString())),
-                                  const SizedBox(height: 40, child: VerticalDivider()),
-                                  Expanded(child: _StatWidget(title: 'Resolved', value: stats.resolved.toString())),
-                                ],
-                              ),
-                              const Divider(height: 32),
-                              Row(
-                                children: [
-                                  Expanded(child: _StatWidget(title: 'In Progress', value: stats.pending.toString())),
-                                  const SizedBox(height: 40, child: VerticalDivider()),
-                                  Expanded(child: _StatWidget(title: 'Pending', value: stats.pending.toString())),
-                                ],
-                              ),
-                              const SizedBox(height: 24),
                               SizedBox(
                                 width: double.infinity,
                                 child: ElevatedButton(

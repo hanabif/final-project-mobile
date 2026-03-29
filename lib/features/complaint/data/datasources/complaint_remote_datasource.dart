@@ -65,7 +65,7 @@ class ComplaintRemoteDataSourceImpl implements ComplaintRemoteDataSource {
   @override
   Future<List<ComplaintModel>> getUserComplaints() async {
     try {
-      final response = await apiClient.dio.get('/complaints');
+      final response = await apiClient.dio.get('/complaints/my-complaints');
 
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data as List<dynamic>;

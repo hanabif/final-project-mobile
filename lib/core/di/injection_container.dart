@@ -136,7 +136,7 @@ Future<void> init() async {
   );
 
   // Complaint - Presentation
-  sl.registerFactory(() => HomeCubit());
+  sl.registerFactory(() => HomeCubit(getCitizenAnalyticsUseCase: sl()));
   sl.registerFactory(() => ComplaintCubit(submitComplaintUseCase: sl()));
   sl.registerFactory(() => ComplaintListCubit(getUserComplaintsUseCase: sl()));
   sl.registerFactory(

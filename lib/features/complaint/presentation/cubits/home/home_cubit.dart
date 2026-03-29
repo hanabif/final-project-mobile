@@ -1,20 +1,17 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../domain/usecases/get_citizen_analytics_usecase.dart';
 import 'home_state.dart';
 
 class HomeCubit extends Cubit<HomeState> {
-  HomeCubit() : super(HomeInitial());
+  final GetCitizenAnalyticsUseCase getCitizenAnalyticsUseCase;
+
+  HomeCubit({required this.getCitizenAnalyticsUseCase}) : super(HomeInitial());
 
   Future<void> loadHomeData() async {
     emit(HomeLoading());
 
     try {
-      // Simulate API call delay
-      await Future.delayed(const Duration(seconds: 1));
-
-      // Dummy statistics
-      final totalComplaints = 10;
-      final resolvedComplaints = 3;
-      final pendingComplaints = 7;
+      final stats = await getCitizenAnalyticsUseCase.call();
 
       // Dummy organizations list mimicking an API response
       // NOTE: Replace these with real ObjectIds from your backend database
@@ -37,9 +34,9 @@ class HomeCubit extends Cubit<HomeState> {
       ];
 
       emit(HomeLoaded(
-        totalComplaints: totalComplaints,
-        resolvedComplaints: resolvedComplaints,
-        pendingComplaints: pendingComplaints,
+        totalComplaints: stats.total,
+        resolvedComplaints: stats.resolved,
+        pendingComplaints: stats.pending,
         organizations: organizations,
       ));
     } catch (e) {

@@ -23,17 +23,14 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _onItemTapped(int index) {
-    if (index == 1) {
+    if (index == 0) {
+      // Home - Already here
+    } else if (index == 1) {
       // Navigate to Report (Complaint Form)
       Navigator.pushNamed(context, RouteNames.complaintForm);
     } else if (index == 2) {
       // Navigate to Profile
       Navigator.pushNamed(context, RouteNames.profile);
-    } else {
-      // Home
-      setState(() {
-        _selectedIndex = index;
-      });
     }
   }
 

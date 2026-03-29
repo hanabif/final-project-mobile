@@ -13,10 +13,10 @@ class CitizenAnalyticsModel {
 
   factory CitizenAnalyticsModel.fromJson(Map<String, dynamic> json) {
     return CitizenAnalyticsModel(
-      total: (json['total'] ?? 0) as int,
-      resolved: (json['resolved'] ?? 0) as int,
-      pending: (json['pending'] ?? 0) as int,
-      resolvedPercentage: (json['resolvedPercentage'] ?? 0.0).toDouble(),
+      total: (json['total'] as num?)?.toInt() ?? 0,
+      resolved: (json['resolved'] as num?)?.toInt() ?? 0,
+      pending: (json['pending'] as num?)?.toInt() ?? 0,
+      resolvedPercentage: (json['resolvedPercentage'] as num?)?.toDouble() ?? 0.0,
     );
   }
 
