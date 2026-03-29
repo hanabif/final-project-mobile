@@ -6,6 +6,7 @@ class ComplaintModel extends Complaint {
     required super.title,
     required super.description,
     super.imageUrl,
+    super.images = const [],
     required super.latitude,
     required super.longitude,
     required super.organizationId,
@@ -14,6 +15,7 @@ class ComplaintModel extends Complaint {
     super.priority,
     super.department,
     required super.createdAt,
+    super.history = const [],
   });
 
   factory ComplaintModel.fromJson(Map<String, dynamic> json) {
@@ -43,6 +45,7 @@ class ComplaintModel extends Complaint {
       title: json['title'] as String,
       description: json['description'] as String,
       imageUrl: json['imageUrl'] as String?,
+      images: (json['images'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
       latitude: lat,
       longitude: lng,
       organizationId: json['organizationId'] as String? ?? '',
@@ -53,6 +56,17 @@ class ComplaintModel extends Complaint {
       createdAt: json['createdAt'] != null 
           ? DateTime.parse(json['createdAt'] as String) 
           : DateTime.now(),
+      history: (json['history'] as List<dynamic>?)?.map((e) {
+        final map = e as Map<String, dynamic>;
+        return StatusUpdate(
+          action: map['action'] ?? 'Updated',
+          comment: map['comment'],
+          by: map['by'],
+          timestamp: map['timestamp'] != null 
+              ? DateTime.parse(map['timestamp'] as String) 
+              : DateTime.now(),
+        );
+      }).toList() ?? [],
     );
   }
 

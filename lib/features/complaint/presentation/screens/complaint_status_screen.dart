@@ -62,12 +62,12 @@ class ComplaintStatusScreen extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              _buildUrgencyTag('Urgent'), // Mocked as per design
+                              _buildUrgencyTag(complaint.priority),
                             ],
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            complaint.organizationId,
+                            complaint.category,
                             style: TextStyle(
                               fontSize: 16,
                               color: Colors.grey.shade600,
@@ -96,31 +96,31 @@ class ComplaintStatusScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 20),
 
-                    // Photos Section
-                    const Text(
-                      'Photos',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                    if (complaint.images.isNotEmpty) ...[
+                      const Text(
+                        'Photos',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 12),
-                    SizedBox(
-                      height: 150,
-                      child: ListView(
-                        scrollDirection: Axis.horizontal,
-                        children: [
-                          _buildPhotoPlaceholder('assets/images/Property 1=road.png'),
-                          _buildPhotoPlaceholder('assets/images/Property 1=road.png'),
-                          _buildPhotoPlaceholder('assets/images/Property 1=road.png'),
-                        ],
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        height: 150,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: complaint.images.length,
+                          itemBuilder: (context, index) {
+                            return _buildPhotoPlaceholder(complaint.images[index], context);
+                          },
+                        ),
                       ),
-                    ),
+                    ],
                     const SizedBox(height: 24),
 
                     // Map Location
                     const Text(
-                      'Map Location',
+                      'Location Details',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -128,26 +128,35 @@ class ComplaintStatusScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 12),
                     _buildSectionContainer(
-                      padding: EdgeInsets.zero,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(16),
-                        child: Stack(
-                          children: [
-                            AspectRatio(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(Icons.location_on, color: Color(0xFFC62828)),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'Lat: ${complaint.latitude.toStringAsFixed(6)}, Lng: ${complaint.longitude.toStringAsFixed(6)}',
+                                  style: TextStyle(color: Colors.grey.shade700),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(16),
+                            child: AspectRatio(
                               aspectRatio: 16 / 9,
                               child: Container(
-                                color: Colors.grey.shade200,
-                                child: const Icon(Icons.map_outlined, size: 50, color: Colors.grey),
+                                color: Colors.grey.shade100,
+                                child: const Center(
+                                  child: Icon(Icons.map_outlined, size: 50, color: Colors.grey),
+                                ),
                               ),
                             ),
-                            // Map Pin Overlay mockup
-                            const Positioned.fill(
-                              child: Center(
-                                child: Icon(Icons.location_on, color: Colors.red, size: 40),
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -213,16 +222,36 @@ class ComplaintStatusScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPhotoPlaceholder(String assetPath) {
+  Widget _buildPhotoPlaceholder(String imageUrl, BuildContext context) {
     return Container(
       width: 150,
       margin: const EdgeInsets.only(right: 12),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
+        color: Colors.grey.shade200,
         image: DecorationImage(
-          image: AssetImage(assetPath),
+          image: NetworkImage(imageUrl),
           fit: BoxFit.cover,
+          onError: (exception, stackTrace) {
+            // Log error or handle gracefully
+          },
         ),
+      ),
+      child: Stack(
+        children: [
+          // Fallback if image fails to load
+          Positioned.fill(
+            child: FutureBuilder(
+              future: precacheImage(NetworkImage(imageUrl), context),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator(strokeWidth: 2));
+                }
+                return const SizedBox.shrink();
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

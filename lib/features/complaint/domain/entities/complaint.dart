@@ -5,6 +5,7 @@ class Complaint extends Equatable {
   final String title;
   final String description;
   final String? imageUrl;
+  final List<String> images;
   final double latitude;
   final double longitude;
   final String organizationId;
@@ -13,12 +14,14 @@ class Complaint extends Equatable {
   final String priority;
   final String department;
   final DateTime createdAt;
+  final List<StatusUpdate> history;
 
   const Complaint({
     required this.id,
     required this.title,
     required this.description,
     this.imageUrl,
+    this.images = const [],
     required this.latitude,
     required this.longitude,
     required this.organizationId,
@@ -27,6 +30,7 @@ class Complaint extends Equatable {
     this.priority = 'Low',
     this.department = 'Auto',
     required this.createdAt,
+    this.history = const [],
   });
 
   @override
@@ -35,6 +39,7 @@ class Complaint extends Equatable {
         title,
         description,
         imageUrl,
+        images,
         latitude,
         longitude,
         organizationId,
@@ -43,5 +48,23 @@ class Complaint extends Equatable {
         priority,
         department,
         createdAt,
+        history,
       ];
+}
+
+class StatusUpdate extends Equatable {
+  final String action;
+  final String? comment;
+  final String? by;
+  final DateTime timestamp;
+
+  const StatusUpdate({
+    required this.action,
+    this.comment,
+    this.by,
+    required this.timestamp,
+  });
+
+  @override
+  List<Object?> get props => [action, comment, by, timestamp];
 }
