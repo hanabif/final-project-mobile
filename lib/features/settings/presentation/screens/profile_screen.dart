@@ -4,6 +4,7 @@ import '../../../../core/routes/route_names.dart';
 import '../../../../core/di/injection_container.dart';
 import '../cubits/settings_cubit.dart';
 import '../cubits/settings_state.dart';
+import '../../../complaint/presentation/cubits/profile/profile_cubit.dart';
 import '../widgets/settings_item.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -11,8 +12,11 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => sl<SettingsCubit>()..loadSettings(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => sl<SettingsCubit>()..loadSettings()),
+        BlocProvider(create: (context) => sl<ProfileCubit>()..loadProfileData()),
+      ],
       child: Scaffold(
         backgroundColor: const Color(0xFFF9FAFB),
         appBar: AppBar(
@@ -28,236 +32,218 @@ class ProfileScreen extends StatelessWidget {
           centerTitle: true,
           elevation: 0,
         ),
-        body: BlocBuilder<SettingsCubit, SettingsState>(
-          builder: (context, state) {
-            if (state is SettingsLoading) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (state is SettingsError) {
-              return Center(child: Text(state.message));
-            } else if (state is SettingsLoaded) {
-              final settings = state.settings;
-              return SingleChildScrollView(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Profile Header
-                    _buildSectionContainer(
-                      child: Row(
-                        children: [
-                          Stack(
+        body: BlocBuilder<ProfileCubit, ProfileState>(
+          builder: (context, profileState) {
+            return BlocBuilder<SettingsCubit, SettingsState>(
+              builder: (context, settingsState) {
+                if (profileState is ProfileLoading || settingsState is SettingsLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (profileState is ProfileError) {
+                  return Center(child: Text(profileState.message));
+                } else if (settingsState is SettingsError) {
+                  return Center(child: Text(settingsState.message));
+                } else if (profileState is ProfileLoaded && settingsState is SettingsLoaded) {
+                  final settings = settingsState.settings;
+                  final user = profileState.user;
+                  final stats = profileState.stats;
+
+                  return SingleChildScrollView(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Profile Header
+                        _buildSectionContainer(
+                          child: Row(
                             children: [
                               CircleAvatar(
                                 radius: 40,
                                 backgroundColor: Colors.grey.shade200,
                                 child: const Icon(Icons.person, size: 50, color: Colors.grey),
                               ),
-                              Positioned(
-                                bottom: 0,
-                                right: 0,
-                                child: Container(
-                                  padding: const EdgeInsets.all(4),
-                                  decoration: const BoxDecoration(
-                                    color: Colors.white,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: const Icon(Icons.edit, size: 16, color: Colors.grey),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      user.name,
+                                      style: const TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      user.email,
+                                      style: TextStyle(color: Colors.grey.shade600),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'Abebe Bikila',
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  '+251 91 123 4567',
-                                  style: TextStyle(color: Colors.grey.shade600),
-                                ),
-                                Text(
-                                  'abebe.b@example.com',
-                                  style: TextStyle(color: Colors.grey.shade600),
-                                ),
-                              ],
-                            ),
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.edit_note, color: Colors.grey.shade400),
-                            onPressed: () {},
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-
-                    // My Complaints
-                    const Text(
-                      'My Complaints',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 12),
-                    _buildSectionContainer(
-                      child: Column(
-                        children: [
-                          const Row(
-                            children: [
-                              const Expanded(child: _StatWidget(title: 'Total', value: '15')),
-                              const SizedBox(height: 40, child: VerticalDivider()),
-                              const Expanded(child: _StatWidget(title: 'Resolved', value: '8')),
-                            ],
-                          ),
-                          const Divider(height: 32),
-                          const Row(
-                            children: [
-                              const Expanded(child: _StatWidget(title: 'In Progress', value: '5')),
-                              const SizedBox(height: 40, child: VerticalDivider()),
-                              const Expanded(child: _StatWidget(title: 'Pending', value: '2')),
-                            ],
-                          ),
-                          const SizedBox(height: 24),
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              onPressed: () => Navigator.pushNamed(context, RouteNames.complaintList),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF005C45),
-                                foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(vertical: 16),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                              child: const Text('View All Complaints'),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-
-                    // Account Settings
-                    const Text(
-                      'Account Settings',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 12),
-                    _buildSectionContainer(
-                      child: Column(
-                        children: [
-                          SettingsItem(
-                            icon: Icons.edit_outlined,
-                            title: 'Edit Profile',
-                            onTap: () {},
-                          ),
-                          SettingsItem(
-                            icon: Icons.phone_android_outlined,
-                            title: 'Change Phone Number',
-                            onTap: () {},
-                          ),
-                          SettingsItem(
-                            icon: Icons.lock_outline,
-                            title: 'Change Password',
-                            onTap: () {},
-                          ),
-                          SettingsItem(
-                            icon: Icons.email_outlined,
-                            title: 'Email Verification',
-                            value: 'Verified',
-                            trailing: const Icon(Icons.check_circle_outline, color: Colors.green, size: 20),
-                            onTap: () {},
-                          ),
-                          SettingsItem(
-                            icon: Icons.visibility_off_outlined,
-                            title: 'Anonymous Mode',
-                            trailing: Switch(
-                              value: settings.isAnonymousMode,
-                              onChanged: (val) => context.read<SettingsCubit>().toggleAnonymousMode(val),
-                              activeColor: const Color(0xFFFCD703),
-                            ),
-                            onTap: () {},
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 40),
-                            child: Text(
-                              'When enabled, your complaints will be submitted anonymously.',
-                              style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-
-                    // Preferences
-                    const Text(
-                      'Preferences',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 12),
-                    _buildSectionContainer(
-                      child: Column(
-                        children: [
-                          SettingsItem(
-                            icon: Icons.language,
-                            title: 'Language',
-                            value: settings.language,
-                            onTap: () {},
-                          ),
-                          SettingsItem(
-                            icon: Icons.notifications_none_outlined,
-                            title: 'Notification Settings',
-                            trailing: Switch(
-                              value: settings.isNotificationsEnabled,
-                              onChanged: (val) => context.read<SettingsCubit>().toggleNotifications(val),
-                              activeColor: const Color(0xFFFCD703),
-                            ),
-                            onTap: () {},
-                          ),
-                          SettingsItem(
-                            icon: Icons.dark_mode_outlined,
-                            title: 'Theme Mode',
-                            trailing: _ThemeSwitch(
-                              current: settings.themeMode,
-                              onChanged: (val) => context.read<SettingsCubit>().setThemeMode(val),
-                            ),
-                            onTap: () {},
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 32),
-
-                    // Logout Button
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF005C45),
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: const Text('Logout'),
-                      ),
+                        const SizedBox(height: 24),
+
+                        // My Complaints
+                        const Text(
+                          'My Complaints',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 12),
+                        _buildSectionContainer(
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(child: _StatWidget(title: 'Total', value: stats.total.toString())),
+                                  const SizedBox(height: 40, child: VerticalDivider()),
+                                  Expanded(child: _StatWidget(title: 'Resolved', value: stats.resolved.toString())),
+                                ],
+                              ),
+                              const Divider(height: 32),
+                              Row(
+                                children: [
+                                  Expanded(child: _StatWidget(title: 'In Progress', value: stats.pending.toString())),
+                                  const SizedBox(height: 40, child: VerticalDivider()),
+                                  Expanded(child: _StatWidget(title: 'Pending', value: stats.pending.toString())),
+                                ],
+                              ),
+                              const SizedBox(height: 24),
+                              SizedBox(
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  onPressed: () => Navigator.pushNamed(context, RouteNames.complaintList),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFF005C45),
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(vertical: 16),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                  child: const Text('View All Complaints'),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+
+                        // Account Settings
+                        const Text(
+                          'Account Settings',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 12),
+                        _buildSectionContainer(
+                          child: Column(
+                            children: [
+                              SettingsItem(
+                                icon: Icons.edit_outlined,
+                                title: 'Edit Profile',
+                                onTap: () {},
+                              ),
+                              SettingsItem(
+                                icon: Icons.lock_outline,
+                                title: 'Change Password',
+                                onTap: () {},
+                              ),
+                              SettingsItem(
+                                icon: Icons.email_outlined,
+                                title: 'Email Verification',
+                                value: 'Verified',
+                                trailing: const Icon(Icons.check_circle_outline, color: Colors.green, size: 20),
+                                onTap: () {},
+                              ),
+                              SettingsItem(
+                                icon: Icons.visibility_off_outlined,
+                                title: 'Anonymous Mode',
+                                trailing: Switch(
+                                  value: settings.isAnonymousMode,
+                                  onChanged: (val) => context.read<SettingsCubit>().toggleAnonymousMode(val),
+                                  activeColor: const Color(0xFFFCD703),
+                                ),
+                                onTap: () {},
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(left: 40),
+                                child: Text(
+                                  'When enabled, your complaints will be submitted anonymously.',
+                                  style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+
+                        // Preferences
+                        const Text(
+                          'Preferences',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 12),
+                        _buildSectionContainer(
+                          child: Column(
+                            children: [
+                              SettingsItem(
+                                icon: Icons.language,
+                                title: 'Language',
+                                value: settings.language,
+                                onTap: () {},
+                              ),
+                              SettingsItem(
+                                icon: Icons.notifications_none_outlined,
+                                title: 'Notification Settings',
+                                trailing: Switch(
+                                  value: settings.isNotificationsEnabled,
+                                  onChanged: (val) => context.read<SettingsCubit>().toggleNotifications(val),
+                                  activeColor: const Color(0xFFFCD703),
+                                ),
+                                onTap: () {},
+                              ),
+                              SettingsItem(
+                                icon: Icons.dark_mode_outlined,
+                                title: 'Theme Mode',
+                                trailing: _ThemeSwitch(
+                                  current: settings.themeMode,
+                                  onChanged: (val) => context.read<SettingsCubit>().setThemeMode(val),
+                                ),
+                                onTap: () {},
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 32),
+
+                        // Logout Button
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              // Handle logout logic
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF005C45),
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: const Text('Logout'),
+                          ),
+                        ),
+                        const SizedBox(height: 80), // Space for bottom nav
+                      ],
                     ),
-                    const SizedBox(height: 80), // Space for bottom nav
-                  ],
-                ),
-              );
-            }
-            return const SizedBox.shrink();
+                  );
+                }
+                return const SizedBox.shrink();
+              },
+            );
           },
         ),
         bottomNavigationBar: _BottomNavBar(),

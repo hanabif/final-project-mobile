@@ -2,6 +2,7 @@ import '../../domain/entities/complaint.dart';
 import '../../domain/repositories/complaint_repository.dart';
 import '../datasources/complaint_remote_datasource.dart';
 import '../models/complaint_model.dart';
+import '../models/citizen_analytics_model.dart';
 
 class ComplaintRepositoryImpl implements ComplaintRepository {
   final ComplaintRemoteDataSource remoteDataSource;
@@ -46,6 +47,15 @@ class ComplaintRepositoryImpl implements ComplaintRepository {
     try {
       final model = await remoteDataSource.getComplaintDetail(complaintId);
       return model;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<CitizenAnalyticsModel> getCitizenAnalytics() async {
+    try {
+      return await remoteDataSource.getCitizenAnalytics();
     } catch (e) {
       rethrow;
     }

@@ -2,12 +2,14 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import '../../../../core/network/api_client.dart';
 import '../models/complaint_model.dart';
+import '../models/citizen_analytics_model.dart';
 
 abstract class ComplaintRemoteDataSource {
   Future<void> submitComplaint(ComplaintModel complaint);
   Future<ComplaintModel> getComplaintStatus(String complaintId);
   Future<List<ComplaintModel>> getUserComplaints();
   Future<ComplaintModel> getComplaintDetail(String complaintId);
+  Future<CitizenAnalyticsModel> getCitizenAnalytics();
 }
 
 class ComplaintRemoteDataSourceImpl implements ComplaintRemoteDataSource {
@@ -104,6 +106,27 @@ class ComplaintRemoteDataSourceImpl implements ComplaintRemoteDataSource {
       }
     } catch (e) {
       throw Exception('Failed to fetch complaint detail: $e');
+    }
+  }
+
+  @override
+  Future<CitizenAnalyticsModel> getCitizenAnalytics() async {
+    try {
+      final response = await apiClient.dio.get('/analytics/citizen');
+      if (response.statusCode == 200) {
+        return CitizenAnalyticsModel.fromJson(response.data as Map<String, dynamic>);
+      } else {
+        throw Exception('Server error: ${response.statusCode}');
+      }
+    } on DioException catch (e) {
+      if (e.response != null) {
+        final message = e.response?.data['message'] ?? 'Server error';
+        throw Exception(message);
+      } else {
+        throw Exception('Network error: ${e.message}');
+      }
+    } catch (e) {
+      throw Exception('Failed to fetch analytics: $e');
     }
   }
 }

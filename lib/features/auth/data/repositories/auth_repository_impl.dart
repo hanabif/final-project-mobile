@@ -48,4 +48,9 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<void> resetPassword(String email, String newPassword) async {
     await Future.delayed(const Duration(seconds: 2));
   }
+
+  @override
+  Future<User> getProfile() async {
+    return await remoteDataSource.getProfile();
+  }
 }

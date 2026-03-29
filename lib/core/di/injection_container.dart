@@ -19,6 +19,7 @@ import '../../../features/auth/domain/usecases/get_token_usecase.dart';
 import '../../../features/auth/domain/usecases/logout_usecase.dart';
 import '../../../features/auth/domain/usecases/is_session_valid_usecase.dart';
 import '../../../features/auth/presentation/cubit/auth/auth_cubit.dart';
+import '../../../features/auth/domain/usecases/get_profile_usecase.dart';
 import '../../../features/auth/presentation/cubit/password_reset/password_reset_cubit.dart';
 
 import '../../../features/complaint/data/datasources/complaint_remote_datasource.dart';
@@ -32,6 +33,8 @@ import '../../../features/complaint/presentation/cubits/complaint_cubit.dart';
 import '../../../features/complaint/presentation/cubits/complaint_list_cubit.dart';
 import '../../../features/complaint/presentation/cubits/complaint_detail_cubit.dart';
 import '../../../features/complaint/presentation/cubits/home/home_cubit.dart';
+import '../../../features/complaint/domain/usecases/get_citizen_analytics_usecase.dart';
+import '../../../features/complaint/presentation/cubits/profile/profile_cubit.dart';
 import '../../../features/settings/presentation/cubits/settings_cubit.dart';
 import '../../../features/notification/data/datasources/notification_remote_datasource.dart';
 import '../../../features/notification/data/repositories/notification_repository_impl.dart';
@@ -100,6 +103,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => GetTokenUseCase(sl()));
   sl.registerLazySingleton(() => LogoutUseCase(sl()));
   sl.registerLazySingleton(() => IsSessionValidUseCase(sl()));
+  sl.registerLazySingleton(() => GetProfileUseCase(sl()));
 
   // Notifications
   sl.registerLazySingleton<FirebaseNotificationService>(
@@ -112,6 +116,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => GetComplaintStatusUseCase(sl()));
   sl.registerLazySingleton(() => GetUserComplaintsUseCase(sl()));
   sl.registerLazySingleton(() => GetComplaintDetailUseCase(sl()));
+  sl.registerLazySingleton(() => GetCitizenAnalyticsUseCase(sl()));
 
   // Auth - Presentation
   sl.registerFactory(
@@ -136,6 +141,12 @@ Future<void> init() async {
   sl.registerFactory(() => ComplaintListCubit(getUserComplaintsUseCase: sl()));
   sl.registerFactory(
     () => ComplaintDetailCubit(getComplaintDetailUseCase: sl()),
+  );
+  sl.registerFactory(
+    () => ProfileCubit(
+      getProfileUseCase: sl(),
+      getCitizenAnalyticsUseCase: sl(),
+    ),
   );
 
   // Settings

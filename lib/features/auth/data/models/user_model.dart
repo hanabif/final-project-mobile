@@ -12,7 +12,7 @@ class UserModel extends User {
     try {
       return UserModel(
         id: json['_id']?.toString() ?? json['id']?.toString() ?? '',
-        name: (json['fullname'] ?? json['name'])?.toString() ?? '',
+        name: (json['fullName'] ?? json['fullname'] ?? json['name'])?.toString() ?? '',
         email: json['email']?.toString() ?? '',
         role: json['role']?.toString() ?? 'Citizen',
       );

@@ -14,6 +14,7 @@ abstract class AuthRemoteDataSource {
   Future<void> forgotPassword(String email);
   Future<void> verifyCode(String email, String code);
   Future<void> resetPassword(String email, String newPassword);
+  Future<UserModel> getProfile();
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -65,6 +66,15 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<void> resetPassword(String email, String newPassword) async {
     await Future.delayed(const Duration(seconds: 1));
-    // Mock success
+  }
+
+  @override
+  Future<UserModel> getProfile() async {
+    final response = await apiClient.dio.get('/auth/profile');
+    if (response.statusCode == 200) {
+      return UserModel.fromJson(response.data as Map<String, dynamic>);
+    } else {
+      throw Exception('Failed to fetch profile: ${response.statusCode}');
+    }
   }
 }
