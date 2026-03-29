@@ -339,7 +339,10 @@ class _BottomNavBar extends StatelessWidget {
     return BottomNavigationBar(
       currentIndex: 2, // Profile selected
       onTap: (index) {
-        if (index == 0) Navigator.popUntil(context, ModalRoute.withName(RouteNames.home));
+        if (index == 0) {
+          // Navigate to Home by clearing stack
+          Navigator.pushNamedAndRemoveUntil(context, RouteNames.home, (route) => false);
+        }
       },
       items: const [
         BottomNavigationBarItem(icon: Icon(Icons.home_outlined), label: 'Home'),

@@ -33,8 +33,6 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
     {'id': '64f7a2b5e4b0a1a2b3c4d5e6', 'name': 'Ethiopian Electric Utility'},
     {'id': '64f7a2b5e4b0a1a2b3c4d5e7', 'name': 'Ethiopian Roads Administration'},
     {'id': '64f7a2b5e4b0a1a2b3c4d5e8', 'name': 'A.A Water and Sewerage Authority'},
-    {'id': '64f7a2b5e4b0a1a2b3c4d5e9', 'name': 'Health Department'},
-    {'id': '64f7a2b5e4b0a1a2b3c4d5f0', 'name': 'City Council'},
   ];
 
   XFile? _selectedImage;

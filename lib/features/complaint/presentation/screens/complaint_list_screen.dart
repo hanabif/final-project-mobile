@@ -36,8 +36,14 @@ class _ComplaintListScreenState extends State<ComplaintListScreen>
       child: Scaffold(
         appBar: AppBar(
           leading: IconButton(
-            icon: const Icon(Icons.menu),
-            onPressed: () {},
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              if (Navigator.of(context).canPop()) {
+                Navigator.of(context).pop();
+              } else {
+                Navigator.of(context).pushReplacementNamed(RouteNames.profile);
+              }
+            },
           ),
           title: const Text(
             'My Reports',
