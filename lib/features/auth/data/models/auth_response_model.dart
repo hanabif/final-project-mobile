@@ -7,9 +7,14 @@ class AuthResponseModel {
   AuthResponseModel({required this.user, required this.token});
 
   factory AuthResponseModel.fromJson(Map<String, dynamic> json) {
-    return AuthResponseModel(
-      user: UserModel.fromJson(json['user'] as Map<String, dynamic>),
-      token: json['token'] as String,
-    );
+    try {
+      return AuthResponseModel(
+        user: UserModel.fromJson((json['user'] as Map<String, dynamic>?) ?? {}),
+        token: json['token']?.toString() ?? '',
+      );
+    } catch (e) {
+      print('Error parsing AuthResponseModel: $e, json: $json');
+      rethrow;
+    }
   }
 }

@@ -13,7 +13,7 @@ class FakeRemote extends AuthRemoteDataSource {
     }
     // return a dummy user and token
     return AuthResponseModel(
-      user: const UserModel(id: 42, name: 'Alice', email: 'alice@mail.com'),
+      user: const UserModel(id: '42', name: 'Alice', email: 'alice@mail.com', role: 'Citizen'),
       token: 'sometoken',
     );
   }
@@ -23,9 +23,10 @@ class FakeRemote extends AuthRemoteDataSource {
     String name,
     String email,
     String password,
+    String role,
   ) async {
     return AuthResponseModel(
-      user: const UserModel(id: 555, name: 'Bob', email: 'bob@mail.com'),
+      user: const UserModel(id: '555', name: 'Bob', email: 'bob@mail.com', role: 'Citizen'),
       token: 'newtoken',
     );
   }
@@ -82,8 +83,8 @@ void main() {
   });
 
   test('register success stores token and returns user', () async {
-    final user = await repo.register('name', 'e@mail.com', 'pw');
-    expect(user.id, 555);
+    final user = await repo.register('name', 'e@mail.com', 'pw', 'Citizen');
+    expect(user.id, '555');
     expect(session.stored, 'newtoken');
   });
 }

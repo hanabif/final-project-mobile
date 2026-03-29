@@ -9,11 +9,16 @@ class UserModel extends User {
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
-    return UserModel(
-      id: json['id'] ?? 0,
-      name: json['fullname'] ?? json['name'] ?? '',
-      email: json['email'] ?? '',
-      role: json['role'] ?? 'Citizen',
-    );
+    try {
+      return UserModel(
+        id: json['_id']?.toString() ?? json['id']?.toString() ?? '',
+        name: (json['fullname'] ?? json['name'])?.toString() ?? '',
+        email: json['email']?.toString() ?? '',
+        role: json['role']?.toString() ?? 'Citizen',
+      );
+    } catch (e) {
+      print('Error parsing UserModel: $e, json: $json');
+      rethrow;
+    }
   }
 }

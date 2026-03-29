@@ -7,28 +7,39 @@ import 'features/notification/presentation/services/firebase_notification_servic
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  
   debugPrint('--- APP STARTING ---');
+  
+  // 1. Initialize Dependency Injection first
   try {
     debugPrint('Initializing Dependency Injection...');
     await init();
     debugPrint('Dependency Injection Initialized Successfully.');
+  } catch (e) {
+    debugPrint('DI Initialization Error: $e');
+  }
 
-    debugPrint('Initializing Notifications...');
-    await sl<FirebaseNotificationService>().initialize();
-    await sl<FirebaseNotificationService>().getDeviceToken();
+  // 2. Start UI immediately (Crucial for avoiding blank screen)
+  runApp(const ComplaintResolutionApp());
+  debugPrint('runApp executed.');
 
-    runApp(const ComplaintResolutionApp());
-    debugPrint('runApp executed.');
-  } catch (e, stack) {
-    debugPrint('CRITICAL ERROR DURING INITIALIZATION: $e');
-    debugPrint('STACK TRACE: $stack');
-    runApp(MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: Text('Initialization Error: $e'),
-        ),
-      ),
-    ));
+  // 3. Initialize Firebase & Notifications in the background gracefully
+  _initializeFirebaseAndNotifications();
+}
+
+Future<void> _initializeFirebaseAndNotifications() async {
+  try {
+    debugPrint('Initializing Firebase (Background)...');
+    await Firebase.initializeApp().timeout(const Duration(seconds: 3));
+    
+    if (Firebase.apps.isNotEmpty) {
+      debugPrint('Firebase Initialized. Setting up notifications...');
+      final notificationService = sl<FirebaseNotificationService>();
+      await notificationService.initialize();
+      await notificationService.getDeviceToken();
+    }
+  } catch (e) {
+    debugPrint('Firebase/Notification Init skipped or failed: $e');
+    // We do not call runApp here to avoid replacing the working app with an error screen
   }
 }

@@ -8,6 +8,9 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:complaint_resolution_app/features/auth/domain/entities/user.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:get_it/get_it.dart';
+
+final sl = GetIt.instance;
 
 class MockAuthCubit extends Mock implements AuthCubit {}
 
@@ -23,6 +26,11 @@ void main() {
   setUp(() {
     cubit = MockAuthCubit();
     when(() => cubit.state).thenReturn(AuthInitial());
+    sl.registerFactory<AuthCubit>(() => cubit);
+  });
+
+  tearDown(() {
+    sl.reset();
   });
 
   Widget makeTestable(Widget child, NavigatorObserver observer) {
@@ -40,12 +48,12 @@ void main() {
     whenListen(
       cubit,
       Stream.fromIterable([
-        AuthAuthenticated(User(id: 1, name: 'x', email: 'x')),
+        AuthAuthenticated(User(id: '1', name: 'x', email: 'x', role: 'Citizen')),
       ]),
     );
     when(
       () => cubit.state,
-    ).thenReturn(AuthAuthenticated(User(id: 1, name: 'x', email: 'x')));
+    ).thenReturn(AuthAuthenticated(User(id: '1', name: 'x', email: 'x', role: 'Citizen')));
 
     await tester.pumpWidget(makeTestable(const LoginPage(), observer));
     await tester.pump(); // process listener

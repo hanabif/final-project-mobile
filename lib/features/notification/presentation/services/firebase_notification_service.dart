@@ -8,15 +8,28 @@ import '../../../../core/utils/navigator_key.dart';
 import '../../../../core/routes/route_names.dart';
 
 class FirebaseNotificationService {
-  final FirebaseMessaging _fcm = FirebaseMessaging.instance;
+  FirebaseMessaging? get _fcm {
+    try {
+      if (Firebase.apps.isNotEmpty) {
+        return FirebaseMessaging.instance;
+      }
+    } catch (_) {}
+    return null;
+  }
+  
   final NotificationRepository _repository;
 
   FirebaseNotificationService(this._repository);
 
   Future<void> initialize() async {
+    if (Firebase.apps.isEmpty) {
+      debugPrint('⚠️ [FirebaseNotificationService] Firebase not initialized. Skipping setup.');
+      return;
+    }
+    
     debugPrint('🔔 [FirebaseNotificationService] Initializing notifications...');
     // Request permission
-    NotificationSettings settings = await _fcm.requestPermission(
+    NotificationSettings? settings = await _fcm?.requestPermission(
       alert: true,
       announcement: false,
       badge: true,
@@ -26,42 +39,47 @@ class FirebaseNotificationService {
       sound: true,
     );
 
-    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+    if (settings?.authorizationStatus == AuthorizationStatus.authorized) {
       debugPrint('User granted permission');
-    } else if (settings.authorizationStatus == AuthorizationStatus.provisional) {
+    } else if (settings?.authorizationStatus == AuthorizationStatus.provisional) {
       debugPrint('User granted provisional permission');
     } else {
       debugPrint('User declined or has not accepted permission');
     }
 
     // Handle foreground messages
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      debugPrint('Got a message whilst in the foreground!');
-      debugPrint('Message data: ${message.data}');
+    // Guard static properties for Web safety
+    try {
+      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+        debugPrint('Got a message whilst in the foreground!');
+        debugPrint('Message data: ${message.data}');
 
-      if (message.notification != null) {
-        debugPrint('Message also contained a notification: ${message.notification}');
-        
-        _showNotificationSnackbar(message);
+        if (message.notification != null) {
+          debugPrint('Message also contained a notification: ${message.notification}');
+          
+          _showNotificationSnackbar(message);
+        }
+      });
+
+      // Handle background messages
+      FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+      
+      // Get initial message if app was opened from a terminated state
+      RemoteMessage? initialMessage = await _fcm?.getInitialMessage();
+      if (initialMessage != null) {
+        _handleMessage(initialMessage);
       }
-    });
 
-    // Handle background messages
-    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-    
-    // Get initial message if app was opened from a terminated state
-    RemoteMessage? initialMessage = await _fcm.getInitialMessage();
-    if (initialMessage != null) {
-      _handleMessage(initialMessage);
+      // Handle when app is in background but opened via notification
+      FirebaseMessaging.onMessageOpenedApp.listen(_handleMessage);
+    } catch (e) {
+      debugPrint('FirebaseMessaging static listeners failed to initialize: $e');
     }
-
-    // Handle when app is in background but opened via notification
-    FirebaseMessaging.onMessageOpenedApp.listen(_handleMessage);
   }
 
   Future<String?> getDeviceToken() async {
     try {
-      String? token = await _fcm.getToken();
+      String? token = await _fcm?.getToken();
       debugPrint("------------------------------------------------------------------");
       debugPrint("🚀 [FirebaseNotificationService] FCM DEVICE TOKEN:");
       debugPrint("$token");
