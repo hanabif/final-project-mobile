@@ -132,7 +132,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             Navigator.pushNamed(
                               context,
                               RouteNames.complaintForm,
-                              arguments: org['name'],
+                              arguments: org['id'],
                             );
                           },
                         );

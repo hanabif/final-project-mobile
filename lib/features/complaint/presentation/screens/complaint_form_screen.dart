@@ -28,13 +28,13 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
 
-  String? _selectedOrganization;
-  final List<String> _organizations = [
-    'Ethiopian Electric Utility',
-    'Ethiopian Roads Administration',
-    'A.A Water and Sewerage Authority',
-    'Health Department',
-    'City Council'
+  String? _selectedOrganizationId;
+  final List<Map<String, String>> _organizations = [
+    {'id': '64f7a2b5e4b0a1a2b3c4d5e6', 'name': 'Ethiopian Electric Utility'},
+    {'id': '64f7a2b5e4b0a1a2b3c4d5e7', 'name': 'Ethiopian Roads Administration'},
+    {'id': '64f7a2b5e4b0a1a2b3c4d5e8', 'name': 'A.A Water and Sewerage Authority'},
+    {'id': '64f7a2b5e4b0a1a2b3c4d5e9', 'name': 'Health Department'},
+    {'id': '64f7a2b5e4b0a1a2b3c4d5f0', 'name': 'City Council'},
   ];
 
   XFile? _selectedImage;
@@ -44,8 +44,12 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
   @override
   void initState() {
     super.initState();
-    if (widget.organizationId != null && _organizations.contains(widget.organizationId)) {
-      _selectedOrganization = widget.organizationId;
+    if (widget.organizationId != null) {
+      // Check if the passed ID exists in our list
+      final exists = _organizations.any((org) => org['id'] == widget.organizationId);
+      if (exists) {
+        _selectedOrganizationId = widget.organizationId;
+      }
     }
     _getCurrentLocation();
   }
@@ -161,8 +165,11 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
         imageUrl: _selectedImage!.path,
         latitude: _currentPosition!.latitude,
         longitude: _currentPosition!.longitude,
-        organizationId: _selectedOrganization!,
+        organizationId: _selectedOrganizationId!,
         status: 'Submitted',
+        category: 'Auto',
+        priority: 'Low',
+        department: _selectedOrganizationId!,
         createdAt: DateTime.now(),
       );
 
@@ -241,30 +248,40 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
                     },
                   ),
                   const SizedBox(height: 16),
-                  DropdownButtonFormField<String>(
-                    decoration: const InputDecoration(
-                      labelText: 'Select Organization',
-                      border: OutlineInputBorder(),
+                  if (widget.organizationId == null)
+                    DropdownButtonFormField<String>(
+                      decoration: const InputDecoration(
+                        labelText: 'Select Organization',
+                        border: OutlineInputBorder(),
+                      ),
+                      value: _selectedOrganizationId,
+                      items: _organizations.map((org) {
+                        return DropdownMenuItem(
+                          value: org['id'],
+                          child: Text(org['name']!),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedOrganizationId = value;
+                        });
+                      },
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please select an organization';
+                        }
+                        return null;
+                      },
+                    )
+                  else
+                    // Only show the header if we're hiding the dropdown
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 16.0),
+                      child: Text(
+                        'Reporting to: ${_organizations.firstWhere((org) => org['id'] == widget.organizationId, orElse: () => {'name': widget.organizationId ?? 'Unknown'})['name']}',
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      ),
                     ),
-                    initialValue: _selectedOrganization,
-                    items: _organizations.map((org) {
-                      return DropdownMenuItem(
-                        value: org,
-                        child: Text(org),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedOrganization = value;
-                      });
-                    },
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please select an organization';
-                      }
-                      return null;
-                    },
-                  ),
                   const SizedBox(height: 24),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,

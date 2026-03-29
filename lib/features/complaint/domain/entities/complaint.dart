@@ -9,6 +9,9 @@ class Complaint extends Equatable {
   final double longitude;
   final String organizationId;
   final String status;
+  final String category;
+  final String priority;
+  final String department;
   final DateTime createdAt;
 
   const Complaint({
@@ -20,6 +23,9 @@ class Complaint extends Equatable {
     required this.longitude,
     required this.organizationId,
     required this.status,
+    this.category = 'Auto',
+    this.priority = 'Low',
+    this.department = 'Auto',
     required this.createdAt,
   });
 
@@ -33,6 +39,9 @@ class Complaint extends Equatable {
         longitude,
         organizationId,
         status,
+        category,
+        priority,
+        department,
         createdAt,
       ];
 }
