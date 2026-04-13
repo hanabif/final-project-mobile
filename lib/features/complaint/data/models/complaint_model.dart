@@ -70,11 +70,11 @@ class ComplaintModel extends Complaint {
     );
   }
 
-  Map<String, dynamic> toJson() {
     return {
       'title': title,
       'description': description,
       'imageUrl': imageUrl,
+      'images': images,
       'location': {
         'latitude': latitude,
         'longitude': longitude,
@@ -93,6 +93,7 @@ class ComplaintModel extends Complaint {
       title: complaint.title,
       description: complaint.description,
       imageUrl: complaint.imageUrl,
+      images: complaint.images,
       latitude: complaint.latitude,
       longitude: complaint.longitude,
       organizationId: complaint.organizationId,

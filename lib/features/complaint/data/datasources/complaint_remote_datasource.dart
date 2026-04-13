@@ -10,6 +10,8 @@ abstract class ComplaintRemoteDataSource {
   Future<List<ComplaintModel>> getUserComplaints();
   Future<ComplaintModel> getComplaintDetail(String complaintId);
   Future<CitizenAnalyticsModel> getCitizenAnalytics();
+  Future<String> uploadSingleFile(File file);
+  Future<List<String>> uploadMultipleFiles(List<File> files);
 }
 
 class ComplaintRemoteDataSourceImpl implements ComplaintRemoteDataSource {
@@ -37,6 +39,64 @@ class ComplaintRemoteDataSourceImpl implements ComplaintRemoteDataSource {
       }
     } catch (e) {
       throw Exception('Failed to submit complaint: $e');
+    }
+  }
+
+  @override
+  Future<String> uploadSingleFile(File file) async {
+    try {
+      final formData = FormData.fromMap({
+        'file': await MultipartFile.fromFile(file.path),
+        'folder': 'complaints',
+      });
+
+      final response = await apiClient.dio.post(
+        '/uploads/single',
+        data: formData,
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return response.data['file']['url'] as String;
+      } else {
+        throw Exception('Upload failed: ${response.statusCode}');
+      }
+    } on DioException catch (e) {
+       final message = e.response?.data['message'] ?? e.message ?? 'Upload error';
+       throw Exception(message);
+    } catch (e) {
+      throw Exception('Failed to upload image: $e');
+    }
+  }
+
+  @override
+  Future<List<String>> uploadMultipleFiles(List<File> files) async {
+    try {
+      final List<MultipartFile> multipartFiles = [];
+      for (final file in files) {
+        multipartFiles.add(await MultipartFile.fromFile(file.path));
+      }
+
+      final formData = FormData.fromMap({
+        'files': multipartFiles,
+        'folder': 'complaints',
+      });
+
+      final response = await apiClient.dio.post(
+        '/uploads/multiple',
+        data: formData,
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final List<dynamic> data = response.data as List<dynamic>;
+        return data.map((item) => item['url'] as String).toList();
+      } else {
+        throw Exception('Upload failed: ${response.statusCode}');
+      }
+    } on DioException catch (e) {
+       final message = e.response?.data['message'] ?? e.message ?? 'Upload error';
+       throw Exception(message);
+    } catch (e) {
+      throw Exception('Failed to upload images: $e');
     }
   }
 

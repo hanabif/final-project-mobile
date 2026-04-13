@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -28,14 +29,14 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
 
-  String? _selectedOrganizationId;
   final List<Map<String, String>> _organizations = [
     {'id': '64f7a2b5e4b0a1a2b3c4d5e6', 'name': 'Ethiopian Electric Utility'},
     {'id': '64f7a2b5e4b0a1a2b3c4d5e7', 'name': 'Ethiopian Roads Administration'},
     {'id': '64f7a2b5e4b0a1a2b3c4d5e8', 'name': 'A.A Water and Sewerage Authority'},
   ];
 
-  XFile? _selectedImage;
+  String? _selectedOrganizationId;
+  List<XFile> _selectedImages = [];
   Position? _currentPosition;
   bool _isGettingLocation = false;
 
@@ -123,11 +124,33 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
   Future<void> _pickImage(ImageSource source) async {
     final picker = ImagePicker();
     try {
-      final pickedFile = await picker.pickImage(source: source);
-      if (pickedFile != null) {
-        setState(() {
-          _selectedImage = pickedFile;
-        });
+      if (source == ImageSource.gallery) {
+        final List<XFile> pickedFiles = await picker.pickMultiImage();
+        if (pickedFiles.isNotEmpty) {
+          setState(() {
+            // Combine existing and new, taking only first 5
+            _selectedImages = [..._selectedImages, ...pickedFiles];
+            if (_selectedImages.length > 5) {
+              _selectedImages = _selectedImages.sublist(0, 5);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Maximum 5 images allowed')),
+              );
+            }
+          });
+        }
+      } else {
+        final pickedFile = await picker.pickImage(source: source);
+        if (pickedFile != null) {
+          setState(() {
+            if (_selectedImages.length < 5) {
+              _selectedImages.add(pickedFile);
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Maximum 5 images allowed')),
+              );
+            }
+          });
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -138,11 +161,17 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
     }
   }
 
+  void _removeImage(int index) {
+    setState(() {
+      _selectedImages.removeAt(index);
+    });
+  }
+
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
-      if (_selectedImage == null) {
+      if (_selectedImages.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please select an image')),
+          const SnackBar(content: Text('Please select at least one image')),
         );
         return;
       }
@@ -160,7 +189,8 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
         id: complaintId,
         title: _titleController.text.trim(),
         description: _descriptionController.text.trim(),
-        imageUrl: _selectedImage!.path,
+        imageUrl: _selectedImages.isNotEmpty ? _selectedImages.first.path : null, // Fallback for single field
+        images: _selectedImages.map((e) => e.path).toList(), // Local paths for entity (will be updated by usecase)
         latitude: _currentPosition!.latitude,
         longitude: _currentPosition!.longitude,
         organizationId: _selectedOrganizationId!,
@@ -171,7 +201,8 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
         createdAt: DateTime.now(),
       );
 
-      context.read<ComplaintCubit>().submitComplaint(complaint);
+      final imageFiles = _selectedImages.map((xFile) => File(xFile.path)).toList();
+      context.read<ComplaintCubit>().submitComplaint(complaint, imageFiles);
     }
   }
 
@@ -297,25 +328,60 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  if (_selectedImage != null)
+                  const SizedBox(height: 16),
+                  if (_selectedImages.isNotEmpty)
                     Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Selected Image Preview:'),
+                        const Text('Selected Images:', style: TextStyle(fontWeight: FontWeight.bold)),
                         const SizedBox(height: 8),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: PlatformImage(
-                            path: _selectedImage!.path,
-                            height: 200,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
+                        SizedBox(
+                          height: 120,
+                          child: ListView.separated(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: _selectedImages.length,
+                            separatorBuilder: (context, index) => const SizedBox(width: 8),
+                            itemBuilder: (context, index) {
+                              return Stack(
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: PlatformImage(
+                                      path: _selectedImages[index].path,
+                                      height: 120,
+                                      width: 120,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                  Positioned(
+                                    top: 4,
+                                    right: 4,
+                                    child: GestureDetector(
+                                      onTap: () => _removeImage(index),
+                                      child: Container(
+                                        padding: const EdgeInsets.all(4),
+                                        decoration: const BoxDecoration(
+                                          color: Colors.red,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: const Icon(
+                                          Icons.close,
+                                          size: 16,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
                           ),
                         ),
                       ],
                     ),
-                  if (_selectedImage == null)
+                  if (_selectedImages.isEmpty)
                     const Text(
-                      'No image selected (Required)',
+                      'No images selected (Required)',
                       style: TextStyle(color: Colors.red),
                       textAlign: TextAlign.center,
                     ),

@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/entities/complaint.dart';
 import '../../domain/usecases/submit_complaint_usecase.dart';
@@ -8,11 +9,11 @@ class ComplaintCubit extends Cubit<ComplaintState> {
 
   ComplaintCubit({required this.submitComplaintUseCase}) : super(ComplaintInitial());
 
-  Future<void> submitComplaint(Complaint complaint) async {
+  Future<void> submitComplaint(Complaint complaint, List<File> imageFiles) async {
     emit(ComplaintSubmitting());
 
     try {
-      await submitComplaintUseCase(complaint);
+      await submitComplaintUseCase(complaint, imageFiles);
       emit(ComplaintSuccess());
     } catch (e) {
       // In a real app we might want to map exceptions to user-friendly messages

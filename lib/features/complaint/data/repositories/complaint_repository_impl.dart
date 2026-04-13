@@ -1,3 +1,4 @@
+import 'dart:io';
 import '../../domain/entities/complaint.dart';
 import '../../domain/repositories/complaint_repository.dart';
 import '../datasources/complaint_remote_datasource.dart';
@@ -56,6 +57,22 @@ class ComplaintRepositoryImpl implements ComplaintRepository {
   Future<CitizenAnalyticsModel> getCitizenAnalytics() async {
     try {
       return await remoteDataSource.getCitizenAnalytics();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<List<String>> uploadImages(List<File> files) async {
+    try {
+      if (files.isEmpty) return [];
+      
+      if (files.length == 1) {
+        final url = await remoteDataSource.uploadSingleFile(files.first);
+        return [url];
+      } else {
+        return await remoteDataSource.uploadMultipleFiles(files);
+      }
     } catch (e) {
       rethrow;
     }
