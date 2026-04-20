@@ -1,12 +1,15 @@
-import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 import '../entities/complaint.dart';
 import '../../data/models/citizen_analytics_model.dart';
 
 abstract class ComplaintRepository {
-  Future<void> submitComplaint(Complaint complaint);
+  Future<String> submitComplaint(Complaint complaint);
   Future<String> getComplaintStatus(String complaintId);
   Future<List<Complaint>> getUserComplaints();
   Future<Complaint> getComplaintDetail(String complaintId);
   Future<CitizenAnalyticsModel> getCitizenAnalytics();
-  Future<List<String>> uploadImages(List<File> files);
+  Future<List<String>> uploadImages(List<XFile> files);
+  Future<void> deleteUploadedFile(String fileKey);
+  Future<void> moderateComplaint(String complaintId);
+  Future<List<Map<String, dynamic>>> getOrganizations();
 }

@@ -25,11 +25,34 @@ class OrganizationCard extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset(
-                logo,
-                height: 60,
-                fit: BoxFit.contain,
-              ),
+              if (logo.isEmpty)
+                const Icon(
+                  Icons.business,
+                  size: 60,
+                  color: Colors.grey,
+                )
+              else if (logo.startsWith('http'))
+                Image.network(
+                  logo,
+                  height: 60,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) => const Icon(
+                    Icons.business,
+                    size: 60,
+                    color: Colors.grey,
+                  ),
+                )
+              else
+                Image.asset(
+                  logo,
+                  height: 60,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) => const Icon(
+                    Icons.business,
+                    size: 60,
+                    color: Colors.grey,
+                  ),
+                ),
               const SizedBox(height: 12),
               Text(
                 name,

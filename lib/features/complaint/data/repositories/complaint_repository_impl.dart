@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 import '../../domain/entities/complaint.dart';
 import '../../domain/repositories/complaint_repository.dart';
 import '../datasources/complaint_remote_datasource.dart';
@@ -11,10 +11,10 @@ class ComplaintRepositoryImpl implements ComplaintRepository {
   ComplaintRepositoryImpl({required this.remoteDataSource});
 
   @override
-  Future<void> submitComplaint(Complaint complaint) async {
+  Future<String> submitComplaint(Complaint complaint) async {
     try {
       final complaintModel = ComplaintModel.fromEntity(complaint);
-      await remoteDataSource.submitComplaint(complaintModel);
+      return await remoteDataSource.submitComplaint(complaintModel);
     } catch (e) {
       // Re-throwing the exception to be handled by the presentation layer
       rethrow;
@@ -63,7 +63,7 @@ class ComplaintRepositoryImpl implements ComplaintRepository {
   }
 
   @override
-  Future<List<String>> uploadImages(List<File> files) async {
+  Future<List<String>> uploadImages(List<XFile> files) async {
     try {
       if (files.isEmpty) return [];
       
@@ -73,6 +73,33 @@ class ComplaintRepositoryImpl implements ComplaintRepository {
       } else {
         return await remoteDataSource.uploadMultipleFiles(files);
       }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> deleteUploadedFile(String fileKey) async {
+    try {
+      await remoteDataSource.deleteUploadedFile(fileKey);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> moderateComplaint(String complaintId) async {
+    try {
+      await remoteDataSource.moderateComplaint(complaintId);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> getOrganizations() async {
+    try {
+      return await remoteDataSource.getOrganizations();
     } catch (e) {
       rethrow;
     }

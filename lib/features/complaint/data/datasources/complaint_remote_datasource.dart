@@ -1,17 +1,20 @@
-import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../../../core/network/api_client.dart';
 import '../models/complaint_model.dart';
 import '../models/citizen_analytics_model.dart';
 
 abstract class ComplaintRemoteDataSource {
-  Future<void> submitComplaint(ComplaintModel complaint);
+  Future<String> submitComplaint(ComplaintModel complaint);
   Future<ComplaintModel> getComplaintStatus(String complaintId);
   Future<List<ComplaintModel>> getUserComplaints();
   Future<ComplaintModel> getComplaintDetail(String complaintId);
   Future<CitizenAnalyticsModel> getCitizenAnalytics();
-  Future<String> uploadSingleFile(File file);
-  Future<List<String>> uploadMultipleFiles(List<File> files);
+  Future<String> uploadSingleFile(XFile file);
+  Future<List<String>> uploadMultipleFiles(List<XFile> files);
+  Future<void> deleteUploadedFile(String fileKey);
+  Future<void> moderateComplaint(String complaintId);
+  Future<List<Map<String, dynamic>>> getOrganizations();
 }
 
 class ComplaintRemoteDataSourceImpl implements ComplaintRemoteDataSource {
@@ -20,14 +23,18 @@ class ComplaintRemoteDataSourceImpl implements ComplaintRemoteDataSource {
   ComplaintRemoteDataSourceImpl({required this.apiClient});
 
   @override
-  Future<void> submitComplaint(ComplaintModel complaint) async {
+  Future<String> submitComplaint(ComplaintModel complaint) async {
     try {
       final response = await apiClient.dio.post(
         '/complaints',
         data: complaint.toJson(),
       );
 
-      if (response.statusCode != 200 && response.statusCode != 201) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = response.data as Map<String, dynamic>;
+        final complaintData = data['complaint'] is Map ? data['complaint'] as Map<String, dynamic> : data;
+        return complaintData['id']?.toString() ?? complaintData['_id']?.toString() ?? '';
+      } else {
         throw Exception('Server error: ${response.statusCode}');
       }
     } on DioException catch (e) {
@@ -43,20 +50,31 @@ class ComplaintRemoteDataSourceImpl implements ComplaintRemoteDataSource {
   }
 
   @override
-  Future<String> uploadSingleFile(File file) async {
+  Future<String> uploadSingleFile(XFile file) async {
     try {
       final formData = FormData.fromMap({
-        'file': await MultipartFile.fromFile(file.path),
+        'file': MultipartFile.fromBytes(
+          await file.readAsBytes(),
+          filename: file.name,
+        ),
         'folder': 'complaints',
       });
 
       final response = await apiClient.dio.post(
-        '/uploads/single',
+        '/uploads',
         data: formData,
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        return response.data['file']['url'] as String;
+        final data = response.data as Map<String, dynamic>;
+        if (data.containsKey('urls') && (data['urls'] as List).isNotEmpty) {
+          return data['urls'][0] as String;
+        } else if (data.containsKey('file')) {
+          return data['file']['url'] as String;
+        } else if (data.containsKey('files') && (data['files'] as List).isNotEmpty) {
+          return data['files'][0]['url'] as String;
+        }
+        throw Exception('Unexpected response format');
       } else {
         throw Exception('Upload failed: ${response.statusCode}');
       }
@@ -69,11 +87,16 @@ class ComplaintRemoteDataSourceImpl implements ComplaintRemoteDataSource {
   }
 
   @override
-  Future<List<String>> uploadMultipleFiles(List<File> files) async {
+  Future<List<String>> uploadMultipleFiles(List<XFile> files) async {
     try {
       final List<MultipartFile> multipartFiles = [];
       for (final file in files) {
-        multipartFiles.add(await MultipartFile.fromFile(file.path));
+        multipartFiles.add(
+          MultipartFile.fromBytes(
+            await file.readAsBytes(),
+            filename: file.name,
+          ),
+        );
       }
 
       final formData = FormData.fromMap({
@@ -82,13 +105,18 @@ class ComplaintRemoteDataSourceImpl implements ComplaintRemoteDataSource {
       });
 
       final response = await apiClient.dio.post(
-        '/uploads/multiple',
+        '/uploads',
         data: formData,
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final List<dynamic> data = response.data as List<dynamic>;
-        return data.map((item) => item['url'] as String).toList();
+        final data = response.data as Map<String, dynamic>;
+        if (data.containsKey('urls')) {
+          return (data['urls'] as List).cast<String>();
+        } else if (data.containsKey('files')) {
+          return (data['files'] as List).map((item) => item['url'] as String).toList();
+        }
+        throw Exception('Unexpected response format');
       } else {
         throw Exception('Upload failed: ${response.statusCode}');
       }
@@ -187,6 +215,66 @@ class ComplaintRemoteDataSourceImpl implements ComplaintRemoteDataSource {
       }
     } catch (e) {
       throw Exception('Failed to fetch analytics: $e');
+    }
+  }
+
+  @override
+  Future<void> deleteUploadedFile(String fileKey) async {
+    try {
+      final response = await apiClient.dio.delete(
+        '/uploads',
+        data: {'fileKey': fileKey},
+      );
+
+      if (response.statusCode != 200 && response.statusCode != 204) {
+        throw Exception('Delete failed: ${response.statusCode}');
+      }
+    } on DioException catch (e) {
+      final message = e.response?.data['message'] ?? e.message ?? 'Delete error';
+      throw Exception(message);
+    } catch (e) {
+      throw Exception('Failed to delete image: $e');
+    }
+  }
+
+  @override
+  Future<void> moderateComplaint(String complaintId) async {
+    try {
+      final response = await apiClient.dio.post(
+        '/ai/moderate',
+        data: {'complaintId': complaintId},
+      );
+
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        throw Exception('AI moderation failed: ${response.statusCode}');
+      }
+    } on DioException catch (e) {
+      final message = e.response?.data['message'] ?? e.message ?? 'Moderation error';
+      throw Exception(message);
+    } catch (e) {
+      throw Exception('Failed to moderate complaint: $e');
+    }
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> getOrganizations() async {
+    try {
+      final response = await apiClient.dio.get('/organizations/citizen-list');
+      if (response.statusCode == 200) {
+        final List<dynamic> data = response.data as List<dynamic>;
+        return data.cast<Map<String, dynamic>>();
+      } else {
+        throw Exception('Server error: ${response.statusCode}');
+      }
+    } on DioException catch (e) {
+      if (e.response != null) {
+        final message = e.response?.data['message'] ?? 'Server error';
+        throw Exception(message);
+      } else {
+        throw Exception('Network error: ${e.message}');
+      }
+    } catch (e) {
+      throw Exception('Failed to fetch organizations: $e');
     }
   }
 }

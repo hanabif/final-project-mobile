@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -11,6 +10,8 @@ import '../../../../core/widgets/platform_image.dart';
 import '../../domain/entities/complaint.dart';
 import '../cubits/complaint_cubit.dart';
 import '../cubits/complaint_state.dart';
+import '../../../../core/di/injection_container.dart';
+import '../../domain/usecases/get_organizations_usecase.dart';
 
 class ComplaintFormScreen extends StatefulWidget {
   final String? organizationId;
@@ -29,11 +30,8 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
 
-  final List<Map<String, String>> _organizations = [
-    {'id': '64f7a2b5e4b0a1a2b3c4d5e6', 'name': 'Ethiopian Electric Utility'},
-    {'id': '64f7a2b5e4b0a1a2b3c4d5e7', 'name': 'Ethiopian Roads Administration'},
-    {'id': '64f7a2b5e4b0a1a2b3c4d5e8', 'name': 'A.A Water and Sewerage Authority'},
-  ];
+  List<Map<String, String>> _organizations = [];
+  bool _isLoadingOrganizations = true;
 
   String? _selectedOrganizationId;
   List<XFile> _selectedImages = [];
@@ -43,14 +41,45 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
   @override
   void initState() {
     super.initState();
-    if (widget.organizationId != null) {
-      // Check if the passed ID exists in our list
-      final exists = _organizations.any((org) => org['id'] == widget.organizationId);
-      if (exists) {
-        _selectedOrganizationId = widget.organizationId;
+    _loadOrganizations();
+    _getCurrentLocation();
+  }
+
+  Future<void> _loadOrganizations() async {
+    try {
+      final getOrganizationsUseCase = sl<GetOrganizationsUseCase>();
+      final orgsResponse = await getOrganizationsUseCase.call();
+      
+      final mappedOrgs = orgsResponse.map((org) {
+        return {
+          'id': org['_id']?.toString() ?? '',
+          'name': org['name']?.toString() ?? 'Unknown',
+        };
+      }).toList();
+
+      if (mounted) {
+        setState(() {
+          _organizations = mappedOrgs;
+          _isLoadingOrganizations = false;
+          
+          if (widget.organizationId != null) {
+            final exists = _organizations.any((org) => org['id'] == widget.organizationId);
+            if (exists) {
+              _selectedOrganizationId = widget.organizationId;
+            }
+          }
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoadingOrganizations = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to load organizations: $e')),
+        );
       }
     }
-    _getCurrentLocation();
   }
 
   @override
@@ -127,9 +156,22 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
       if (source == ImageSource.gallery) {
         final List<XFile> pickedFiles = await picker.pickMultiImage();
         if (pickedFiles.isNotEmpty) {
+          final validFiles = <XFile>[];
+          for (var file in pickedFiles) {
+            final length = await file.length();
+            if (length <= 5 * 1024 * 1024) {
+              validFiles.add(file);
+            } else {
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('${file.name} exceeds 5MB limit')),
+                );
+              }
+            }
+          }
           setState(() {
             // Combine existing and new, taking only first 5
-            _selectedImages = [..._selectedImages, ...pickedFiles];
+            _selectedImages = [..._selectedImages, ...validFiles];
             if (_selectedImages.length > 5) {
               _selectedImages = _selectedImages.sublist(0, 5);
               ScaffoldMessenger.of(context).showSnackBar(
@@ -141,15 +183,24 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
       } else {
         final pickedFile = await picker.pickImage(source: source);
         if (pickedFile != null) {
-          setState(() {
-            if (_selectedImages.length < 5) {
-              _selectedImages.add(pickedFile);
-            } else {
+          final length = await pickedFile.length();
+          if (length <= 5 * 1024 * 1024) {
+            setState(() {
+              if (_selectedImages.length < 5) {
+                _selectedImages.add(pickedFile);
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Maximum 5 images allowed')),
+                );
+              }
+            });
+          } else {
+            if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Maximum 5 images allowed')),
+                SnackBar(content: Text('${pickedFile.name} exceeds 5MB limit')),
               );
             }
-          });
+          }
         }
       }
     } catch (e) {
@@ -201,8 +252,7 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
         createdAt: DateTime.now(),
       );
 
-      final imageFiles = _selectedImages.map((xFile) => File(xFile.path)).toList();
-      context.read<ComplaintCubit>().submitComplaint(complaint, imageFiles);
+      context.read<ComplaintCubit>().submitComplaint(complaint, _selectedImages);
     }
   }
 
@@ -277,7 +327,9 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
                     },
                   ),
                   const SizedBox(height: 16),
-                  if (widget.organizationId == null)
+                  if (_isLoadingOrganizations)
+                    const Center(child: CircularProgressIndicator())
+                  else if (widget.organizationId == null)
                     DropdownButtonFormField<String>(
                       decoration: const InputDecoration(
                         labelText: 'Select Organization',

@@ -40,19 +40,26 @@ class ComplaintModel extends Complaint {
       lng = (json['longitude'] as num).toDouble();
     }
 
+    String extractId(dynamic val) {
+      if (val == null) return '';
+      if (val is String) return val;
+      if (val is Map) return val['id']?.toString() ?? val['_id']?.toString() ?? '';
+      return val.toString();
+    }
+
     return ComplaintModel(
-      id: json['id']?.toString() ?? json['_id']?.toString() ?? '',
+      id: extractId(json['id'] ?? json['_id']),
       title: json['title'] as String,
       description: json['description'] as String,
       imageUrl: json['imageUrl'] as String?,
       images: (json['images'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
       latitude: lat,
       longitude: lng,
-      organizationId: json['organizationId'] as String? ?? '',
+      organizationId: extractId(json['organizationId']),
       status: json['status'] as String? ?? 'Pending',
       category: json['category'] as String? ?? 'Auto',
       priority: json['priority'] as String? ?? 'Low',
-      department: json['department'] as String? ?? 'Auto',
+      department: extractId(json['department'] ?? 'Auto'),
       createdAt: json['createdAt'] != null 
           ? DateTime.parse(json['createdAt'] as String) 
           : DateTime.now(),

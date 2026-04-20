@@ -138,7 +138,7 @@ class _LoginPageState extends State<LoginPage> {
                             alignment: Alignment.centerLeft,
                             child: TextButton(
                               onPressed: () {
-                                // TODO: Implement forgot password
+                                Navigator.pushNamed(context, RouteNames.forgotPassword);
                               },
                               style: TextButton.styleFrom(
                                 padding: EdgeInsets.zero,

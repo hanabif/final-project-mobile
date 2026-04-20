@@ -36,6 +36,7 @@ import '../../../features/complaint/presentation/cubits/complaint_list_cubit.dar
 import '../../../features/complaint/presentation/cubits/complaint_detail_cubit.dart';
 import '../../../features/complaint/presentation/cubits/home/home_cubit.dart';
 import '../../../features/complaint/domain/usecases/get_citizen_analytics_usecase.dart';
+import '../../../features/complaint/domain/usecases/get_organizations_usecase.dart';
 import '../../../features/complaint/presentation/cubits/profile/profile_cubit.dart';
 import '../../../features/settings/presentation/cubits/settings_cubit.dart';
 import '../../../features/notification/data/datasources/notification_remote_datasource.dart';
@@ -121,6 +122,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => GetUserComplaintsUseCase(sl()));
   sl.registerLazySingleton(() => GetComplaintDetailUseCase(sl()));
   sl.registerLazySingleton(() => GetCitizenAnalyticsUseCase(sl()));
+  sl.registerLazySingleton(() => GetOrganizationsUseCase(sl()));
 
   // Auth - Presentation
   sl.registerFactory(
@@ -141,7 +143,10 @@ Future<void> init() async {
   );
 
   // Complaint - Presentation
-  sl.registerFactory(() => HomeCubit(getCitizenAnalyticsUseCase: sl()));
+  sl.registerFactory(() => HomeCubit(
+        getCitizenAnalyticsUseCase: sl(),
+        getOrganizationsUseCase: sl(),
+      ));
   sl.registerFactory(() => ComplaintCubit(submitComplaintUseCase: sl()));
   sl.registerFactory(() => ComplaintListCubit(getUserComplaintsUseCase: sl()));
   sl.registerFactory(
