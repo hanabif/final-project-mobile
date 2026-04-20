@@ -10,10 +10,17 @@ class PasswordResetEmailSent extends PasswordResetState {
   PasswordResetEmailSent(this.email);
 }
 
-class PasswordResetCodeVerified extends PasswordResetState {
+class PasswordResetOtpSent extends PasswordResetState {
   final String email;
 
-  PasswordResetCodeVerified(this.email);
+  PasswordResetOtpSent(this.email);
+}
+
+class PasswordResetCodeVerified extends PasswordResetState {
+  final String email;
+  final String token;
+
+  PasswordResetCodeVerified(this.email, this.token);
 }
 
 class PasswordResetSuccess extends PasswordResetState {}

@@ -21,10 +21,24 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<PasswordResetCubit>();
-    final state = cubit.state as PasswordResetEmailSent;
-    final email = state.email;
+    String email = "";
+    
+    if (cubit.state is PasswordResetEmailSent) {
+      email = (cubit.state as PasswordResetEmailSent).email;
+    } else if (cubit.state is PasswordResetOtpSent) {
+      email = (cubit.state as PasswordResetOtpSent).email;
+    }
 
     return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          onPressed: () => Navigator.pop(context),
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+        ),
+      ),
       body: SafeArea(
         child: BlocListener<PasswordResetCubit, PasswordResetState>(
           listener: (context, state) {
@@ -39,45 +53,47 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
           },
           child: BlocBuilder<PasswordResetCubit, PasswordResetState>(
             builder: (context, state) {
-              return Padding(
+              return SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Form(
                   key: _formKey,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const SizedBox(height: 20),
-                      IconButton(
-                        onPressed: () => Navigator.pop(context),
-                        icon: const Icon(Icons.arrow_back),
-                      ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 10),
                       const Text(
-                        "Verify code",
+                        "Verify Code",
                         style: TextStyle(
                           fontFamily: 'Poppins',
-                          fontSize: 26,
+                          fontSize: 28,
                           fontWeight: FontWeight.w700,
                           color: primaryColor,
                         ),
                       ),
-                      const SizedBox(height: 12),
-                      const Text(
-                        "We have sent an email to your email account with a verification code!",
-                        style: TextStyle(fontFamily: 'Poppins'),
+                      const SizedBox(height: 8),
+                      Text(
+                        "We've sent a 6-digit verification code to $email. Please enter it below to continue.",
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          color: Colors.grey[600],
+                          fontSize: 15,
+                        ),
                       ),
                       const SizedBox(height: 40),
                       const Text(
-                        "Verification code",
+                        "Verification Code",
                         style: TextStyle(
-                            fontFamily: 'Poppins',
-                            fontWeight: FontWeight.w500),
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                        ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 12),
                       AuthTextField(
                         controller: _codeController,
-                        hint: "Enter code",
-                        icon: Icons.lock_outline,
+                        hint: "Enter 6-digit code",
+                        icon: Icons.lock_clock_outlined,
+                        keyboardType: TextInputType.number,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return "Code is required";
@@ -85,9 +101,9 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
                           return null;
                         },
                       ),
-                      const SizedBox(height: 30),
+                      const SizedBox(height: 32),
                       PrimaryButton(
-                        text: "Submit",
+                        text: "Verify Code",
                         isLoading: state is PasswordResetLoading,
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
@@ -96,6 +112,22 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
                                 .verifyCode(email, _codeController.text.trim());
                           }
                         },
+                      ),
+                      const SizedBox(height: 24),
+                      Center(
+                        child: TextButton(
+                          onPressed: () {
+                             // Logic to resend code could go here
+                          },
+                          child: const Text(
+                            "Didn't receive code? Resend",
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              color: primaryColor,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -107,4 +139,4 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
       ),
     );
   }
-}
+}

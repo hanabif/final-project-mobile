@@ -12,8 +12,9 @@ abstract class AuthRemoteDataSource {
     String role,
   );
   Future<void> forgotPassword(String email);
+  Future<void> forgotPasswordOtp(String email);
   Future<void> verifyCode(String email, String code);
-  Future<void> resetPassword(String email, String newPassword);
+  Future<void> resetPassword(String email, String token, String newPassword);
   Future<UserModel> getProfile();
 }
 
@@ -53,19 +54,37 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<void> forgotPassword(String email) async {
-    await Future.delayed(const Duration(seconds: 1));
-    // Mock success
+    await apiClient.dio.post(
+      '/auth/forgot-password',
+      data: {"email": email},
+    );
+  }
+
+  @override
+  Future<void> forgotPasswordOtp(String email) async {
+    await apiClient.dio.post(
+      '/auth/forgot-password-otp',
+      data: {"email": email},
+    );
   }
 
   @override
   Future<void> verifyCode(String email, String code) async {
-    await Future.delayed(const Duration(seconds: 1));
-    // Mock success
+    // There is no verify-code endpoint in the screenshots provided.
+    // We will treat this as a mock local step as planned.
+    await Future.delayed(const Duration(milliseconds: 500));
   }
 
   @override
-  Future<void> resetPassword(String email, String newPassword) async {
-    await Future.delayed(const Duration(seconds: 1));
+  Future<void> resetPassword(String email, String token, String newPassword) async {
+    await apiClient.dio.post(
+      '/auth/reset-password',
+      data: {
+        "email": email,
+        "token": token,
+        "password": newPassword,
+      },
+    );
   }
 
   @override

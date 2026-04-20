@@ -70,6 +70,7 @@ class ComplaintModel extends Complaint {
     );
   }
 
+  Map<String, dynamic> toJson() {
     return {
       'title': title,
       'description': description,

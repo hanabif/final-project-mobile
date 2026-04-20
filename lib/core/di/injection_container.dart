@@ -20,7 +20,9 @@ import '../../../features/auth/domain/usecases/logout_usecase.dart';
 import '../../../features/auth/domain/usecases/is_session_valid_usecase.dart';
 import '../../../features/auth/presentation/cubit/auth/auth_cubit.dart';
 import '../../../features/auth/domain/usecases/get_profile_usecase.dart';
+import '../../../features/auth/domain/usecases/forgot_password_otp_usecase.dart';
 import '../../../features/auth/presentation/cubit/password_reset/password_reset_cubit.dart';
+import '../network/deep_link_service.dart';
 
 import '../../../features/complaint/data/datasources/complaint_remote_datasource.dart';
 import '../../../features/complaint/data/repositories/complaint_repository_impl.dart';
@@ -60,6 +62,7 @@ Future<void> init() async {
     () => SessionRepositoryImpl(sl()),
   );
   sl.registerLazySingleton<ApiClient>(() => ApiClient(sl()));
+  sl.registerLazySingleton<DeepLinkService>(() => DeepLinkService());
 
   // Auth - Data sources
   sl.registerLazySingleton<AuthRemoteDataSource>(
@@ -99,6 +102,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => ResetPasswordUseCase(sl()));
   sl.registerLazySingleton(() => VerifyCodeUseCase(sl()));
   sl.registerLazySingleton(() => ForgotPasswordUseCase(sl()));
+  sl.registerLazySingleton(() => ForgotPasswordOtpUseCase(sl()));
   sl.registerLazySingleton(() => SaveTokenUseCase(sl()));
   sl.registerLazySingleton(() => GetTokenUseCase(sl()));
   sl.registerLazySingleton(() => LogoutUseCase(sl()));
@@ -130,6 +134,7 @@ Future<void> init() async {
   sl.registerFactory(
     () => PasswordResetCubit(
       forgotPasswordUseCase: sl(),
+      forgotPasswordOtpUseCase: sl(),
       verifyCodeUseCase: sl(),
       resetPasswordUseCase: sl(),
     ),

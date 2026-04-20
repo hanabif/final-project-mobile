@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'app.dart';
 import 'core/di/injection_container.dart';
+import 'core/network/deep_link_service.dart';
 import 'features/notification/presentation/services/firebase_notification_service.dart';
 
 
@@ -19,11 +20,14 @@ void main() async {
     debugPrint('DI Initialization Error: $e');
   }
 
-  // 2. Start UI immediately (Crucial for avoiding blank screen)
+  // 2. Initialize DeepLinkService
+  sl<DeepLinkService>().initialize();
+
+  // 3. Start UI immediately (Crucial for avoiding blank screen)
   runApp(const ComplaintResolutionApp());
   debugPrint('runApp executed.');
 
-  // 3. Initialize Firebase & Notifications in the background gracefully
+  // 4. Initialize Firebase & Notifications in the background gracefully
   _initializeFirebaseAndNotifications();
 }
 
