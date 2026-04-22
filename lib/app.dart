@@ -8,6 +8,7 @@ import 'core/utils/scaffold_messenger_key.dart';
 import 'core/utils/navigator_key.dart';
 import 'features/complaint/presentation/cubits/complaint_cubit.dart';
 import 'features/complaint/presentation/cubits/home/home_cubit.dart';
+import 'features/auth/presentation/cubit/password_reset/password_reset_cubit.dart';
 
 class ComplaintResolutionApp extends StatelessWidget {
   const ComplaintResolutionApp({super.key});
@@ -18,6 +19,7 @@ class ComplaintResolutionApp extends StatelessWidget {
       providers: [
         BlocProvider(create: (_) => sl<HomeCubit>()),
         BlocProvider(create: (_) => sl<ComplaintCubit>()),
+        BlocProvider(create: (_) => sl<PasswordResetCubit>()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

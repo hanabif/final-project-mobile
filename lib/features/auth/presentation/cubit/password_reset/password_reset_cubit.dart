@@ -48,10 +48,20 @@ class PasswordResetCubit extends Cubit<PasswordResetState> {
     }
   }
 
-  Future<void> resetPassword(String email, String token, String newPassword) async {
+  Future<void> resetPassword({
+    required String email,
+    required String token,
+    required String newPassword,
+    required bool isOtp,
+  }) async {
     emit(PasswordResetLoading());
     try {
-      await resetPasswordUseCase(email, token, newPassword);
+      await resetPasswordUseCase(
+        email: email,
+        token: token,
+        newPassword: newPassword,
+        isOtp: isOtp,
+      );
       emit(PasswordResetSuccess());
     } catch (e) {
       emit(PasswordResetError(e.toString()));

@@ -27,14 +27,17 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
     // Check for arguments from DeepLink (passed via Navigator)
     final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    bool isOtp = false;
     
     if (args != null) {
       email = args['email'];
       token = args['token'];
+      isOtp = false;
     } else if (cubit.state is PasswordResetCodeVerified) {
       final state = cubit.state as PasswordResetCodeVerified;
       email = state.email;
       token = state.token;
+      isOtp = true;
     }
 
     return Scaffold(
@@ -152,9 +155,10 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
                             context.read<PasswordResetCubit>().resetPassword(
-                                  email!,
-                                  token!,
-                                  _passwordController.text.trim(),
+                                  email: email!,
+                                  token: token!,
+                                  newPassword: _passwordController.text.trim(),
+                                  isOtp: isOtp,
                                 );
                           }
                         },

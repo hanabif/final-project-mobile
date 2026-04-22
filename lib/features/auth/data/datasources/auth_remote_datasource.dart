@@ -15,6 +15,7 @@ abstract class AuthRemoteDataSource {
   Future<void> forgotPasswordOtp(String email);
   Future<void> verifyCode(String email, String code);
   Future<void> resetPassword(String email, String token, String newPassword);
+  Future<void> resetPasswordOtp(String email, String code, String newPassword);
   Future<UserModel> getProfile();
 }
 
@@ -82,6 +83,18 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       data: {
         "email": email,
         "token": token,
+        "password": newPassword,
+      },
+    );
+  }
+
+  @override
+  Future<void> resetPasswordOtp(String email, String code, String newPassword) async {
+    await apiClient.dio.post(
+      '/auth/reset-password-otp',
+      data: {
+        "email": email,
+        "otp": code,
         "password": newPassword,
       },
     );
