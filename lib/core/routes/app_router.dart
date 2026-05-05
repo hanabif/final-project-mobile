@@ -10,6 +10,7 @@ import '../../features/settings/presentation/screens/profile_screen.dart';
 import '../../features/auth/presentation/pages/forgot_password_page.dart';
 import '../../features/auth/presentation/pages/verify_code_page.dart';
 import '../../features/auth/presentation/pages/reset_password_page.dart';
+import '../../features/notification/presentation/screens/notifications_screen.dart';
 import 'route_names.dart';
 
 class AppRouter {
@@ -71,6 +72,11 @@ class AppRouter {
       case RouteNames.resetPassword:
         return MaterialPageRoute(
           builder: (_) => const ResetPasswordPage(),
+        );
+
+      case RouteNames.notifications:
+        return MaterialPageRoute(
+          builder: (_) => const NotificationsScreen(),
         );
 
       default:

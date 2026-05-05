@@ -45,12 +45,10 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.account_circle, size: 30),
+            icon: const Icon(Icons.notifications, size: 30),
             onPressed: () {
-              // Placeholder for profile navigation
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Profile Screen - Coming Soon')),
-              );
+              // Navigate to notifications screen
+              Navigator.pushNamed(context, RouteNames.notifications);
             },
           )
         ],

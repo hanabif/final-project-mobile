@@ -145,7 +145,7 @@ class _ComplaintListScreenState extends State<ComplaintListScreen>
                   Navigator.pushNamed(
                     context,
                     RouteNames.complaintStatus,
-                    arguments: complaint.id,
+                    arguments: complaint.id.toString(),
                   );
                 },
               ))

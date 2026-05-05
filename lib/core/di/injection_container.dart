@@ -42,6 +42,9 @@ import '../../../features/settings/presentation/cubits/settings_cubit.dart';
 import '../../../features/notification/data/datasources/notification_remote_datasource.dart';
 import '../../../features/notification/data/repositories/notification_repository_impl.dart';
 import '../../../features/notification/domain/repositories/notification_repository.dart';
+import '../../../features/notification/domain/usecases/get_notifications_usecase.dart';
+import '../../../features/notification/domain/usecases/mark_all_notifications_as_read_usecase.dart';
+import '../../../features/notification/presentation/cubit/notification_cubit.dart';
 import '../../../features/notification/presentation/services/firebase_notification_service.dart';
 import '../../../features/settings/data/datasources/settings_remote_datasource.dart';
 import '../../../features/settings/data/repositories/settings_repository_impl.dart';
@@ -124,6 +127,10 @@ Future<void> init() async {
   sl.registerLazySingleton(() => GetCitizenAnalyticsUseCase(sl()));
   sl.registerLazySingleton(() => GetOrganizationsUseCase(sl()));
 
+  // Notification - Use cases
+  sl.registerLazySingleton(() => GetNotificationsUseCase(sl()));
+  sl.registerLazySingleton(() => MarkAllNotificationsAsReadUseCase(sl()));
+
   // Auth - Presentation
   sl.registerFactory(
     () => AuthCubit(
@@ -151,6 +158,12 @@ Future<void> init() async {
   sl.registerFactory(() => ComplaintListCubit(getUserComplaintsUseCase: sl()));
   sl.registerFactory(
     () => ComplaintDetailCubit(getComplaintDetailUseCase: sl()),
+  );
+  sl.registerFactory(
+    () => NotificationCubit(
+      sl<GetNotificationsUseCase>(),
+      sl<MarkAllNotificationsAsReadUseCase>(),
+    ),
   );
   sl.registerFactory(
     () => ProfileCubit(
