@@ -1,8 +1,8 @@
 import 'package:bloc/bloc.dart';
-import 'package:equatable/equatable.dart';
-import '../../domain/entities/notification_item.dart';
 import '../../domain/usecases/get_notifications_usecase.dart';
 import '../../domain/usecases/mark_all_notifications_as_read_usecase.dart';
+import '../../domain/entities/notification_item.dart';
+import 'package:equatable/equatable.dart';
 
 part 'notification_state.dart';
 

@@ -3,9 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../cubit/notification_cubit.dart';
+import '../../domain/entities/notification_item.dart';
 
 class NotificationsScreen extends StatelessWidget {
-  const NotificationsScreen({Key? key}) : super(key: key);
+  const NotificationsScreen({super.key});
 
   String _formatNotificationDate(DateTime date) {
     final localDate = date.toLocal();
