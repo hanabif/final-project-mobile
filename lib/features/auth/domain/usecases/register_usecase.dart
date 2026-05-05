@@ -6,7 +6,7 @@ class RegisterUseCase {
 
   RegisterUseCase(this.repository);
 
-  Future<User> call(String name, String email, String password) {
-    return repository.register(name, email, password);
+  Future<User> call(String name, String email, String password, String role) {
+    return repository.register(name, email, password, role);
   }
 }

@@ -1,11 +1,11 @@
+import 'package:complaint_resolution_app/core/routes/route_names.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../injection_container.dart';
-import '../cubit/auth_cubit.dart';
-import '../cubit/auth_state.dart';
+import '../../../../core/di/injection_container.dart';
+import '../cubit/auth/auth_cubit.dart';
+import '../cubit/auth/auth_state.dart';
 import '../widgets/auth_text_field.dart';
 import '../widgets/primary_button.dart';
-import 'register_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -39,19 +39,17 @@ class _LoginPageState extends State<LoginPage> {
             listener: (context, state) {
               if (state is AuthAuthenticated) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("Login successful"),
-                  ),
+                  const SnackBar(content: Text("Login successful")),
                 );
 
                 // TODO: Navigate to home page
-                // Navigator.pushReplacement(...)
+                Navigator.pushReplacementNamed(context, RouteNames.home);
               }
 
               if (state is AuthError) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(state.message)),
-                );
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(state.message)));
               }
             },
             child: BlocBuilder<AuthCubit, AuthState>(
@@ -96,6 +94,12 @@ class _LoginPageState extends State<LoginPage> {
                               if (value == null || value.isEmpty) {
                                 return "Email is required";
                               }
+                              final emailReg = RegExp(
+                                r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}",
+                              );
+                              if (!emailReg.hasMatch(value.trim())) {
+                                return "Enter a valid email";
+                              }
                               return null;
                             },
                           ),
@@ -120,6 +124,9 @@ class _LoginPageState extends State<LoginPage> {
                               if (value == null || value.isEmpty) {
                                 return "Password is required";
                               }
+                              if (value.length < 6) {
+                                return "Password must be at least 6 characters";
+                              }
                               return null;
                             },
                           ),
@@ -131,7 +138,7 @@ class _LoginPageState extends State<LoginPage> {
                             alignment: Alignment.centerLeft,
                             child: TextButton(
                               onPressed: () {
-                                // TODO: Implement forgot password
+                                Navigator.pushNamed(context, RouteNames.forgotPassword);
                               },
                               style: TextButton.styleFrom(
                                 padding: EdgeInsets.zero,
@@ -157,9 +164,9 @@ class _LoginPageState extends State<LoginPage> {
                             onPressed: () {
                               if (_formKey.currentState!.validate()) {
                                 context.read<AuthCubit>().login(
-                                      _emailController.text.trim(),
-                                      _passwordController.text.trim(),
-                                    );
+                                  _emailController.text.trim(),
+                                  _passwordController.text.trim(),
+                                );
                               }
                             },
                           ),
@@ -167,9 +174,7 @@ class _LoginPageState extends State<LoginPage> {
                           const SizedBox(height: 30),
 
                           /// Divider
-                          const Divider(
-                            thickness: 1,
-                          ),
+                          const Divider(thickness: 1),
 
                           const SizedBox(height: 20),
 
@@ -177,12 +182,9 @@ class _LoginPageState extends State<LoginPage> {
                           Center(
                             child: TextButton(
                               onPressed: () {
-                                Navigator.push(
+                                Navigator.pushNamed(
                                   context,
-                                  MaterialPageRoute(
-                                    builder: (_) =>
-                                        const RegisterPage(),
-                                  ),
+                                  RouteNames.register,
                                 );
                               },
                               child: const Text(

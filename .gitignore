@@ -12,6 +12,14 @@
 .swiftpm/
 migrate_working_dir/
 
+# Sensitive Configuration Files
+/android/app/google-services.json
+/ios/Runner/GoogleService-Info.plist
+/android/key.properties
+*.keystore
+*.jks
+.env
+
 # IntelliJ related
 *.iml
 *.ipr

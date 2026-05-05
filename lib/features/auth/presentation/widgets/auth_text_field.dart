@@ -14,7 +14,10 @@ class AuthTextField extends StatelessWidget {
     required this.icon,
     this.obscure = false,
     this.validator,
+    this.keyboardType,
   });
+
+  final TextInputType? keyboardType;
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +27,7 @@ class AuthTextField extends StatelessWidget {
       controller: controller,
       obscureText: obscure,
       validator: validator,
+      keyboardType: keyboardType,
       style: const TextStyle(fontFamily: 'Poppins'),
       decoration: InputDecoration(
         hintText: hint,

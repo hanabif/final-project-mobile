@@ -1,8 +1,9 @@
+import 'package:complaint_resolution_app/core/routes/route_names.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../injection_container.dart';
-import '../cubit/auth_cubit.dart';
-import '../cubit/auth_state.dart';
+import '../../../../core/di/injection_container.dart';
+import '../cubit/auth/auth_cubit.dart';
+import '../cubit/auth/auth_state.dart';
 import '../widgets/auth_text_field.dart';
 import '../widgets/primary_button.dart';
 
@@ -40,19 +41,17 @@ class _RegisterPageState extends State<RegisterPage> {
             listener: (context, state) {
               if (state is AuthAuthenticated) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("Registration successful"),
-                  ),
+                  const SnackBar(content: Text("Registration successful")),
                 );
 
                 // TODO: Navigate to home page
-                // Navigator.pushReplacement(...)
+                Navigator.pushNamed(context, RouteNames.login);
               }
 
               if (state is AuthError) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(state.message)),
-                );
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(state.message)));
               }
             },
             child: BlocBuilder<AuthCubit, AuthState>(
@@ -96,6 +95,12 @@ class _RegisterPageState extends State<RegisterPage> {
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return "Email is required";
+                              }
+                              final emailReg = RegExp(
+                                r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}",
+                              );
+                              if (!emailReg.hasMatch(value.trim())) {
+                                return "Enter a valid email";
                               }
                               return null;
                             },
@@ -141,7 +146,10 @@ class _RegisterPageState extends State<RegisterPage> {
                             icon: Icons.lock_outline,
                             obscure: true,
                             validator: (value) {
-                              if (value == null || value.length < 6) {
+                              if (value == null || value.isEmpty) {
+                                return "Password is required";
+                              }
+                              if (value.length < 6) {
                                 return "Minimum 6 characters";
                               }
                               return null;
@@ -157,10 +165,10 @@ class _RegisterPageState extends State<RegisterPage> {
                             onPressed: () {
                               if (_formKey.currentState!.validate()) {
                                 context.read<AuthCubit>().register(
-                                      _nameController.text.trim(),
-                                      _emailController.text.trim(),
-                                      _passwordController.text.trim(),
-                                    );
+                                  _nameController.text.trim(),
+                                  _emailController.text.trim(),
+                                  _passwordController.text.trim(),
+                                );
                               }
                             },
                           ),
