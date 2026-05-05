@@ -28,7 +28,8 @@ class NotificationsScreen extends StatelessWidget {
               builder: (appBarContext) => IconButton(
                 tooltip: 'Mark all as read',
                 icon: const Icon(Icons.done_all),
-                onPressed: () => appBarContext.read<NotificationCubit>().markAllAsRead(),
+                onPressed: () =>
+                    appBarContext.read<NotificationCubit>().markAllAsRead(),
               ),
             ),
           ],
@@ -45,7 +46,8 @@ class NotificationsScreen extends StatelessWidget {
               return ListView.separated(
                 padding: const EdgeInsets.all(16),
                 itemCount: notifications.length,
-                separatorBuilder: (context, index) => const SizedBox(height: 12),
+                separatorBuilder: (context, index) =>
+                    const SizedBox(height: 12),
                 itemBuilder: (context, index) {
                   final notif = notifications[index];
                   return Card(
@@ -55,19 +57,26 @@ class NotificationsScreen extends StatelessWidget {
                     elevation: 2,
                     child: ListTile(
                       leading: Icon(
-                        notif.isRead ? Icons.notifications_none : Icons.notifications,
+                        notif.isRead
+                            ? Icons.notifications_none
+                            : Icons.notifications,
                         color: AppTheme.primaryColor,
                       ),
                       title: Text(
                         notif.title,
                         style: TextStyle(
-                          fontWeight: notif.isRead ? FontWeight.w500 : FontWeight.bold,
+                          fontWeight: notif.isRead
+                              ? FontWeight.w500
+                              : FontWeight.bold,
                         ),
                       ),
                       subtitle: Text(notif.body),
                       trailing: Text(
                         _formatNotificationDate(notif.date),
-                        style: const TextStyle(fontSize: 12, color: Colors.grey),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
                       ),
                     ),
                   );
