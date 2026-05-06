@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/register_page.dart';
+import '../../features/complaint/domain/entities/complaint.dart';
 import '../../features/complaint/presentation/screens/home_screen.dart';
 import '../../features/complaint/presentation/screens/complaint_form_screen.dart';
 import '../../features/complaint/presentation/screens/complaint_success_screen.dart';
@@ -44,9 +45,9 @@ class AppRouter {
         );
 
       case RouteNames.complaintStatus:
-        final complaintId = settings.arguments as String;
+        final complaint = settings.arguments as Complaint;
         return MaterialPageRoute(
-          builder: (_) => ComplaintStatusScreen(complaintId: complaintId),
+          builder: (_) => ComplaintStatusScreen(complaint: complaint),
         );
 
       case RouteNames.complaintList:

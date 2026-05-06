@@ -68,7 +68,7 @@ Future<void> init() async {
   // Support
   sl.registerLazySingleton<ApiClient>(() => ApiClient(sl()));
   sl.registerLazySingleton<DeepLinkService>(() => DeepLinkService());
-  sl.registerLazySingleton<FirebaseNotificationService>(() => FirebaseNotificationService(sl()));
+  // sl.registerLazySingleton<FirebaseNotificationService>(() => FirebaseNotificationService(sl()));
 
   // Auth - Data sources
   sl.registerLazySingleton<AuthRemoteDataSource>(
