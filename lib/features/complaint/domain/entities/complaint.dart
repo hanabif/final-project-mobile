@@ -14,6 +14,8 @@ class Complaint extends Equatable {
   final String priority;
   final String department;
   final DateTime createdAt;
+  final DateTime? updatedAt;
+  final DateTime? resolvedAt;
   final List<StatusUpdate> history;
 
   const Complaint({
@@ -30,6 +32,8 @@ class Complaint extends Equatable {
     this.priority = 'Low',
     this.department = 'Auto',
     required this.createdAt,
+    this.updatedAt,
+    this.resolvedAt,
     this.history = const [],
   });
 
@@ -48,6 +52,8 @@ class Complaint extends Equatable {
         priority,
         department,
         createdAt,
+        updatedAt,
+        resolvedAt,
         history,
       ];
 }

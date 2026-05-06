@@ -142,10 +142,12 @@ class _ComplaintListScreenState extends State<ComplaintListScreen>
           .map((complaint) => ComplaintCard(
                 complaint: complaint,
                 onTap: () {
+                  // Pass the full Complaint object — the detail screen
+                  // uses it immediately with no extra API call.
                   Navigator.pushNamed(
                     context,
                     RouteNames.complaintStatus,
-                    arguments: complaint.id.toString(),
+                    arguments: complaint,
                   );
                 },
               ))

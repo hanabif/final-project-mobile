@@ -76,6 +76,14 @@ class ComplaintCard extends StatelessWidget {
                             color: Colors.grey.shade600,
                           ),
                         ),
+                        const SizedBox(height: 2),
+                        Text(
+                          _formatDate(complaint.createdAt),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey.shade400,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -86,17 +94,17 @@ class ComplaintCard extends StatelessWidget {
                 children: [
                   _IconLabel(
                     icon: Icons.location_on_rounded,
-                    label: '1', // Mock data as per image
+                    label: complaint.latitude != 0 ? '1' : '0',
                   ),
                   const SizedBox(width: 16),
                   _IconLabel(
                     icon: Icons.camera_alt_rounded,
-                    label: '3', // Mock data
+                    label: '${complaint.images.length}',
                   ),
                   const SizedBox(width: 16),
                   _IconLabel(
                     icon: Icons.chat_bubble_rounded,
-                    label: '5', // Mock data
+                    label: '0', 
                   ),
                 ],
               ),
@@ -107,18 +115,26 @@ class ComplaintCard extends StatelessWidget {
     );
   }
 
+  String _formatDate(DateTime date) {
+    final months = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    ];
+    return '${months[date.month - 1]} ${date.day}, ${date.year}';
+  }
+
   String _getLogoPath(String organization) {
-    switch (organization) {
-      case 'Ethiopian Electric Utility':
-        return 'assets/images/Property 1=electric.png';
-      case 'Addis Ababa Water Authority':
-        return 'assets/images/Property 1=water.png';
-      case 'Ethio Telecom':
-        return 'assets/images/logo (1).png';
-      case 'Roads & Transportation Dept.':
-        return 'assets/images/Property 1=road.png';
-      default:
-        return 'assets/images/logo (1).png';
+    final org = organization.toLowerCase();
+    if (org.contains('electric')) {
+      return 'assets/images/Property 1=electric.png';
+    } else if (org.contains('water')) {
+      return 'assets/images/Property 1=water.png';
+    } else if (org.contains('telecom')) {
+      return 'assets/images/logo (1).png';
+    } else if (org.contains('road') || org.contains('transport')) {
+      return 'assets/images/Property 1=road.png';
+    } else {
+      return 'assets/images/logo (1).png';
     }
   }
 

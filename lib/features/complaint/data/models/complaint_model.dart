@@ -15,6 +15,8 @@ class ComplaintModel extends Complaint {
     super.priority,
     super.department,
     required super.createdAt,
+    super.updatedAt,
+    super.resolvedAt,
     super.history = const [],
   });
 
@@ -47,33 +49,63 @@ class ComplaintModel extends Complaint {
       return val.toString();
     }
 
+    // Parse images from 'attachments' list (each has a 'url' key)
+    // or fall back to a plain 'images' string list
+    List<String> imagesList = [];
+    if (json['attachments'] != null && json['attachments'] is List) {
+      imagesList = (json['attachments'] as List<dynamic>)
+          .map((a) {
+            if (a is Map<String, dynamic>) return a['url']?.toString() ?? '';
+            return a.toString();
+          })
+          .where((url) => url.isNotEmpty)
+          .toList();
+    } else if (json['images'] != null && json['images'] is List) {
+      imagesList = (json['images'] as List<dynamic>).map((e) => e.toString()).toList();
+    }
+
+    // 'organization' may be a name string or an object; prefer 'organizationId'
+    String orgId = '';
+    if (json['organizationId'] != null) {
+      orgId = extractId(json['organizationId']);
+    } else if (json['organization'] != null) {
+      orgId = extractId(json['organization']);
+    }
+
     return ComplaintModel(
       id: extractId(json['id'] ?? json['_id']),
-      title: json['title'] as String,
-      description: json['description'] as String,
+      title: json['title'] as String? ?? '',
+      description: json['description'] as String? ?? '',
       imageUrl: json['imageUrl'] as String?,
-      images: (json['images'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
+      images: imagesList,
       latitude: lat,
       longitude: lng,
-      organizationId: extractId(json['organizationId']),
+      organizationId: orgId,
       status: json['status'] as String? ?? 'Pending',
       category: json['category'] as String? ?? 'Auto',
       priority: json['priority'] as String? ?? 'Low',
       department: extractId(json['department'] ?? 'Auto'),
-      createdAt: json['createdAt'] != null 
-          ? DateTime.parse(json['createdAt'] as String) 
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'] as String)
           : DateTime.now(),
+      updatedAt: json['updatedAt'] != null
+          ? DateTime.parse(json['updatedAt'] as String)
+          : null,
+      resolvedAt: json['resolvedAt'] != null
+          ? DateTime.parse(json['resolvedAt'] as String)
+          : null,
       history: (json['history'] as List<dynamic>?)?.map((e) {
         final map = e as Map<String, dynamic>;
         return StatusUpdate(
           action: map['action'] ?? 'Updated',
           comment: map['comment'],
           by: map['by'],
-          timestamp: map['timestamp'] != null 
-              ? DateTime.parse(map['timestamp'] as String) 
+          timestamp: map['timestamp'] != null
+              ? DateTime.parse(map['timestamp'] as String)
               : DateTime.now(),
         );
-      }).toList() ?? [],
+      }).toList() ??
+          [],
     );
   }
 
@@ -110,6 +142,8 @@ class ComplaintModel extends Complaint {
       priority: complaint.priority,
       department: complaint.department,
       createdAt: complaint.createdAt,
+      updatedAt: complaint.updatedAt,
+      resolvedAt: complaint.resolvedAt,
     );
   }
 }
