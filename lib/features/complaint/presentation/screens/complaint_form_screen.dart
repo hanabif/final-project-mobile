@@ -450,8 +450,8 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
                                 ? const Center(child: CircularProgressIndicator())
                                 : _currentPosition != null
                                     ? Text(
-                                        'Lat: \${_currentPosition!.latitude.toStringAsFixed(4)}\n'
-                                        'Lng: \${_currentPosition!.longitude.toStringAsFixed(4)}')
+                                        'Lat: ${_currentPosition!.latitude.toStringAsFixed(4)}\n'
+                                        'Lng: ${_currentPosition!.longitude.toStringAsFixed(4)}')
                                     : const Text(
                                         'Location not available',
                                         style: TextStyle(color: Colors.red),
@@ -466,7 +466,41 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 16),
+                  if (_selectedOrganizationId != null)
+                    Builder(
+                      builder: (context) {
+                        final selectedOrg = _organizations.firstWhere(
+                          (org) => org['id'] == _selectedOrganizationId,
+                          orElse: () => {'name': ''},
+                        );
+                        final orgName = selectedOrg['name']?.toLowerCase() ?? '';
+                        
+                        String? callCenterText;
+                        if (orgName.contains('electric')) {
+                          callCenterText = 'or report through their call center 905 for Ethiopian Electric Utility';
+                        } else if (orgName.contains('water') || orgName.contains('sewerage')) {
+                          callCenterText = 'or report through their call center +251116674036 for Addis Ababa Water and Sewerage Authority';
+                        }
+
+                        if (callCenterText != null) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                            child: Text(
+                              callCenterText,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                                fontStyle: FontStyle.italic,
+                                fontSize: 13,
+                              ),
+                            ),
+                          );
+                        }
+                        return const SizedBox.shrink();
+                      },
+                    ),
+                  const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: state is ComplaintSubmitting ? null : _submitForm,
                     style: ElevatedButton.styleFrom(
