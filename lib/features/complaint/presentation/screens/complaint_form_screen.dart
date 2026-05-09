@@ -16,10 +16,7 @@ import '../../domain/usecases/get_organizations_usecase.dart';
 class ComplaintFormScreen extends StatefulWidget {
   final String? organizationId;
 
-  const ComplaintFormScreen({
-    super.key,
-    this.organizationId,
-  });
+  const ComplaintFormScreen({super.key, this.organizationId});
 
   @override
   State<ComplaintFormScreen> createState() => _ComplaintFormScreenState();
@@ -49,7 +46,7 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
     try {
       final getOrganizationsUseCase = sl<GetOrganizationsUseCase>();
       final orgsResponse = await getOrganizationsUseCase.call();
-      
+
       final mappedOrgs = orgsResponse.map((org) {
         return {
           'id': org['_id']?.toString() ?? '',
@@ -61,9 +58,11 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
         setState(() {
           _organizations = mappedOrgs;
           _isLoadingOrganizations = false;
-          
+
           if (widget.organizationId != null) {
-            final exists = _organizations.any((org) => org['id'] == widget.organizationId);
+            final exists = _organizations.any(
+              (org) => org['id'] == widget.organizationId,
+            );
             if (exists) {
               _selectedOrganizationId = widget.organizationId;
             }
@@ -127,8 +126,10 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-                content: Text(
-                    'Location permissions are permanently denied, we cannot request permissions.')),
+              content: Text(
+                'Location permissions are permanently denied, we cannot request permissions.',
+              ),
+            ),
           );
         }
         setState(() => _isGettingLocation = false);
@@ -221,9 +222,9 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
       if (_currentPosition == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Location is required')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Location is required')));
         return;
       }
 
@@ -233,8 +234,12 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
         id: complaintId,
         title: _titleController.text.trim(),
         description: _descriptionController.text.trim(),
-        imageUrl: _selectedImages.isNotEmpty ? _selectedImages.first.path : null, // Fallback for single field
-        images: _selectedImages.map((e) => e.path).toList(), // Local paths for entity (will be updated by usecase)
+        imageUrl: _selectedImages.isNotEmpty
+            ? _selectedImages.first.path
+            : null, // Fallback for single field
+        images: _selectedImages
+            .map((e) => e.path)
+            .toList(), // Local paths for entity (will be updated by usecase)
         latitude: _currentPosition!.latitude,
         longitude: _currentPosition!.longitude,
         organizationId: _selectedOrganizationId!,
@@ -245,28 +250,31 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
         createdAt: DateTime.now(),
       );
 
-      context.read<ComplaintCubit>().submitComplaint(complaint, _selectedImages);
+      context.read<ComplaintCubit>().submitComplaint(
+        complaint,
+        _selectedImages,
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Submit Complaint'),
-      ),
+      appBar: AppBar(title: const Text('Submit Complaint')),
       body: BlocConsumer<ComplaintCubit, ComplaintState>(
         listener: (context, state) {
           if (state is ComplaintSuccess) {
-             ScaffoldMessenger.of(context).showSnackBar(
-               const SnackBar(content: Text('Complaint submitted successfully!')),
-             );
-             // In a real app we'd get the actual ID from the state/response if it's generated on backend
-             // For now we'll just pass a generated one.
-             Navigator.of(context).pushReplacementNamed(
-               RouteNames.complaintSuccess,
-               arguments: const Uuid().v4().substring(0, 8).toUpperCase(),
-             );
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Complaint submitted successfully!'),
+              ),
+            );
+            // In a real app we'd get the actual ID from the state/response if it's generated on backend
+            // For now we'll just pass a generated one.
+            Navigator.of(context).pushReplacementNamed(
+              RouteNames.complaintSuccess,
+              arguments: const Uuid().v4().substring(0, 8).toUpperCase(),
+            );
           } else if (state is ComplaintFailure) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -284,7 +292,7 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                   TextFormField(
+                  TextFormField(
                     controller: _titleController,
                     decoration: const InputDecoration(
                       labelText: 'Complaint Title',
@@ -376,14 +384,18 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Selected Images:', style: TextStyle(fontWeight: FontWeight.bold)),
+                        const Text(
+                          'Selected Images:',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
                         const SizedBox(height: 8),
                         SizedBox(
                           height: 120,
                           child: ListView.separated(
                             scrollDirection: Axis.horizontal,
                             itemCount: _selectedImages.length,
-                            separatorBuilder: (context, index) => const SizedBox(width: 8),
+                            separatorBuilder: (context, index) =>
+                                const SizedBox(width: 8),
                             itemBuilder: (context, index) {
                               return Stack(
                                 children: [
@@ -438,21 +450,24 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
                           const SizedBox(width: 8),
                           Expanded(
                             child: _isGettingLocation
-                                ? const Center(child: CircularProgressIndicator())
+                                ? const Center(
+                                    child: CircularProgressIndicator(),
+                                  )
                                 : _currentPosition != null
-                                    ? Text(
-                                        'Lat: ${_currentPosition!.latitude.toStringAsFixed(4)}\n'
-                                        'Lng: ${_currentPosition!.longitude.toStringAsFixed(4)}')
-                                    : const Text(
-                                        'Location not available',
-                                        style: TextStyle(color: Colors.red),
-                                      ),
+                                ? Text(
+                                    'Lat: ${_currentPosition!.latitude.toStringAsFixed(4)}\n'
+                                    'Lng: ${_currentPosition!.longitude.toStringAsFixed(4)}',
+                                  )
+                                : const Text(
+                                    'Location not available',
+                                    style: TextStyle(color: Colors.red),
+                                  ),
                           ),
                           IconButton(
                             icon: const Icon(Icons.refresh),
                             onPressed: _getCurrentLocation,
                             tooltip: 'Refresh Location',
-                          )
+                          ),
                         ],
                       ),
                     ),
@@ -465,13 +480,17 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
                           (org) => org['id'] == _selectedOrganizationId,
                           orElse: () => {'name': ''},
                         );
-                        final orgName = selectedOrg['name']?.toLowerCase() ?? '';
-                        
+                        final orgName =
+                            selectedOrg['name']?.toLowerCase() ?? '';
+
                         String? callCenterText;
                         if (orgName.contains('electric')) {
-                          callCenterText = 'or report through their call center 905 for Ethiopian Electric Utility';
-                        } else if (orgName.contains('water') || orgName.contains('sewerage')) {
-                          callCenterText = 'or report through their call center +251116674036 for Addis Ababa Water and Sewerage Authority';
+                          callCenterText =
+                              'or report through their call center 905 for Ethiopian Electric Utility';
+                        } else if (orgName.contains('water') ||
+                            orgName.contains('sewerage')) {
+                          callCenterText =
+                              'or report through their call center +251116674036 for Addis Ababa Water and Sewerage Authority';
                         }
 
                         if (callCenterText != null) {
@@ -493,7 +512,9 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
                     ),
                   const SizedBox(height: 16),
                   ElevatedButton(
-                    onPressed: state is ComplaintSubmitting ? null : _submitForm,
+                    onPressed: state is ComplaintSubmitting
+                        ? null
+                        : _submitForm,
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
