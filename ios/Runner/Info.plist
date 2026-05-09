@@ -49,5 +49,9 @@
 	<string>This app needs access to location when open to automatically include your location in the complaint report.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>This app needs access to location to automatically include your location in the complaint report.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app needs gallery access to let you pick images for your complaint.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>This app needs camera access to let you take photos for your complaint.</string>
 </dict>
 </plist>

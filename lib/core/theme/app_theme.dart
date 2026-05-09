@@ -34,8 +34,8 @@ class AppTheme {
     ),
 
     floatingActionButtonTheme: const FloatingActionButtonThemeData(
-      backgroundColor: secondaryColor,
-      foregroundColor: Colors.black,
+      backgroundColor: primaryColor,
+      foregroundColor: Colors.white,
     ),
 
     inputDecorationTheme: InputDecorationTheme(

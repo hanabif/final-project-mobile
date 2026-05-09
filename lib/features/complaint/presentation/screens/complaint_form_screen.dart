@@ -220,13 +220,6 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
-      if (_selectedImages.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please select at least one image')),
-        );
-        return;
-      }
-
       if (_currentPosition == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Location is required')),
@@ -355,15 +348,13 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
                       },
                     )
                   else
-                    // Only show the header if we're hiding the dropdown
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 16.0),
-                      child: Text(
-                        'Reporting to: ${_organizations.firstWhere((org) => org['id'] == widget.organizationId, orElse: () => {'name': widget.organizationId ?? 'Unknown'})['name']}',
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                      ),
-                    ),
+                    const SizedBox.shrink(),
                   const SizedBox(height: 24),
+                  const Text(
+                    'Attach Images (Optional)',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  const SizedBox(height: 8),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
@@ -433,8 +424,8 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
                     ),
                   if (_selectedImages.isEmpty)
                     const Text(
-                      'No images selected (Required)',
-                      style: TextStyle(color: Colors.red),
+                      'No images selected',
+                      style: TextStyle(color: Colors.grey),
                       textAlign: TextAlign.center,
                     ),
                   const SizedBox(height: 24),

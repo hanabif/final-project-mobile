@@ -145,6 +145,9 @@ class _HomeScreenState extends State<HomeScreen> {
         onPressed: () {
           Navigator.pushNamed(context, RouteNames.complaintForm);
         },
+        backgroundColor: const Color(0xFF005C45),
+        foregroundColor: Colors.white,
+        shape: const CircleBorder(),
         child: const Icon(Icons.add),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
