@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/routes/route_names.dart';
+import '../../../../core/di/injection_container.dart';
+import '../../../auth/domain/repositories/session_repository.dart';
 import '../cubits/home/home_cubit.dart';
 import '../cubits/home/home_state.dart';
 import '../widgets/stat_card.dart';
@@ -44,6 +46,19 @@ class _HomeScreenState extends State<HomeScreen> {
           fit: BoxFit.contain,
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.logout, color: Colors.blue),
+            onPressed: () async {
+              await sl<SessionRepository>().clearSession();
+              if (mounted) {
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  RouteNames.login,
+                  (route) => false,
+                );
+              }
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.notifications, size: 30),
             onPressed: () {
@@ -131,14 +146,17 @@ class _HomeScreenState extends State<HomeScreen> {
                             crossAxisCount: 2,
                             crossAxisSpacing: 16,
                             mainAxisSpacing: 16,
-                            childAspectRatio: 1.1,
+                            childAspectRatio: 0.9, // Adjusted height
                           ),
                       itemCount: state.organizations.length,
                       itemBuilder: (context, index) {
                         final org = state.organizations[index];
+                        final name = org['name'] ?? 'Unknown';
+                        final logo = org['logo'] ?? '';
+                        
                         return OrganizationCard(
-                          name: org['name']!,
-                          logo: org['logo']!,
+                          name: name,
+                          logo: logo,
                           onTap: () {
                             Navigator.pushNamed(
                               context,

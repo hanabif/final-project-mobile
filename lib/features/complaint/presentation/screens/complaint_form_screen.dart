@@ -38,6 +38,9 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
   @override
   void initState() {
     super.initState();
+    if (widget.organizationId != null) {
+      _selectedOrganizationId = widget.organizationId;
+    }
     _loadOrganizations();
     _getCurrentLocation();
   }
@@ -49,8 +52,8 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
 
       final mappedOrgs = orgsResponse.map((org) {
         return {
-          'id': org['_id']?.toString() ?? '',
-          'name': org['name']?.toString() ?? 'Unknown',
+          'id': org.id,
+          'name': org.name,
         };
       }).toList();
 
@@ -328,35 +331,35 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
                     },
                   ),
                   const SizedBox(height: 16),
-                  if (_isLoadingOrganizations)
-                    const Center(child: CircularProgressIndicator())
-                  else if (widget.organizationId == null)
-                    DropdownButtonFormField<String>(
-                      decoration: const InputDecoration(
-                        labelText: 'Select Organization',
-                        border: OutlineInputBorder(),
+                  if (widget.organizationId == null) ...[
+                    if (_isLoadingOrganizations)
+                      const Center(child: CircularProgressIndicator())
+                    else
+                      DropdownButtonFormField<String>(
+                        decoration: const InputDecoration(
+                          labelText: 'Select Organization',
+                          border: OutlineInputBorder(),
+                        ),
+                        value: _selectedOrganizationId,
+                        items: _organizations.map((org) {
+                          return DropdownMenuItem(
+                            value: org['id'],
+                            child: Text(org['name']!),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedOrganizationId = value;
+                          });
+                        },
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please select an organization';
+                          }
+                          return null;
+                        },
                       ),
-                      value: _selectedOrganizationId,
-                      items: _organizations.map((org) {
-                        return DropdownMenuItem(
-                          value: org['id'],
-                          child: Text(org['name']!),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedOrganizationId = value;
-                        });
-                      },
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please select an organization';
-                        }
-                        return null;
-                      },
-                    )
-                  else
-                    const SizedBox.shrink(),
+                  ],
                   const SizedBox(height: 24),
                   const Text(
                     'Attach Images (Optional)',

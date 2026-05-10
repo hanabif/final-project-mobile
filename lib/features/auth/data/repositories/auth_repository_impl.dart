@@ -14,6 +14,9 @@ class AuthRepositoryImpl implements AuthRepository {
     final authResponse = await remoteDataSource.login(email, password);
     // store token as soon as we get it
     await sessionRepository.saveToken(authResponse.token);
+    if (authResponse.refreshToken != null) {
+      await sessionRepository.saveRefreshToken(authResponse.refreshToken!);
+    }
     return authResponse.user;
   }
 
@@ -31,6 +34,9 @@ class AuthRepositoryImpl implements AuthRepository {
       role,
     );
     await sessionRepository.saveToken(authResponse.token);
+    if (authResponse.refreshToken != null) {
+      await sessionRepository.saveRefreshToken(authResponse.refreshToken!);
+    }
     return authResponse.user;
   }
 

@@ -1,8 +1,11 @@
 import 'package:get_it/get_it.dart';
 import 'package:dio/dio.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 import '../network/api_client.dart';
+import '../network/network_info.dart';
 import '../utils/secure_storage.dart';
 import '../../../features/auth/data/datasources/auth_remote_datasource.dart';
 import '../../../features/auth/data/repositories/auth_repository_impl.dart';
@@ -51,16 +54,21 @@ import '../../../features/settings/data/repositories/settings_repository_impl.da
 import '../../../features/settings/domain/repositories/settings_repository.dart';
 import '../../../features/settings/domain/usecases/get_settings_usecase.dart';
 import '../../../features/settings/domain/usecases/update_settings_usecase.dart';
+import '../../../features/complaint/data/datasources/complaint_local_data_source.dart';
 
 
 final sl = GetIt.instance;
 
 Future<void> init() async {
   // External
+  final sharedPreferences = await SharedPreferences.getInstance();
+  sl.registerLazySingleton(() => sharedPreferences);
+  sl.registerLazySingleton(() => Connectivity());
   sl.registerLazySingleton(() => Dio());
   sl.registerLazySingleton(() => ImagePicker());
 
   // Core
+  sl.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(sl()));
   sl.registerLazySingleton<SecureStorageService>(() => SecureStorageService());
   sl.registerLazySingleton<SessionRepository>(
     () => SessionRepositoryImpl(sl()),
@@ -79,6 +87,9 @@ Future<void> init() async {
   sl.registerLazySingleton<ComplaintRemoteDataSource>(
     () => ComplaintRemoteDataSourceImpl(apiClient: sl()),
   );
+  sl.registerLazySingleton<ComplaintLocalDataSource>(
+    () => ComplaintLocalDataSourceImpl(sharedPreferences: sl()),
+  );
 
   // Notification - Data sources
   sl.registerLazySingleton<NotificationRemoteDataSource>(
@@ -93,7 +104,11 @@ Future<void> init() async {
 
   // Complaint - Repository
   sl.registerLazySingleton<ComplaintRepository>(
-    () => ComplaintRepositoryImpl(remoteDataSource: sl()),
+    () => ComplaintRepositoryImpl(
+      remoteDataSource: sl(),
+      localDataSource: sl(),
+      networkInfo: sl(),
+    ),
   );
 
   // Notification - Repository

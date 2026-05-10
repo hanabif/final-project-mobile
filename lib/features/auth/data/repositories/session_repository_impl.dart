@@ -24,6 +24,16 @@ class SessionRepositoryImpl implements SessionRepository {
   }
 
   @override
+  Future<void> saveRefreshToken(String token) {
+    return _secureStorage.saveRefreshToken(token);
+  }
+
+  @override
+  Future<String?> getRefreshToken() {
+    return _secureStorage.getRefreshToken();
+  }
+
+  @override
   Future<bool> hasValidSession() async {
     final token = await _secureStorage.getToken();
     if (token == null) return false;

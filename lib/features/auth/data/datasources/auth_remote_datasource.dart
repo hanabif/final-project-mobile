@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import '../../../../core/network/api_client.dart';
 import '../models/auth_response_model.dart';
 import '../models/user_model.dart';
@@ -29,6 +30,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     final response = await apiClient.dio.post(
       '/auth/login',
       data: {"email": email, "password": password},
+      options: Options(extra: {'no-auth': true}),
     );
 
     return AuthResponseModel.fromJson(response.data);
@@ -48,6 +50,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         "email": email,
         "password": password,
       },
+      options: Options(extra: {'no-auth': true}),
     );
 
     return AuthResponseModel.fromJson(response.data);
