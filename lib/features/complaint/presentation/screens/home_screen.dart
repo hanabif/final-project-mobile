@@ -153,7 +153,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         final org = state.organizations[index];
                         final name = org['name'] ?? 'Unknown';
                         final logo = org['logo'] ?? '';
-                        
+
                         return OrganizationCard(
                           name: name,
                           logo: logo,

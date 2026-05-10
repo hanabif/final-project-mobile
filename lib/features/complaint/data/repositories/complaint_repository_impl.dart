@@ -39,8 +39,9 @@ class ComplaintRepositoryImpl implements ComplaintRepository {
   @override
   Future<String> getComplaintStatus(String complaintId) async {
     try {
-      final complaintModel =
-          await remoteDataSource.getComplaintStatus(complaintId);
+      final complaintModel = await remoteDataSource.getComplaintStatus(
+        complaintId,
+      );
       return complaintModel.status;
     } catch (e) {
       rethrow;

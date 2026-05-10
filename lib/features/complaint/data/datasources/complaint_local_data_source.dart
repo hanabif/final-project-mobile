@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';  
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/complaint_model.dart';
 import '../models/organization_model.dart';
 
@@ -22,7 +22,9 @@ class ComplaintLocalDataSourceImpl implements ComplaintLocalDataSource {
 
   @override
   Future<void> cacheOrganizations(List<OrganizationModel> organizations) {
-    final jsonString = json.encode(organizations.map((e) => e.toJson()).toList());
+    final jsonString = json.encode(
+      organizations.map((e) => e.toJson()).toList(),
+    );
     return sharedPreferences.setString(CACHED_ORGANIZATIONS, jsonString);
   }
 
@@ -31,7 +33,9 @@ class ComplaintLocalDataSourceImpl implements ComplaintLocalDataSource {
     final jsonString = sharedPreferences.getString(CACHED_ORGANIZATIONS);
     if (jsonString != null) {
       final jsonList = json.decode(jsonString) as List;
-      final organizations = jsonList.map((e) => OrganizationModel.fromJson(e)).toList();
+      final organizations = jsonList
+          .map((e) => OrganizationModel.fromJson(e))
+          .toList();
       return Future.value(organizations);
     } else {
       return Future.value([]);
@@ -49,7 +53,9 @@ class ComplaintLocalDataSourceImpl implements ComplaintLocalDataSource {
     final jsonString = sharedPreferences.getString(CACHED_COMPLAINTS);
     if (jsonString != null) {
       final jsonList = json.decode(jsonString) as List;
-      final complaints = jsonList.map((e) => ComplaintModel.fromJson(e)).toList();
+      final complaints = jsonList
+          .map((e) => ComplaintModel.fromJson(e))
+          .toList();
       return Future.value(complaints);
     } else {
       return Future.value([]);
@@ -58,14 +64,21 @@ class ComplaintLocalDataSourceImpl implements ComplaintLocalDataSource {
 
   @override
   Future<void> cacheComplaint(ComplaintModel complaint) async {
-    final jsonString = sharedPreferences.getString(CACHED_UNSUBMITTED_COMPLAINTS);
+    final jsonString = sharedPreferences.getString(
+      CACHED_UNSUBMITTED_COMPLAINTS,
+    );
     List<ComplaintModel> complaints = [];
     if (jsonString != null) {
       final jsonList = json.decode(jsonString) as List;
       complaints = jsonList.map((e) => ComplaintModel.fromJson(e)).toList();
     }
     complaints.add(complaint);
-    final newJsonString = json.encode(complaints.map((e) => e.toJson()).toList());
-    await sharedPreferences.setString(CACHED_UNSUBMITTED_COMPLAINTS, newJsonString);
+    final newJsonString = json.encode(
+      complaints.map((e) => e.toJson()).toList(),
+    );
+    await sharedPreferences.setString(
+      CACHED_UNSUBMITTED_COMPLAINTS,
+      newJsonString,
+    );
   }
 }

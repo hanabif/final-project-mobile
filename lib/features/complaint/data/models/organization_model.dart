@@ -16,10 +16,6 @@ class OrganizationModel extends Organization {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'logo': logo,
-    };
+    return {'id': id, 'name': name, 'logo': logo};
   }
 }

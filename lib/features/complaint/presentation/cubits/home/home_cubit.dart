@@ -18,25 +18,24 @@ class HomeCubit extends Cubit<HomeState> {
 
     try {
       final stats = await getCitizenAnalyticsUseCase.call();
-      final List<Organization> orgsResponse = await getOrganizationsUseCase.call();
+      final List<Organization> orgsResponse = await getOrganizationsUseCase
+          .call();
 
       final List<Map<String, String>> organizations = orgsResponse.map((org) {
         // Log individual organization to verify fields
         print('Mapping Org: ID=\${org.id}, Name=\${org.name}');
-        return {
-          'id': org.id,
-          'name': org.name,
-          'logo': org.logo,
-        };
+        return {'id': org.id, 'name': org.name, 'logo': org.logo};
       }).toList();
 
       print('Emitting HomeLoaded with \${organizations.length} organizations');
-      emit(HomeLoaded(
-        totalComplaints: stats.total,
-        resolvedComplaints: stats.resolved,
-        pendingComplaints: stats.pending,
-        organizations: organizations,
-      ));
+      emit(
+        HomeLoaded(
+          totalComplaints: stats.total,
+          resolvedComplaints: stats.resolved,
+          pendingComplaints: stats.pending,
+          organizations: organizations,
+        ),
+      );
     } catch (e, stackTrace) {
       print('HomeCubit Error: $e');
       print('Stacktrace: $stackTrace');

@@ -51,10 +51,7 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
       final orgsResponse = await getOrganizationsUseCase.call();
 
       final mappedOrgs = orgsResponse.map((org) {
-        return {
-          'id': org.id,
-          'name': org.name,
-        };
+        return {'id': org.id, 'name': org.name};
       }).toList();
 
       if (mounted) {

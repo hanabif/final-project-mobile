@@ -56,7 +56,6 @@ import '../../../features/settings/domain/usecases/get_settings_usecase.dart';
 import '../../../features/settings/domain/usecases/update_settings_usecase.dart';
 import '../../../features/complaint/data/datasources/complaint_local_data_source.dart';
 
-
 final sl = GetIt.instance;
 
 Future<void> init() async {
@@ -96,7 +95,6 @@ Future<void> init() async {
     () => NotificationRemoteDataSourceImpl(sl()),
   );
 
-
   // Auth - Repository
   sl.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(sl(), sl()),
@@ -116,7 +114,6 @@ Future<void> init() async {
     () => NotificationRepositoryImpl(sl()),
   );
 
-
   // Auth - Use cases
   sl.registerLazySingleton(() => LoginUseCase(sl()));
   sl.registerLazySingleton(() => RegisterUseCase(sl()));
@@ -134,7 +131,6 @@ Future<void> init() async {
   sl.registerLazySingleton<FirebaseNotificationService>(
     () => FirebaseNotificationService(sl()),
   );
-
 
   // Complaint - Use cases
   sl.registerLazySingleton(() => SubmitComplaintUseCase(sl()));
@@ -167,10 +163,12 @@ Future<void> init() async {
   );
 
   // Complaint - Presentation
-  sl.registerFactory(() => HomeCubit(
-        getCitizenAnalyticsUseCase: sl(),
-        getOrganizationsUseCase: sl(),
-      ));
+  sl.registerFactory(
+    () => HomeCubit(
+      getCitizenAnalyticsUseCase: sl(),
+      getOrganizationsUseCase: sl(),
+    ),
+  );
   sl.registerFactory(() => ComplaintCubit(submitComplaintUseCase: sl()));
   sl.registerFactory(() => ComplaintListCubit(getUserComplaintsUseCase: sl()));
   sl.registerFactory(
@@ -183,21 +181,20 @@ Future<void> init() async {
     ),
   );
   sl.registerFactory(
-    () => ProfileCubit(
-      getProfileUseCase: sl(),
-      getCitizenAnalyticsUseCase: sl(),
-    ),
+    () =>
+        ProfileCubit(getProfileUseCase: sl(), getCitizenAnalyticsUseCase: sl()),
   );
 
   // Settings
-  sl.registerFactory(() => SettingsCubit(
-        getSettingsUseCase: sl(),
-        updateSettingsUseCase: sl(),
-      ));
+  sl.registerFactory(
+    () => SettingsCubit(getSettingsUseCase: sl(), updateSettingsUseCase: sl()),
+  );
   sl.registerLazySingleton(() => GetSettingsUseCase(sl()));
   sl.registerLazySingleton(() => UpdateSettingsUseCase(sl()));
   sl.registerLazySingleton<SettingsRepository>(
-      () => SettingsRepositoryImpl(remoteDataSource: sl()));
+    () => SettingsRepositoryImpl(remoteDataSource: sl()),
+  );
   sl.registerLazySingleton<SettingsRemoteDataSource>(
-      () => SettingsRemoteDataSourceImpl());
+    () => SettingsRemoteDataSourceImpl(),
+  );
 }
