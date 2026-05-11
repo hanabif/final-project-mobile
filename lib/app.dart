@@ -29,7 +29,7 @@ class ComplaintResolutionApp extends StatelessWidget {
         theme: AppTheme.lightTheme,
         scaffoldMessengerKey: scaffoldMessengerKey,
         navigatorKey: navigatorKey,
-        initialRoute: RouteNames.login,
+        initialRoute: RouteNames.splash,
         onGenerateRoute: AppRouter.generateRoute,
       ),
     );

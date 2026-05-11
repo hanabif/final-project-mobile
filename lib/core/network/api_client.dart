@@ -2,7 +2,9 @@ import 'package:complaint_resolution_app/features/auth/data/models/refresh_token
 import 'package:dio/dio.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import '../utils/app_config.dart';
+import '../utils/navigator_key.dart';
 import '../../features/auth/domain/repositories/session_repository.dart';
+import '../routes/route_names.dart';
 import '../error/exceptions.dart';
 // Conditional import for HttpClientAdapter
 import 'api_client_adapter_stub.dart'
@@ -110,6 +112,11 @@ class ApiClient {
               }
             } on DioException {
               await sessionRepository.clearSession();
+              // Redirect to login if a refresh fails
+              navigatorKey.currentState?.pushNamedAndRemoveUntil(
+                RouteNames.login,
+                (route) => false,
+              );
               // Pass the original error to be handled by the UI
             }
           }
