@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:uuid/uuid.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../../../../core/routes/route_names.dart';
 import '../../../../core/widgets/platform_image.dart';
@@ -101,7 +102,15 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
       if (!serviceEnabled) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Location services are disabled.')),
+            const SnackBar(
+              content: Text(
+                'Location services are disabled. Please enable them in settings.',
+              ),
+              action: SnackBarAction(
+                label: 'Settings',
+                onPressed: Geolocator.openLocationSettings,
+              ),
+            ),
           );
         }
         setState(() => _isGettingLocation = false);
@@ -110,15 +119,39 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
 
       permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.denied) {
+        // Use permission_handler for a more standard request flow if geolocator's request fails to show
+        final status = await Permission.location.request();
+        if (status.isPermanentlyDenied) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Location permissions are denied')),
+              const SnackBar(
+                content: Text('Location permissions are permanently denied.'),
+                action: SnackBarAction(
+                  label: 'Settings',
+                  onPressed: openAppSettings,
+                ),
+              ),
             );
           }
           setState(() => _isGettingLocation = false);
           return;
+        }
+
+        // Re-check geolocator permission after permission_handler request
+        permission = await Geolocator.checkPermission();
+        if (permission == LocationPermission.denied) {
+          permission = await Geolocator.requestPermission();
+          if (permission == LocationPermission.denied) {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Location permissions are denied'),
+                ),
+              );
+            }
+            setState(() => _isGettingLocation = false);
+            return;
+          }
         }
       }
 
@@ -128,6 +161,10 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
             const SnackBar(
               content: Text(
                 'Location permissions are permanently denied, we cannot request permissions.',
+              ),
+              action: SnackBarAction(
+                label: 'Settings',
+                onPressed: openAppSettings,
               ),
             ),
           );
@@ -154,6 +191,38 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
   Future<void> _pickImage(ImageSource source) async {
     final picker = ImagePicker();
     try {
+      // Request permissions before picking
+      if (source == ImageSource.camera) {
+        final status = await Permission.camera.request();
+        if (status.isDenied) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Camera permission is required')),
+            );
+          }
+          return;
+        }
+      } else if (source == ImageSource.gallery) {
+        // For Android 13+ (API 33+), we need photos permission.
+        // For older, we need storage. permission_handler handles this with .photos and .storage
+        PermissionStatus status;
+        if (await Permission.photos.isRestricted ||
+            await Permission.photos.isDenied) {
+          status = await Permission.photos.request();
+        } else {
+          status = await Permission.storage.request();
+        }
+
+        if (status.isDenied) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Gallery permission is required')),
+            );
+          }
+          return;
+        }
+      }
+
       if (source == ImageSource.gallery) {
         final List<XFile> pickedFiles = await picker.pickMultiImage();
         if (pickedFiles.isNotEmpty) {

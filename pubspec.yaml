@@ -55,6 +55,7 @@ dependencies:
   app_links: ^6.3.2
   jwt_decoder: ^2.0.1
   shared_preferences: ^2.2.2
+  permission_handler:
 
 dev_dependencies:
   flutter_test:
