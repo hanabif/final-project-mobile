@@ -103,7 +103,9 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Location services are disabled. Please enable them in settings.'),
+              content: Text(
+                'Location services are disabled. Please enable them in settings.',
+              ),
               action: SnackBarAction(
                 label: 'Settings',
                 onPressed: Geolocator.openLocationSettings,
@@ -134,7 +136,7 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
           setState(() => _isGettingLocation = false);
           return;
         }
-        
+
         // Re-check geolocator permission after permission_handler request
         permission = await Geolocator.checkPermission();
         if (permission == LocationPermission.denied) {
@@ -142,7 +144,9 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
           if (permission == LocationPermission.denied) {
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Location permissions are denied')),
+                const SnackBar(
+                  content: Text('Location permissions are denied'),
+                ),
               );
             }
             setState(() => _isGettingLocation = false);
@@ -199,10 +203,11 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
           return;
         }
       } else if (source == ImageSource.gallery) {
-        // For Android 13+ (API 33+), we need photos permission. 
+        // For Android 13+ (API 33+), we need photos permission.
         // For older, we need storage. permission_handler handles this with .photos and .storage
         PermissionStatus status;
-        if (await Permission.photos.isRestricted || await Permission.photos.isDenied) {
+        if (await Permission.photos.isRestricted ||
+            await Permission.photos.isDenied) {
           status = await Permission.photos.request();
         } else {
           status = await Permission.storage.request();
