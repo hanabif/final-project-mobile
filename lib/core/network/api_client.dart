@@ -1,4 +1,6 @@
+import 'package:complaint_resolution_app/features/auth/data/models/refresh_token_response.dart';
 import 'package:dio/dio.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 import '../utils/app_config.dart';
 import '../../features/auth/domain/repositories/session_repository.dart';
 import '../error/exceptions.dart';
@@ -8,8 +10,9 @@ import 'api_client_adapter_stub.dart'
 
 class ApiClient {
   final Dio dio;
+  final SessionRepository sessionRepository;
 
-  ApiClient(SessionRepository sessionRepository)
+  ApiClient(this.sessionRepository)
     : dio = Dio(
         BaseOptions(
           baseUrl: AppConfig.baseUrl,
@@ -23,17 +26,93 @@ class ApiClient {
       ) {
     dio.interceptors.add(
       InterceptorsWrapper(
-        onResponse: (response, handler) {
-          return handler.next(response);
-        },
         onRequest: (options, handler) async {
+          // Skip token logic if marked as no-auth
+          if (options.extra['no-auth'] == true) {
+            return handler.next(options);
+          }
+
           final token = await sessionRepository.getToken();
           if (token != null && token.isNotEmpty) {
-            options.headers['Authorization'] = 'Bearer $token';
+            bool isExpired = false;
+            try {
+              isExpired = JwtDecoder.isExpired(token);
+            } catch (e) {
+              // If token is malformed, treat as expired to trigger refresh or re-auth
+              isExpired = true;
+            }
+
+            if (isExpired) {
+              try {
+                final refreshToken = await sessionRepository.getRefreshToken();
+                if (refreshToken != null && refreshToken.isNotEmpty) {
+                  // Use a separate Dio instance or lock to avoid circularity if possible,
+                  // but here we just use the same one with a flag or direct call.
+                  // For simplicity, we'll try a fresh POST.
+                  final response = await dio.post(
+                    '/auth/refresh',
+                    data: {'refreshToken': refreshToken},
+                    // Prevent infinite loop by not running interceptors for refresh
+                    options: Options(extra: {'no-auth': true}),
+                  );
+                  if (response.statusCode == 200) {
+                    final newTokens = RefreshTokenResponse.fromJson(
+                      response.data,
+                    );
+                    await sessionRepository.saveToken(newTokens.accessToken);
+                    await sessionRepository.saveRefreshToken(
+                      newTokens.refreshToken,
+                    );
+                    options.headers['Authorization'] =
+                        'Bearer ${newTokens.accessToken}';
+                  } else {
+                    await sessionRepository.clearSession();
+                  }
+                } else {
+                  await sessionRepository.clearSession();
+                }
+              } catch (e) {
+                await sessionRepository.clearSession();
+              }
+            } else {
+              options.headers['Authorization'] = 'Bearer $token';
+            }
           }
           return handler.next(options);
         },
-        onError: (DioException e, handler) {
+        onError: (DioException e, handler) async {
+          if (e.response?.statusCode == 401) {
+            try {
+              final refreshToken = await sessionRepository.getRefreshToken();
+              if (refreshToken != null && refreshToken.isNotEmpty) {
+                final response = await dio.post(
+                  '/auth/refresh',
+                  data: {'refreshToken': refreshToken},
+                  options: Options(extra: {'no-auth': true}),
+                );
+
+                if (response.statusCode == 200) {
+                  final newTokens = RefreshTokenResponse.fromJson(
+                    response.data,
+                  );
+                  await sessionRepository.saveToken(newTokens.accessToken);
+                  await sessionRepository.saveRefreshToken(
+                    newTokens.refreshToken,
+                  );
+
+                  // Retry the original request
+                  final opts = e.requestOptions;
+                  opts.headers['Authorization'] =
+                      'Bearer ${newTokens.accessToken}';
+                  final cloneReq = await dio.fetch(opts);
+                  return handler.resolve(cloneReq);
+                }
+              }
+            } on DioException {
+              await sessionRepository.clearSession();
+              // Pass the original error to be handled by the UI
+            }
+          }
           final message = _getErrorMessage(e);
           return handler.reject(
             DioException(
@@ -51,10 +130,7 @@ class ApiClient {
     configureAdapter(dio);
 
     // Optional: Add logging interceptor in debug mode
-    dio.interceptors.add(LogInterceptor(
-      requestBody: true,
-      responseBody: true,
-    ));
+    dio.interceptors.add(LogInterceptor(requestBody: true, responseBody: true));
   }
 
   String _getErrorMessage(DioException e) {
@@ -66,7 +142,7 @@ class ApiClient {
         return data['error'];
       }
     }
-    
+
     switch (e.type) {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:

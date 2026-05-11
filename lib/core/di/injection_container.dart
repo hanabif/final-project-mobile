@@ -1,8 +1,11 @@
 import 'package:get_it/get_it.dart';
 import 'package:dio/dio.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 import '../network/api_client.dart';
+import '../network/network_info.dart';
 import '../utils/secure_storage.dart';
 import '../../../features/auth/data/datasources/auth_remote_datasource.dart';
 import '../../../features/auth/data/repositories/auth_repository_impl.dart';
@@ -44,6 +47,7 @@ import '../../../features/notification/data/repositories/notification_repository
 import '../../../features/notification/domain/repositories/notification_repository.dart';
 import '../../../features/notification/domain/usecases/get_notifications_usecase.dart';
 import '../../../features/notification/domain/usecases/mark_all_notifications_as_read_usecase.dart';
+import '../../../features/notification/domain/usecases/mark_notification_as_read_usecase.dart';
 import '../../../features/notification/presentation/cubit/notification_cubit.dart';
 import '../../../features/notification/presentation/services/firebase_notification_service.dart';
 import '../../../features/settings/data/datasources/settings_remote_datasource.dart';
@@ -51,16 +55,20 @@ import '../../../features/settings/data/repositories/settings_repository_impl.da
 import '../../../features/settings/domain/repositories/settings_repository.dart';
 import '../../../features/settings/domain/usecases/get_settings_usecase.dart';
 import '../../../features/settings/domain/usecases/update_settings_usecase.dart';
-
+import '../../../features/complaint/data/datasources/complaint_local_data_source.dart';
 
 final sl = GetIt.instance;
 
 Future<void> init() async {
   // External
+  final sharedPreferences = await SharedPreferences.getInstance();
+  sl.registerLazySingleton(() => sharedPreferences);
+  sl.registerLazySingleton(() => Connectivity());
   sl.registerLazySingleton(() => Dio());
   sl.registerLazySingleton(() => ImagePicker());
 
   // Core
+  sl.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(sl()));
   sl.registerLazySingleton<SecureStorageService>(() => SecureStorageService());
   sl.registerLazySingleton<SessionRepository>(
     () => SessionRepositoryImpl(sl()),
@@ -79,12 +87,14 @@ Future<void> init() async {
   sl.registerLazySingleton<ComplaintRemoteDataSource>(
     () => ComplaintRemoteDataSourceImpl(apiClient: sl()),
   );
+  sl.registerLazySingleton<ComplaintLocalDataSource>(
+    () => ComplaintLocalDataSourceImpl(sharedPreferences: sl()),
+  );
 
   // Notification - Data sources
   sl.registerLazySingleton<NotificationRemoteDataSource>(
     () => NotificationRemoteDataSourceImpl(sl()),
   );
-
 
   // Auth - Repository
   sl.registerLazySingleton<AuthRepository>(
@@ -93,14 +103,17 @@ Future<void> init() async {
 
   // Complaint - Repository
   sl.registerLazySingleton<ComplaintRepository>(
-    () => ComplaintRepositoryImpl(remoteDataSource: sl()),
+    () => ComplaintRepositoryImpl(
+      remoteDataSource: sl(),
+      localDataSource: sl(),
+      networkInfo: sl(),
+    ),
   );
 
   // Notification - Repository
   sl.registerLazySingleton<NotificationRepository>(
     () => NotificationRepositoryImpl(sl()),
   );
-
 
   // Auth - Use cases
   sl.registerLazySingleton(() => LoginUseCase(sl()));
@@ -120,7 +133,6 @@ Future<void> init() async {
     () => FirebaseNotificationService(sl()),
   );
 
-
   // Complaint - Use cases
   sl.registerLazySingleton(() => SubmitComplaintUseCase(sl()));
   sl.registerLazySingleton(() => GetComplaintStatusUseCase(sl()));
@@ -132,6 +144,7 @@ Future<void> init() async {
   // Notification - Use cases
   sl.registerLazySingleton(() => GetNotificationsUseCase(sl()));
   sl.registerLazySingleton(() => MarkAllNotificationsAsReadUseCase(sl()));
+  sl.registerLazySingleton(() => MarkNotificationAsReadUseCase(sl()));
 
   // Auth - Presentation
   sl.registerFactory(
@@ -152,10 +165,12 @@ Future<void> init() async {
   );
 
   // Complaint - Presentation
-  sl.registerFactory(() => HomeCubit(
-        getCitizenAnalyticsUseCase: sl(),
-        getOrganizationsUseCase: sl(),
-      ));
+  sl.registerFactory(
+    () => HomeCubit(
+      getCitizenAnalyticsUseCase: sl(),
+      getOrganizationsUseCase: sl(),
+    ),
+  );
   sl.registerFactory(() => ComplaintCubit(submitComplaintUseCase: sl()));
   sl.registerFactory(() => ComplaintListCubit(getUserComplaintsUseCase: sl()));
   sl.registerFactory(
@@ -165,24 +180,24 @@ Future<void> init() async {
     () => NotificationCubit(
       sl<GetNotificationsUseCase>(),
       sl<MarkAllNotificationsAsReadUseCase>(),
+      sl<MarkNotificationAsReadUseCase>(),
     ),
   );
   sl.registerFactory(
-    () => ProfileCubit(
-      getProfileUseCase: sl(),
-      getCitizenAnalyticsUseCase: sl(),
-    ),
+    () =>
+        ProfileCubit(getProfileUseCase: sl(), getCitizenAnalyticsUseCase: sl()),
   );
 
   // Settings
-  sl.registerFactory(() => SettingsCubit(
-        getSettingsUseCase: sl(),
-        updateSettingsUseCase: sl(),
-      ));
+  sl.registerFactory(
+    () => SettingsCubit(getSettingsUseCase: sl(), updateSettingsUseCase: sl()),
+  );
   sl.registerLazySingleton(() => GetSettingsUseCase(sl()));
   sl.registerLazySingleton(() => UpdateSettingsUseCase(sl()));
   sl.registerLazySingleton<SettingsRepository>(
-      () => SettingsRepositoryImpl(remoteDataSource: sl()));
+    () => SettingsRepositoryImpl(remoteDataSource: sl()),
+  );
   sl.registerLazySingleton<SettingsRemoteDataSource>(
-      () => SettingsRemoteDataSourceImpl());
+    () => SettingsRemoteDataSourceImpl(),
+  );
 }

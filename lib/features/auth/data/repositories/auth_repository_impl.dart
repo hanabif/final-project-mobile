@@ -14,6 +14,9 @@ class AuthRepositoryImpl implements AuthRepository {
     final authResponse = await remoteDataSource.login(email, password);
     // store token as soon as we get it
     await sessionRepository.saveToken(authResponse.token);
+    if (authResponse.refreshToken != null) {
+      await sessionRepository.saveRefreshToken(authResponse.refreshToken!);
+    }
     return authResponse.user;
   }
 
@@ -31,6 +34,9 @@ class AuthRepositoryImpl implements AuthRepository {
       role,
     );
     await sessionRepository.saveToken(authResponse.token);
+    if (authResponse.refreshToken != null) {
+      await sessionRepository.saveRefreshToken(authResponse.refreshToken!);
+    }
     return authResponse.user;
   }
 
@@ -50,12 +56,20 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<void> resetPassword(String email, String token, String newPassword) async {
+  Future<void> resetPassword(
+    String email,
+    String token,
+    String newPassword,
+  ) async {
     return await remoteDataSource.resetPassword(email, token, newPassword);
   }
 
   @override
-  Future<void> resetPasswordOtp(String email, String code, String newPassword) async {
+  Future<void> resetPasswordOtp(
+    String email,
+    String code,
+    String newPassword,
+  ) async {
     return await remoteDataSource.resetPasswordOtp(email, code, newPassword);
   }
 

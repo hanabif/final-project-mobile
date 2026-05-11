@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import '../../../../core/network/api_client.dart';
 import '../models/auth_response_model.dart';
 import '../models/user_model.dart';
@@ -29,6 +30,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     final response = await apiClient.dio.post(
       '/auth/login',
       data: {"email": email, "password": password},
+      options: Options(extra: {'no-auth': true}),
     );
 
     return AuthResponseModel.fromJson(response.data);
@@ -43,11 +45,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   ) async {
     final response = await apiClient.dio.post(
       '/auth/register',
-      data: {
-        "fullName": name,
-        "email": email,
-        "password": password,
-      },
+      data: {"fullName": name, "email": email, "password": password},
+      options: Options(extra: {'no-auth': true}),
     );
 
     return AuthResponseModel.fromJson(response.data);
@@ -55,10 +54,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<void> forgotPassword(String email) async {
-    await apiClient.dio.post(
-      '/auth/forgot-password',
-      data: {"email": email},
-    );
+    await apiClient.dio.post('/auth/forgot-password', data: {"email": email});
   }
 
   @override
@@ -77,26 +73,26 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<void> resetPassword(String email, String token, String newPassword) async {
+  Future<void> resetPassword(
+    String email,
+    String token,
+    String newPassword,
+  ) async {
     await apiClient.dio.post(
       '/auth/reset-password',
-      data: {
-        "email": email,
-        "token": token,
-        "password": newPassword,
-      },
+      data: {"email": email, "token": token, "password": newPassword},
     );
   }
 
   @override
-  Future<void> resetPasswordOtp(String email, String code, String newPassword) async {
+  Future<void> resetPasswordOtp(
+    String email,
+    String code,
+    String newPassword,
+  ) async {
     await apiClient.dio.post(
       '/auth/reset-password-otp',
-      data: {
-        "email": email,
-        "otp": code,
-        "password": newPassword,
-      },
+      data: {"email": email, "otp": code, "password": newPassword},
     );
   }
 

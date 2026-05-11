@@ -1,3 +1,4 @@
+﻿import '../entities/organization.dart';
 import '../repositories/complaint_repository.dart';
 
 class GetOrganizationsUseCase {
@@ -5,7 +6,7 @@ class GetOrganizationsUseCase {
 
   GetOrganizationsUseCase(this.repository);
 
-  Future<List<Map<String, dynamic>>> call() async {
+  Future<List<Organization>> call() async {
     return await repository.getOrganizations();
   }
 }

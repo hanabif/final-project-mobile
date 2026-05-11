@@ -17,24 +17,29 @@ class NotificationsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final sl = GetIt.instance;
-    return BlocProvider(
-      create: (context) => sl<NotificationCubit>()..fetchNotifications(),
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Notifications'),
-          actions: [
-            Builder(
-              builder: (appBarContext) => IconButton(
-                tooltip: 'Mark all as read',
-                icon: const Icon(Icons.done_all),
-                onPressed: () =>
-                    appBarContext.read<NotificationCubit>().markAllAsRead(),
-              ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Notifications'),
+        actions: [
+          Builder(
+            builder: (appBarContext) => IconButton(
+              tooltip: 'Mark all as read',
+              icon: const Icon(Icons.done_all),
+              onPressed: () =>
+                  appBarContext.read<NotificationCubit>().markAllAsRead(),
             ),
-          ],
-        ),
-        body: BlocBuilder<NotificationCubit, NotificationState>(
+          ),
+        ],
+      ),
+      body: BlocListener<NotificationCubit, NotificationState>(
+        listener: (context, state) {
+          if (state is NotificationError) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.message)));
+          }
+        },
+        child: BlocBuilder<NotificationCubit, NotificationState>(
           builder: (context, state) {
             if (state is NotificationLoading || state is NotificationInitial) {
               return const Center(child: CircularProgressIndicator());
@@ -71,19 +76,47 @@ class NotificationsScreen extends StatelessWidget {
                         ),
                       ),
                       subtitle: Text(notif.body),
-                      trailing: Text(
-                        _formatNotificationDate(notif.date),
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey,
-                        ),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            _formatNotificationDate(notif.date),
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          if (!notif.isRead)
+                            PopupMenuButton<String>(
+                              icon: const Icon(Icons.more_vert, size: 20),
+                              onSelected: (value) {
+                                if (value == 'markAsRead') {
+                                  context.read<NotificationCubit>().markAsRead(
+                                    notif.id,
+                                  );
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        'This notification is marked as read',
+                                      ),
+                                      duration: Duration(seconds: 2),
+                                    ),
+                                  );
+                                }
+                              },
+                              itemBuilder: (BuildContext context) => [
+                                const PopupMenuItem(
+                                  value: 'markAsRead',
+                                  child: Text('Mark as read'),
+                                ),
+                              ],
+                            ),
+                        ],
                       ),
                     ),
                   );
                 },
               );
-            } else if (state is NotificationError) {
-              return Center(child: Text(state.message));
             }
             return const SizedBox.shrink();
           },

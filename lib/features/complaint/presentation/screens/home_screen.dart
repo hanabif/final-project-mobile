@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/routes/route_names.dart';
+import '../../../../core/di/injection_container.dart';
+import '../../../auth/domain/repositories/session_repository.dart';
+import '../../../notification/presentation/cubit/notification_cubit.dart';
 import '../cubits/home/home_cubit.dart';
 import '../cubits/home/home_state.dart';
 import '../widgets/stat_card.dart';
@@ -20,6 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     context.read<HomeCubit>().loadHomeData();
+    context.read<NotificationCubit>().fetchNotifications();
   }
 
   void _onItemTapped(int index) {
@@ -44,13 +48,27 @@ class _HomeScreenState extends State<HomeScreen> {
           fit: BoxFit.contain,
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications, size: 30),
-            onPressed: () {
-              // Navigate to notifications screen
-              Navigator.pushNamed(context, RouteNames.notifications);
+          BlocBuilder<NotificationCubit, NotificationState>(
+            builder: (context, state) {
+              int unreadCount = 0;
+              if (state is NotificationLoaded) {
+                unreadCount = state.notifications
+                    .where((n) => !n.isRead)
+                    .length;
+              }
+              return IconButton(
+                icon: unreadCount > 0
+                    ? Badge(
+                        label: Text(unreadCount.toString()),
+                        child: const Icon(Icons.notifications, size: 30),
+                      )
+                    : const Icon(Icons.notifications, size: 30),
+                onPressed: () {
+                  Navigator.pushNamed(context, RouteNames.notifications);
+                },
+              );
             },
-          )
+          ),
         ],
       ),
       body: BlocBuilder<HomeCubit, HomeState>(
@@ -80,23 +98,38 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(height: 16),
                     Row(
                       children: [
-                        Expanded(child: StatCard(
-                          title: 'Total Complaints', 
-                          number: state.totalComplaints.toString(),
-                          onTap: () => Navigator.pushNamed(context, RouteNames.complaintList),
-                        )),
+                        Expanded(
+                          child: StatCard(
+                            title: 'Total Complaints',
+                            number: state.totalComplaints.toString(),
+                            onTap: () => Navigator.pushNamed(
+                              context,
+                              RouteNames.complaintList,
+                            ),
+                          ),
+                        ),
                         const SizedBox(width: 12),
-                        Expanded(child: StatCard(
-                          title: 'Resolved Cases', 
-                          number: state.resolvedComplaints.toString(),
-                          onTap: () => Navigator.pushNamed(context, RouteNames.complaintList),
-                        )),
+                        Expanded(
+                          child: StatCard(
+                            title: 'Resolved Cases',
+                            number: state.resolvedComplaints.toString(),
+                            onTap: () => Navigator.pushNamed(
+                              context,
+                              RouteNames.complaintList,
+                            ),
+                          ),
+                        ),
                         const SizedBox(width: 12),
-                        Expanded(child: StatCard(
-                          title: 'Pending Cases', 
-                          number: state.pendingComplaints.toString(),
-                          onTap: () => Navigator.pushNamed(context, RouteNames.complaintList),
-                        )),
+                        Expanded(
+                          child: StatCard(
+                            title: 'Pending Cases',
+                            number: state.pendingComplaints.toString(),
+                            onTap: () => Navigator.pushNamed(
+                              context,
+                              RouteNames.complaintList,
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                     const SizedBox(height: 32),
@@ -111,18 +144,22 @@ class _HomeScreenState extends State<HomeScreen> {
                     GridView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 16,
-                        mainAxisSpacing: 16,
-                        childAspectRatio: 1.1,
-                      ),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 16,
+                            mainAxisSpacing: 16,
+                            childAspectRatio: 0.9, // Adjusted height
+                          ),
                       itemCount: state.organizations.length,
                       itemBuilder: (context, index) {
                         final org = state.organizations[index];
+                        final name = org['name'] ?? 'Unknown';
+                        final logo = org['logo'] ?? '';
+
                         return OrganizationCard(
-                          name: org['name']!,
-                          logo: org['logo']!,
+                          name: name,
+                          logo: logo,
                           onTap: () {
                             Navigator.pushNamed(
                               context,
@@ -145,6 +182,9 @@ class _HomeScreenState extends State<HomeScreen> {
         onPressed: () {
           Navigator.pushNamed(context, RouteNames.complaintForm);
         },
+        backgroundColor: const Color(0xFF005C45),
+        foregroundColor: Colors.white,
+        shape: const CircleBorder(),
         child: const Icon(Icons.add),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -152,19 +192,13 @@ class _HomeScreenState extends State<HomeScreen> {
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           // Empty item visually to make space for the FAB
           BottomNavigationBarItem(
             icon: Icon(Icons.edit_document, color: Colors.transparent),
             label: 'Report',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),
     );

@@ -34,4 +34,13 @@ class NotificationRepositoryImpl implements NotificationRepository {
       rethrow;
     }
   }
+
+  @override
+  Future<void> markAsRead(String id) async {
+    try {
+      await remoteDataSource.markAsRead(id);
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

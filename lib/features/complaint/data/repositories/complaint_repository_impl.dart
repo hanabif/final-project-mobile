@@ -1,3 +1,7 @@
+﻿import 'package:complaint_resolution_app/core/network/network_info.dart';
+import 'package:complaint_resolution_app/features/complaint/data/datasources/complaint_local_data_source.dart';
+import 'package:complaint_resolution_app/features/complaint/data/models/organization_model.dart';
+import 'package:complaint_resolution_app/features/complaint/domain/entities/organization.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../domain/entities/complaint.dart';
 import '../../domain/repositories/complaint_repository.dart';
@@ -7,39 +11,55 @@ import '../models/citizen_analytics_model.dart';
 
 class ComplaintRepositoryImpl implements ComplaintRepository {
   final ComplaintRemoteDataSource remoteDataSource;
+  final ComplaintLocalDataSource localDataSource;
+  final NetworkInfo networkInfo;
 
-  ComplaintRepositoryImpl({required this.remoteDataSource});
+  ComplaintRepositoryImpl({
+    required this.remoteDataSource,
+    required this.localDataSource,
+    required this.networkInfo,
+  });
 
   @override
   Future<String> submitComplaint(Complaint complaint) async {
-    try {
+    if (await networkInfo.isConnected) {
+      try {
+        final complaintModel = ComplaintModel.fromEntity(complaint);
+        return await remoteDataSource.submitComplaint(complaintModel);
+      } catch (e) {
+        rethrow;
+      }
+    } else {
       final complaintModel = ComplaintModel.fromEntity(complaint);
-      return await remoteDataSource.submitComplaint(complaintModel);
-    } catch (e) {
-      // Re-throwing the exception to be handled by the presentation layer
-      rethrow;
+      await localDataSource.cacheComplaint(complaintModel);
+      return 'Complaint cached and will be submitted when online.';
     }
   }
 
   @override
   Future<String> getComplaintStatus(String complaintId) async {
     try {
-      final complaintModel = await remoteDataSource.getComplaintStatus(complaintId);
+      final complaintModel = await remoteDataSource.getComplaintStatus(
+        complaintId,
+      );
       return complaintModel.status;
     } catch (e) {
-      // Re-throwing the exception to be handled by the presentation layer
       rethrow;
     }
   }
 
   @override
   Future<List<Complaint>> getUserComplaints() async {
-    try {
-      final models = await remoteDataSource.getUserComplaints();
-      // ComplaintModel extends Complaint, so the cast is safe.
-      return models.cast<Complaint>();
-    } catch (e) {
-      rethrow;
+    if (await networkInfo.isConnected) {
+      try {
+        final remoteComplaints = await remoteDataSource.getUserComplaints();
+        await localDataSource.cacheComplaints(remoteComplaints);
+        return remoteComplaints;
+      } catch (e) {
+        rethrow;
+      }
+    } else {
+      return await localDataSource.getComplaints();
     }
   }
 
@@ -66,7 +86,6 @@ class ComplaintRepositoryImpl implements ComplaintRepository {
   Future<List<String>> uploadImages(List<XFile> files) async {
     try {
       if (files.isEmpty) return [];
-      
       if (files.length == 1) {
         final url = await remoteDataSource.uploadSingleFile(files.first);
         return [url];
@@ -97,11 +116,20 @@ class ComplaintRepositoryImpl implements ComplaintRepository {
   }
 
   @override
-  Future<List<Map<String, dynamic>>> getOrganizations() async {
-    try {
-      return await remoteDataSource.getOrganizations();
-    } catch (e) {
-      rethrow;
+  Future<List<Organization>> getOrganizations() async {
+    if (await networkInfo.isConnected) {
+      try {
+        final remoteOrgs = await remoteDataSource.getOrganizations();
+        final orgModels = remoteOrgs
+            .map((org) => OrganizationModel.fromJson(org))
+            .toList();
+        await localDataSource.cacheOrganizations(orgModels);
+        return orgModels;
+      } catch (e) {
+        rethrow;
+      }
+    } else {
+      return await localDataSource.getOrganizations();
     }
   }
 }

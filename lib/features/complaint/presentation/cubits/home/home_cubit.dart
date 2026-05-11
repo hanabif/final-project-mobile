@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../domain/entities/organization.dart';
 import '../../../domain/usecases/get_citizen_analytics_usecase.dart';
 import '../../../domain/usecases/get_organizations_usecase.dart';
 import 'home_state.dart';
@@ -17,24 +18,28 @@ class HomeCubit extends Cubit<HomeState> {
 
     try {
       final stats = await getCitizenAnalyticsUseCase.call();
-      final orgsResponse = await getOrganizationsUseCase.call();
+      final List<Organization> orgsResponse = await getOrganizationsUseCase
+          .call();
 
       final List<Map<String, String>> organizations = orgsResponse.map((org) {
-        return {
-          'id': org['_id']?.toString() ?? '',
-          'name': org['name']?.toString() ?? 'Unknown',
-          'logo': org['logo']?.toString() ?? '',
-        };
+        // Log individual organization to verify fields
+        print('Mapping Org: ID=\${org.id}, Name=\${org.name}');
+        return {'id': org.id, 'name': org.name, 'logo': org.logo};
       }).toList();
 
-      emit(HomeLoaded(
-        totalComplaints: stats.total,
-        resolvedComplaints: stats.resolved,
-        pendingComplaints: stats.pending,
-        organizations: organizations,
-      ));
-    } catch (e) {
-      emit(HomeError(message: 'Failed to load home data: \${e.toString()}'));
+      print('Emitting HomeLoaded with \${organizations.length} organizations');
+      emit(
+        HomeLoaded(
+          totalComplaints: stats.total,
+          resolvedComplaints: stats.resolved,
+          pendingComplaints: stats.pending,
+          organizations: organizations,
+        ),
+      );
+    } catch (e, stackTrace) {
+      print('HomeCubit Error: $e');
+      print('Stacktrace: $stackTrace');
+      emit(HomeError(message: 'Failed to load home data: ${e.toString()}'));
     }
   }
 }
