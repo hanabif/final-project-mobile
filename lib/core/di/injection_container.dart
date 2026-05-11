@@ -47,6 +47,7 @@ import '../../../features/notification/data/repositories/notification_repository
 import '../../../features/notification/domain/repositories/notification_repository.dart';
 import '../../../features/notification/domain/usecases/get_notifications_usecase.dart';
 import '../../../features/notification/domain/usecases/mark_all_notifications_as_read_usecase.dart';
+import '../../../features/notification/domain/usecases/mark_notification_as_read_usecase.dart';
 import '../../../features/notification/presentation/cubit/notification_cubit.dart';
 import '../../../features/notification/presentation/services/firebase_notification_service.dart';
 import '../../../features/settings/data/datasources/settings_remote_datasource.dart';
@@ -143,6 +144,7 @@ Future<void> init() async {
   // Notification - Use cases
   sl.registerLazySingleton(() => GetNotificationsUseCase(sl()));
   sl.registerLazySingleton(() => MarkAllNotificationsAsReadUseCase(sl()));
+  sl.registerLazySingleton(() => MarkNotificationAsReadUseCase(sl()));
 
   // Auth - Presentation
   sl.registerFactory(
@@ -178,6 +180,7 @@ Future<void> init() async {
     () => NotificationCubit(
       sl<GetNotificationsUseCase>(),
       sl<MarkAllNotificationsAsReadUseCase>(),
+      sl<MarkNotificationAsReadUseCase>(),
     ),
   );
   sl.registerFactory(

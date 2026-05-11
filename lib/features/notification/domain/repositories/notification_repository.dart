@@ -4,4 +4,5 @@ abstract class NotificationRepository {
   Future<void> registerDeviceToken(String token);
   Future<List<NotificationItem>> getNotifications();
   Future<void> markAllAsRead();
+  Future<void> markAsRead(String id);
 }

@@ -5,6 +5,7 @@ abstract class NotificationRemoteDataSource {
   Future<void> registerDeviceToken(String token);
   Future<List<NotificationModel>> getNotifications();
   Future<void> markAllAsRead();
+  Future<void> markAsRead(String id);
 }
 
 class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
@@ -16,9 +17,7 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
   Future<void> registerDeviceToken(String token) async {
     await apiClient.dio.post(
       '/notifications/register-token',
-      data: {
-        "token": token,
-      },
+      data: {"token": token},
     );
   }
 
@@ -31,7 +30,11 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
     if (data is List) {
       rawList = data;
     } else if (data is Map<String, dynamic>) {
-      final candidate = data['data'] ?? data['notifications'] ?? data['items'] ?? data['results'];
+      final candidate =
+          data['data'] ??
+          data['notifications'] ??
+          data['items'] ??
+          data['results'];
       rawList = candidate is List ? candidate : <dynamic>[];
     } else {
       rawList = <dynamic>[];
@@ -46,5 +49,10 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
   @override
   Future<void> markAllAsRead() async {
     await apiClient.dio.put('/notifications/read-all');
+  }
+
+  @override
+  Future<void> markAsRead(String id) async {
+    await apiClient.dio.put('/notifications/$id/read');
   }
 }

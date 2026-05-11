@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/routes/route_names.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../auth/domain/repositories/session_repository.dart';
+import '../../../notification/presentation/cubit/notification_cubit.dart';
 import '../cubits/home/home_cubit.dart';
 import '../cubits/home/home_state.dart';
 import '../widgets/stat_card.dart';
@@ -22,6 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     context.read<HomeCubit>().loadHomeData();
+    context.read<NotificationCubit>().fetchNotifications();
   }
 
   void _onItemTapped(int index) {
@@ -46,24 +48,25 @@ class _HomeScreenState extends State<HomeScreen> {
           fit: BoxFit.contain,
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.logout, color: Colors.blue),
-            onPressed: () async {
-              await sl<SessionRepository>().clearSession();
-              if (mounted) {
-                Navigator.pushNamedAndRemoveUntil(
-                  context,
-                  RouteNames.login,
-                  (route) => false,
-                );
+          BlocBuilder<NotificationCubit, NotificationState>(
+            builder: (context, state) {
+              int unreadCount = 0;
+              if (state is NotificationLoaded) {
+                unreadCount = state.notifications
+                    .where((n) => !n.isRead)
+                    .length;
               }
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.notifications, size: 30),
-            onPressed: () {
-              // Navigate to notifications screen
-              Navigator.pushNamed(context, RouteNames.notifications);
+              return IconButton(
+                icon: unreadCount > 0
+                    ? Badge(
+                        label: Text(unreadCount.toString()),
+                        child: const Icon(Icons.notifications, size: 30),
+                      )
+                    : const Icon(Icons.notifications, size: 30),
+                onPressed: () {
+                  Navigator.pushNamed(context, RouteNames.notifications);
+                },
+              );
             },
           ),
         ],
