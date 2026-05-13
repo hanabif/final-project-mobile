@@ -1,0 +1,86 @@
+{
+  "@@locale": "am",
+  "appTitle": "ሲቲቮይስ",
+  
+ 
+  "login": "ግባ",
+  "register": "ተመዝገብ",
+  "email": "ኢሜል",
+  "password": "የይለፍ ቃል",
+  "forgotPassword": "የይለፍ ቃል ረሳሁ?",
+  "noAccount": "መለያ የለም?",
+  "yesAccount": "አካውንት አለዎት?",
+  
+
+  "home": "ዋና ገጽ",
+  "report": "ሪፖርት አድርግ",
+  "profile": "መገለጫ",
+  
+
+  "complaintStatistics": "የቅሬታ ስታቲስቲክስ",
+  "totalComplaints": "ጠቅላላ ቅሬታዎች",
+  "resolvedCases": "የተፈቱ ጉዳዮች",
+  "pendingCases": "በመጠባበቅ ላይ ያሉ",
+  
+  
+  "complaintCategories": "የቅሬታ ምድቦች",
+  
+  
+  "submitComplaint": "ቅሬታ አስገባ",
+  "complaintTitle": "የቅሬታ ርዕስ",
+  "description": "መግለጫ",
+  "attachImagesOptional": "ምስሎችን አያይዝ (አማራጭ)",
+  "camera": "ካሜራ",
+  "gallery": "ማህደር",
+  "noImagesSelected": "ምንም ምስሎች አልተመረጡም",
+  "latitude": "ኬክሮስ",
+  "longitude": "ኬንትሮስ",
+  "submit": "ቅሬታ አስገባ",
+  "reportThroughCallCenter": "ወይም በስልክ ቁጥራቸው ሪፖርት ያድርጉ",
+  
+ 
+  "notifications": "ማስታወቂያዎች",
+  "complaintStatusUpdated": "የቅሬታ ሁኔታ ተዘምኗል",
+  "resolved": "ተፈትቷል",
+  "inProgress": "በሂደት ላይ",
+  "thankYouForPatience": "ትዕግስትዎ እናመሰግናለን",
+  "weAreWorkingOnIt": "እየሰራንበት ነው",
+  
+  
+  "myReports": "ቅሬታዎቼ",
+  "all": "ሁሉም",
+  "active": "ንቁ",
+  "resolved": "የተፈቱ",
+  "submitted": "የተላከ",
+  
+
+  "profile": "መገለጫ",
+  "myComplaints": "ቅሬታዎቼ",
+  "viewAllComplaints": "ሁሉንም ቅሬታዎች ተመልከት",
+  "accountSettings": "የአካውንት ቅንብሮች",
+  "editProfile": "መገለጫ አርትዕ",
+  "changePassword": "የይለፍ ቃል ቀይር",
+  "emailVerification": "ኢሜል ማረጋገጫ",
+  "verified": "ተረጋግጧል",
+  "anonymousMode": "ማንነት አልሰወር ሁነታ",
+  "anonymousModeDescription": "ሲነቃ ቅሬታዎችዎ በስም አልባነት ይላካሉ",
+  "preferences": "ምርጫዎች",
+  "language": "ቋንቋ",
+  "notificationSettings": "የማስታወቂያ ቅንብሮች",
+  "themeMode": "የገጽታ ሁነታ",
+  "light": "ብርሃን",
+  "dark": "ጨለማ",
+  "logout": "ውጣ",
+  
+  
+  "statusSubmitted": "ተልኳል",
+  "statusResolved": "ተፈትቷል",
+  "statusInProgress": "በሂደት ላይ",
+  
+  "ok": "እሺ",
+  "cancel": "ሰርዝ",
+  "loading": "በመጫን ላይ...",
+  "error": "ስህተት",
+  "retry": "ደግሞ ሞክር",
+  "noData": "ምንም መረጃ የለም" 
+}
