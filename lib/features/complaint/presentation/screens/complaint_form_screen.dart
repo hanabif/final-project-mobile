@@ -104,7 +104,7 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text(
-                'Location services are disabled. Please enable them in settings.',
+                'You should turn on your location to submit complaints.',
               ),
               action: SnackBarAction(
                 label: 'Settings',
@@ -203,17 +203,11 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
           return;
         }
       } else if (source == ImageSource.gallery) {
-        // For Android 13+ (API 33+), we need photos permission.
-        // For older, we need storage. permission_handler handles this with .photos and .storage
-        PermissionStatus status;
-        if (await Permission.photos.isRestricted ||
-            await Permission.photos.isDenied) {
-          status = await Permission.photos.request();
-        } else {
-          status = await Permission.storage.request();
-        }
+        // Request Permission.photos (required for Android 13+) and Permission.storage (for older versions)
+        final photoStatus = await Permission.photos.request();
+        final storageStatus = await Permission.storage.request();
 
-        if (status.isDenied) {
+        if (photoStatus.isDenied && storageStatus.isDenied) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Gallery permission is required')),
