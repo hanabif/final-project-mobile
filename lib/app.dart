@@ -10,6 +10,8 @@ import 'features/complaint/presentation/cubits/complaint_cubit.dart';
 import 'features/complaint/presentation/cubits/home/home_cubit.dart';
 import 'features/notification/presentation/cubit/notification_cubit.dart';
 import 'features/auth/presentation/cubit/password_reset/password_reset_cubit.dart';
+import 'features/settings/presentation/cubits/settings_cubit.dart';
+import 'features/settings/presentation/cubits/settings_state.dart';
 
 class ComplaintResolutionApp extends StatelessWidget {
   const ComplaintResolutionApp({super.key});
@@ -22,15 +24,36 @@ class ComplaintResolutionApp extends StatelessWidget {
         BlocProvider(create: (_) => sl<ComplaintCubit>()),
         BlocProvider(create: (_) => sl<NotificationCubit>()),
         BlocProvider(create: (_) => sl<PasswordResetCubit>()),
+        BlocProvider(create: (_) => sl<SettingsCubit>()..loadSettings()),
       ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'CityVoice',
-        theme: AppTheme.lightTheme,
-        scaffoldMessengerKey: scaffoldMessengerKey,
-        navigatorKey: navigatorKey,
-        initialRoute: RouteNames.splash,
-        onGenerateRoute: AppRouter.generateRoute,
+      child: BlocBuilder<SettingsCubit, SettingsState>(
+        builder: (context, state) {
+          ThemeMode mode = ThemeMode.system;
+          if (state is SettingsLoaded) {
+            switch (state.settings.themeMode.toLowerCase()) {
+              case 'light':
+                mode = ThemeMode.light;
+                break;
+              case 'dark':
+                mode = ThemeMode.dark;
+                break;
+              default:
+                mode = ThemeMode.system;
+            }
+          }
+
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'CityVoice',
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
+            themeMode: mode,
+            scaffoldMessengerKey: scaffoldMessengerKey,
+            navigatorKey: navigatorKey,
+            initialRoute: RouteNames.splash,
+            onGenerateRoute: AppRouter.generateRoute,
+          );
+        },
       ),
     );
   }

@@ -67,8 +67,10 @@ class AppRouter {
         );
       
       case RouteNames.forgotPassword:
+        final args = settings.arguments as Map<String, dynamic>?;
+        final isChangePassword = args?['isChangePassword'] ?? false;
         return MaterialPageRoute(
-          builder: (_) => const ForgotPasswordPage(),
+          builder: (_) => ForgotPasswordPage(isChangePassword: isChangePassword),
         );
 
       case RouteNames.verifyCode:

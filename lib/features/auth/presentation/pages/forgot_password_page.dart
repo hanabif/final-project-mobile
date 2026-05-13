@@ -8,7 +8,8 @@ import '../widgets/auth_text_field.dart';
 import '../widgets/primary_button.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
-  const ForgotPasswordPage({super.key});
+  final bool isChangePassword;
+  const ForgotPasswordPage({super.key, this.isChangePassword = false});
 
   @override
   State<ForgotPasswordPage> createState() => _ForgotPasswordPageState();
@@ -61,9 +62,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(height: 10),
-                        const Text(
-                          "Forgot Password?",
-                          style: TextStyle(
+                        Text(
+                          widget.isChangePassword ? "Change Password" : "Forgot Password?",
+                          style: const TextStyle(
                             fontFamily: 'Poppins',
                             fontSize: 28,
                             fontWeight: FontWeight.w700,
@@ -253,4 +254,4 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       ),
     );
   }
-}
+}
