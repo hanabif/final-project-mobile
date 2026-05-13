@@ -132,7 +132,13 @@ class ProfileScreen extends StatelessWidget {
                               SettingsItem(
                                 icon: Icons.lock_outline,
                                 title: 'Change Password',
-                                onTap: () {},
+                                onTap: () {
+                                  Navigator.pushNamed(
+                                    context,
+                                    RouteNames.forgotPassword,
+                                    arguments: {'isChangePassword': true},
+                                  );
+                                },
                               ),
                               SettingsItem(
                                 icon: Icons.email_outlined,
@@ -140,23 +146,6 @@ class ProfileScreen extends StatelessWidget {
                                 value: 'Verified',
                                 trailing: const Icon(Icons.check_circle_outline, color: Colors.green, size: 20),
                                 onTap: () {},
-                              ),
-                              SettingsItem(
-                                icon: Icons.visibility_off_outlined,
-                                title: 'Anonymous Mode',
-                                trailing: Switch(
-                                  value: settings.isAnonymousMode,
-                                  onChanged: (val) => context.read<SettingsCubit>().toggleAnonymousMode(val),
-                                  activeColor: const Color(0xFFFCD703),
-                                ),
-                                onTap: () {},
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 40),
-                                child: Text(
-                                  'When enabled, your complaints will be submitted anonymously.',
-                                  style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
-                                ),
                               ),
                             ],
                           ),
@@ -176,16 +165,6 @@ class ProfileScreen extends StatelessWidget {
                                 icon: Icons.language,
                                 title: 'Language',
                                 value: settings.language,
-                                onTap: () {},
-                              ),
-                              SettingsItem(
-                                icon: Icons.notifications_none_outlined,
-                                title: 'Notification Settings',
-                                trailing: Switch(
-                                  value: settings.isNotificationsEnabled,
-                                  onChanged: (val) => context.read<SettingsCubit>().toggleNotifications(val),
-                                  activeColor: const Color(0xFFFCD703),
-                                ),
                                 onTap: () {},
                               ),
                               SettingsItem(
