@@ -1,0 +1,86 @@
+{
+  "@@locale": "en",
+  "appTitle": "CityVoice",
+ 
+  "login": "Login",
+  "register": "Register",
+  "email": "Email",
+  "password": "Password",
+  "forgotPassword": "Forgot Password?",
+  "noAccount": "Don't have an account?",
+  "yesAccount": "Already have an account?",
+  
+
+  "home": "Home",
+  "report": "Report",
+  "profile": "Profile",
+  
+ 
+  "complaintStatistics": "Complaint Statistics",
+  "totalComplaints": "Total Complaints",
+  "resolvedCases": "Resolved Cases",
+  "pendingCases": "Pending Cases",
+  
+
+  "complaintCategories": "Complaint Categories",
+  
+ 
+  "submitComplaint": "Submit Complaint",
+  "complaintTitle": "Complaint Title",
+  "description": "Description",
+  "attachImagesOptional": "Attach Images (Optional)",
+  "camera": "Camera",
+  "gallery": "Gallery",
+  "noImagesSelected": "No images selected",
+  "latitude": "Lat",
+  "longitude": "Lng",
+  "submit": "Submit Complaint",
+  "reportThroughCallCenter": "or report through their call center",
+  
+ 
+  "notifications": "Notifications",
+  "complaintStatusUpdated": "Complaint status updated",
+  "resolved": "resolved",
+  "inProgress": "in progress",
+  "thankYouForPatience": "Thank you for your patience",
+  "weAreWorkingOnIt": "We are working on it",
+  
+  
+  "myReports": "My Reports",
+  "all": "All",
+  "active": "Active",
+  "resolved": "Resolved",
+  "submitted": "Submitted",
+  
+  
+  "profile": "Profile",
+  "myComplaints": "My Complaints",
+  "viewAllComplaints": "View All Complaints",
+  "accountSettings": "Account Settings",
+  "editProfile": "Edit Profile",
+  "changePassword": "Change Password",
+  "emailVerification": "Email Verification",
+  "verified": "Verified",
+  "anonymousMode": "Anonymous Mode",
+  "anonymousModeDescription": "When enabled, your complaints will be submitted anonymously.",
+  "preferences": "Preferences",
+  "language": "Language",
+  "notificationSettings": "Notification Settings",
+  "themeMode": "Theme Mode",
+  "light": "Light",
+  "dark": "Dark",
+  "logout": "Logout",
+  
+  
+  "statusSubmitted": "Submitted",
+  "statusResolved": "Resolved",
+  "statusInProgress": "In Progress",
+  
+  
+  "ok": "OK",
+  "cancel": "Cancel",
+  "loading": "Loading...",
+  "error": "Error",
+  "retry": "Retry",
+  "noData": "No data available"
+}
