@@ -12,6 +12,8 @@ import 'features/notification/presentation/cubit/notification_cubit.dart';
 import 'features/auth/presentation/cubit/password_reset/password_reset_cubit.dart';
 import 'features/settings/presentation/cubits/settings_cubit.dart';
 import 'features/settings/presentation/cubits/settings_state.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import '../l10n/app_localizations.dart';
 
 class ComplaintResolutionApp extends StatelessWidget {
   const ComplaintResolutionApp({super.key});
@@ -52,6 +54,20 @@ class ComplaintResolutionApp extends StatelessWidget {
             navigatorKey: navigatorKey,
             initialRoute: RouteNames.splash,
             onGenerateRoute: AppRouter.generateRoute,
+
+             // localization delegates
+            localizationsDelegates: const [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+              AppLocalizations.delegate,
+            ],
+            
+            // supported locale
+            supportedLocales: const [
+              Locale('en'),
+              Locale('am'),
+            ],
           );
         },
       ),
