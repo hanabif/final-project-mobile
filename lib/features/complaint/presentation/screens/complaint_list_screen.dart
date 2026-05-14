@@ -49,12 +49,6 @@ class _ComplaintListScreenState extends State<ComplaintListScreen>
             'My Reports',
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.notifications),
-              onPressed: () {},
-            ),
-          ],
           bottom: TabBar(
             controller: _tabController,
             indicatorColor: Colors.white,

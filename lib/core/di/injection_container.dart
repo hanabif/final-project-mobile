@@ -50,7 +50,7 @@ import '../../../features/notification/domain/usecases/mark_all_notifications_as
 import '../../../features/notification/domain/usecases/mark_notification_as_read_usecase.dart';
 import '../../../features/notification/presentation/cubit/notification_cubit.dart';
 import '../../../features/notification/presentation/services/firebase_notification_service.dart';
-import '../../../features/settings/data/datasources/settings_remote_datasource.dart';
+import '../../../features/settings/data/datasources/settings_local_datasource.dart';
 import '../../../features/settings/data/repositories/settings_repository_impl.dart';
 import '../../../features/settings/domain/repositories/settings_repository.dart';
 import '../../../features/settings/domain/usecases/get_settings_usecase.dart';
@@ -195,9 +195,9 @@ Future<void> init() async {
   sl.registerLazySingleton(() => GetSettingsUseCase(sl()));
   sl.registerLazySingleton(() => UpdateSettingsUseCase(sl()));
   sl.registerLazySingleton<SettingsRepository>(
-    () => SettingsRepositoryImpl(remoteDataSource: sl()),
+    () => SettingsRepositoryImpl(localDataSource: sl()),
   );
-  sl.registerLazySingleton<SettingsRemoteDataSource>(
-    () => SettingsRemoteDataSourceImpl(),
+  sl.registerLazySingleton<SettingsDataSource>(
+    () => SettingsDataSourceImpl(sharedPreferences: sl()),
   );
 }

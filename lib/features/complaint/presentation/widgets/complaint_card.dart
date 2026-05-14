@@ -90,24 +90,7 @@ class ComplaintCard extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 16),
-              Row(
-                children: [
-                  _IconLabel(
-                    icon: Icons.location_on_rounded,
-                    label: complaint.latitude != 0 ? '1' : '0',
-                  ),
-                  const SizedBox(width: 16),
-                  _IconLabel(
-                    icon: Icons.camera_alt_rounded,
-                    label: '${complaint.images.length}',
-                  ),
-                  const SizedBox(width: 16),
-                  _IconLabel(
-                    icon: Icons.chat_bubble_rounded,
-                    label: '0', 
-                  ),
-                ],
-              ),
+              // Removed location, camera, and comment icons as requested
             ],
           ),
         ),
