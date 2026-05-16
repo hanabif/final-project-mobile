@@ -9,6 +9,7 @@ import '../cubits/settings_cubit.dart';
 import '../cubits/settings_state.dart';
 import '../../../complaint/presentation/cubits/profile/profile_cubit.dart';
 import '../widgets/settings_item.dart';
+import '../../../../features/auth/domain/usecases/logout_usecase.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -536,11 +537,17 @@ class ProfileScreen extends StatelessWidget {
           ElevatedButton(
             onPressed: () async {
               Navigator.pop(dialogContext);
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                RouteNames.login,
-                (route) => false,
-              );
+              
+              // Clear session and call logout endpoint
+              await sl<LogoutUseCase>()();
+              
+              if (context.mounted) {
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  RouteNames.login,
+                  (route) => false,
+                );
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red,

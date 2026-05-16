@@ -1,11 +1,11 @@
-import '../repositories/session_repository.dart';
+import '../repositories/auth_repository.dart';
 
 class LogoutUseCase {
-  final SessionRepository repository;
+  final AuthRepository repository;
 
   LogoutUseCase(this.repository);
 
   Future<void> call() {
-    return repository.clearSession();
+    return repository.logout();
   }
 }

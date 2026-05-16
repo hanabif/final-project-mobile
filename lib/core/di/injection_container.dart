@@ -155,6 +155,7 @@ Future<void> init() async {
     () => AuthCubit(
       loginUseCase: sl(),
       registerUseCase: sl(),
+      logoutUseCase: sl(),
       notificationService: sl(),
     ),
   );
