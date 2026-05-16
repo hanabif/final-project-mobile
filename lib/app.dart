@@ -31,6 +31,7 @@ class ComplaintResolutionApp extends StatelessWidget {
       child: BlocBuilder<SettingsCubit, SettingsState>(
         builder: (context, state) {
           ThemeMode mode = ThemeMode.system;
+          Locale appLocale = const Locale('en');
           if (state is SettingsLoaded) {
             switch (state.settings.themeMode.toLowerCase()) {
               case 'light':
@@ -42,6 +43,17 @@ class ComplaintResolutionApp extends StatelessWidget {
               default:
                 mode = ThemeMode.system;
             }
+
+            switch (state.settings.language.toLowerCase()) {
+              case 'am':
+              case 'amharic':
+                appLocale = const Locale('am');
+                break;
+              case 'en':
+              case 'english':
+              default:
+                appLocale = const Locale('en');
+            }
           }
 
           return MaterialApp(
@@ -50,6 +62,7 @@ class ComplaintResolutionApp extends StatelessWidget {
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
             themeMode: mode,
+            locale: appLocale,
             scaffoldMessengerKey: scaffoldMessengerKey,
             navigatorKey: navigatorKey,
             initialRoute: RouteNames.splash,

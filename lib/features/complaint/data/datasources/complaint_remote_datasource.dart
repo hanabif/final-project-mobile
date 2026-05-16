@@ -1,8 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../../core/network/api_client.dart';
 import '../models/complaint_model.dart';
 import '../models/citizen_analytics_model.dart';
+
 
 abstract class ComplaintRemoteDataSource {
   Future<String> submitComplaint(ComplaintModel complaint);
@@ -25,9 +27,13 @@ class ComplaintRemoteDataSourceImpl implements ComplaintRemoteDataSource {
   @override
   Future<String> submitComplaint(ComplaintModel complaint) async {
     try {
+      final payload = complaint.toJson();
+      debugPrint('--- Submitting to /complaints ---');
+      debugPrint('Payload: $payload');
+      
       final response = await apiClient.dio.post(
         '/complaints',
-        data: complaint.toJson(),
+        data: payload,
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
@@ -52,13 +58,24 @@ class ComplaintRemoteDataSourceImpl implements ComplaintRemoteDataSource {
   @override
   Future<String> uploadSingleFile(XFile file) async {
     try {
+      debugPrint('--- Uploading Single File to /uploads ---');
+      debugPrint('File name: ${file.name}, path: ${file.path}');
+      
+      String filename = file.name;
+      if (filename.toLowerCase().endsWith('.webp')) {
+        filename = filename.replaceAll(RegExp(r'\.webp$', caseSensitive: false), '.jpg');
+      }
+
       final formData = FormData.fromMap({
-        'file': MultipartFile.fromBytes(
+        'files': MultipartFile.fromBytes(
           await file.readAsBytes(),
-          filename: file.name,
+          filename: filename,
         ),
         'folder': 'complaints',
       });
+
+      debugPrint('FormData fields: ${formData.fields}');
+      debugPrint('FormData files: ${formData.files.map((f) => f.key).toList()}');
 
       final response = await apiClient.dio.post(
         '/uploads',
@@ -89,12 +106,18 @@ class ComplaintRemoteDataSourceImpl implements ComplaintRemoteDataSource {
   @override
   Future<List<String>> uploadMultipleFiles(List<XFile> files) async {
     try {
+      debugPrint('--- Uploading Multiple Files to /uploads ---');
+      debugPrint('Files count: ${files.length}');
       final List<MultipartFile> multipartFiles = [];
       for (final file in files) {
+        String filename = file.name;
+        if (filename.toLowerCase().endsWith('.webp')) {
+          filename = filename.replaceAll(RegExp(r'\.webp$', caseSensitive: false), '.jpg');
+        }
         multipartFiles.add(
           MultipartFile.fromBytes(
             await file.readAsBytes(),
-            filename: file.name,
+            filename: filename,
           ),
         );
       }
@@ -103,6 +126,9 @@ class ComplaintRemoteDataSourceImpl implements ComplaintRemoteDataSource {
         'files': multipartFiles,
         'folder': 'complaints',
       });
+      
+      debugPrint('FormData fields: ${formData.fields}');
+      debugPrint('FormData files: ${formData.files.map((f) => f.key).toList()}');
 
       final response = await apiClient.dio.post(
         '/uploads',

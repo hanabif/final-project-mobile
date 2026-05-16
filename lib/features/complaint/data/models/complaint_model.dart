@@ -111,19 +111,44 @@ class ComplaintModel extends Complaint {
 
   Map<String, dynamic> toJson() {
     return {
+      'id': id,
       'title': title,
       'description': description,
       'imageUrl': imageUrl,
       'images': images,
-      'location': {
-        'latitude': latitude,
-        'longitude': longitude,
-      },
+      'latitude': latitude,
+      'longitude': longitude,
       'organizationId': organizationId,
+      'organization': organizationId,
       'status': status,
       'category': category,
       'priority': priority,
       'department': department,
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt?.toIso8601String(),
+      'resolvedAt': resolvedAt?.toIso8601String(),
+      'location': {
+        'latitude': latitude,
+        'longitude': longitude,
+      },
+      'attachments': images
+          .map(
+            (url) => {
+              'url': url,
+              'filename': 'image',
+            },
+          )
+          .toList(),
+      'history': history
+          .map(
+            (entry) => {
+              'action': entry.action,
+              'comment': entry.comment,
+              'by': entry.by,
+              'timestamp': entry.timestamp.toIso8601String(),
+            },
+          )
+          .toList(),
     };
   }
 

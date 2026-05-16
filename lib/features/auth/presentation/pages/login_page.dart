@@ -33,7 +33,6 @@ class _LoginPageState extends State<LoginPage> {
     return BlocProvider(
       create: (_) => sl<AuthCubit>(),
       child: Scaffold(
-        backgroundColor: Colors.white,
         body: SafeArea(
           child: BlocListener<AuthCubit, AuthState>(
             listener: (context, state) {

@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class ComplaintSuccessScreen extends StatelessWidget {
-  final String complaintId;
 
   const ComplaintSuccessScreen({
-    super.key,
-    required this.complaintId,
+    super.key
   });
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Success'),
+        title: Text(l10n.success),
         automaticallyImplyLeading: false, // Prevent going back to form
       ),
       body: Center(
@@ -27,34 +27,18 @@ class ComplaintSuccessScreen extends StatelessWidget {
                 size: 100,
               ),
               const SizedBox(height: 24),
-              const Text(
-                'Complaint Submitted Successfully!',
-                style: TextStyle(
+              Text(
+                l10n.complaintSubmittedSuccessfully,
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade200,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Column(
-                  children: [
-                    const Text('Complaint ID:'),
-                    Text(
-                      complaintId,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'Status: Submitted',
+
+              Text(
+                '${l10n.statusSubmitted}',
                 style: TextStyle(
                   fontSize: 16,
                   color: Colors.blue,
@@ -71,7 +55,7 @@ class ComplaintSuccessScreen extends StatelessWidget {
                     Navigator.of(context).popUntil((route) => route.isFirst);
                   }
                 },
-                child: const Text('Return to Dashboard'),
+                child: Text(l10n.returnToDashboard),
               ),
             ],
           ),
