@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/routes/route_names.dart';
 import '../../../../core/di/injection_container.dart';
+import '../../../../core/utils/organization_logo_mapper.dart';
+import '../../../../core/widgets/custom_app_bar.dart';
 import '../../../auth/domain/repositories/session_repository.dart';
 import '../../../notification/presentation/cubit/notification_cubit.dart';
 import '../cubits/home/home_cubit.dart';
@@ -41,35 +43,12 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Image.asset(
-          'assets/images/logo (1).png',
-          height: 40,
-          fit: BoxFit.contain,
-        ),
-        actions: [
-          BlocBuilder<NotificationCubit, NotificationState>(
-            builder: (context, state) {
-              int unreadCount = 0;
-              if (state is NotificationLoaded) {
-                unreadCount = state.notifications
-                    .where((n) => !n.isRead)
-                    .length;
-              }
-              return IconButton(
-                icon: unreadCount > 0
-                    ? Badge(
-                        label: Text(unreadCount.toString()),
-                        child: const Icon(Icons.notifications, size: 30),
-                      )
-                    : const Icon(Icons.notifications, size: 30),
-                onPressed: () {
-                  Navigator.pushNamed(context, RouteNames.notifications);
-                },
-              );
-            },
-          ),
-        ],
+      appBar: CustomAppBar(
+        title: null,
+        showBackButton: false,
+        showThemeToggle: true,
+        showNotification: true,
+        backgroundColor: const Color(0xFF005C45),
       ),
       body: BlocBuilder<HomeCubit, HomeState>(
         builder: (context, state) {
@@ -155,7 +134,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       itemBuilder: (context, index) {
                         final org = state.organizations[index];
                         final name = org['name'] ?? 'Unknown';
-                        final logo = org['logo'] ?? '';
+                        final logo = OrganizationLogoMapper.getLogoPath(name);
 
                         return OrganizationCard(
                           name: name,

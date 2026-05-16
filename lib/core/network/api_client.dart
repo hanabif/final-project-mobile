@@ -1,8 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:complaint_resolution_app/features/auth/data/models/refresh_token_response.dart';
 import 'package:dio/dio.dart';
-import 'package:jwt_decoder/jwt_decoder.dart';
 import '../utils/app_config.dart';
 import '../utils/navigator_key.dart';
+import '../utils/token_refresh_util.dart';
 import '../../features/auth/domain/repositories/session_repository.dart';
 import '../routes/route_names.dart';
 import '../error/exceptions.dart';
@@ -29,28 +30,19 @@ class ApiClient {
     dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
-          // Skip token logic if marked as no-auth
+          // Skip token logic if marked as no-auth (for public endpoints like login/register)
           if (options.extra['no-auth'] == true) {
             return handler.next(options);
           }
 
           final token = await sessionRepository.getToken();
           if (token != null && token.isNotEmpty) {
-            bool isExpired = false;
-            try {
-              isExpired = JwtDecoder.isExpired(token);
-            } catch (e) {
-              // If token is malformed, treat as expired to trigger refresh or re-auth
-              isExpired = true;
-            }
-
-            if (isExpired) {
+            // Check if token is expired
+            if (TokenRefreshUtil.isTokenExpired(token)) {
+              // Token is expired, attempt to refresh
               try {
                 final refreshToken = await sessionRepository.getRefreshToken();
                 if (refreshToken != null && refreshToken.isNotEmpty) {
-                  // Use a separate Dio instance or lock to avoid circularity if possible,
-                  // but here we just use the same one with a flag or direct call.
-                  // For simplicity, we'll try a fresh POST.
                   final response = await dio.post(
                     '/auth/refresh',
                     data: {'refreshToken': refreshToken},
@@ -59,7 +51,7 @@ class ApiClient {
                   );
                   if (response.statusCode == 200) {
                     final newTokens = RefreshTokenResponse.fromJson(
-                      response.data,
+                      response.data as Map<String, dynamic>,
                     );
                     await sessionRepository.saveToken(newTokens.accessToken);
                     await sessionRepository.saveRefreshToken(
@@ -68,15 +60,28 @@ class ApiClient {
                     options.headers['Authorization'] =
                         'Bearer ${newTokens.accessToken}';
                   } else {
+                    // Refresh failed, clear session and redirect to login
                     await sessionRepository.clearSession();
+                    navigatorKey.currentState?.pushNamedAndRemoveUntil(
+                      RouteNames.login,
+                      (route) => false,
+                    );
                   }
                 } else {
+                  // No refresh token available, clear session
                   await sessionRepository.clearSession();
                 }
               } catch (e) {
+                // Refresh error, clear session and redirect
+                debugPrint('Token refresh error: $e');
                 await sessionRepository.clearSession();
+                navigatorKey.currentState?.pushNamedAndRemoveUntil(
+                  RouteNames.login,
+                  (route) => false,
+                );
               }
             } else {
+              // Token is still valid, attach it to request
               options.headers['Authorization'] = 'Bearer $token';
             }
           }
@@ -84,6 +89,7 @@ class ApiClient {
         },
         onError: (DioException e, handler) async {
           if (e.response?.statusCode == 401) {
+            debugPrint('Received 401 Unauthorized - attempting token refresh');
             try {
               final refreshToken = await sessionRepository.getRefreshToken();
               if (refreshToken != null && refreshToken.isNotEmpty) {
@@ -95,14 +101,14 @@ class ApiClient {
 
                 if (response.statusCode == 200) {
                   final newTokens = RefreshTokenResponse.fromJson(
-                    response.data,
+                    response.data as Map<String, dynamic>,
                   );
                   await sessionRepository.saveToken(newTokens.accessToken);
                   await sessionRepository.saveRefreshToken(
                     newTokens.refreshToken,
                   );
 
-                  // Retry the original request
+                  // Retry the original request with new token
                   final opts = e.requestOptions;
                   opts.headers['Authorization'] =
                       'Bearer ${newTokens.accessToken}';
@@ -110,14 +116,26 @@ class ApiClient {
                   return handler.resolve(cloneReq);
                 }
               }
-            } on DioException {
+              // Refresh failed or no refresh token, clear session
               await sessionRepository.clearSession();
-              // Redirect to login if a refresh fails
               navigatorKey.currentState?.pushNamedAndRemoveUntil(
                 RouteNames.login,
                 (route) => false,
               );
-              // Pass the original error to be handled by the UI
+            } on DioException catch (refreshError) {
+              debugPrint('Token refresh failed: ${refreshError.message}');
+              await sessionRepository.clearSession();
+              navigatorKey.currentState?.pushNamedAndRemoveUntil(
+                RouteNames.login,
+                (route) => false,
+              );
+            } catch (e) {
+              debugPrint('Unexpected error during token refresh: $e');
+              await sessionRepository.clearSession();
+              navigatorKey.currentState?.pushNamedAndRemoveUntil(
+                RouteNames.login,
+                (route) => false,
+              );
             }
           }
           final message = _getErrorMessage(e);

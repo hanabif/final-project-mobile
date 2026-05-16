@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/routes/route_names.dart';
+import '../../../../core/widgets/custom_app_bar.dart';
 import '../cubits/complaint_list_cubit.dart';
 import '../cubits/complaint_list_state.dart';
 import '../widgets/complaint_card.dart';
@@ -34,21 +35,18 @@ class _ComplaintListScreenState extends State<ComplaintListScreen>
     return BlocProvider(
       create: (context) => sl<ComplaintListCubit>()..fetchComplaints(),
       child: Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () {
-              if (Navigator.of(context).canPop()) {
-                Navigator.of(context).pop();
-              } else {
-                Navigator.of(context).pushReplacementNamed(RouteNames.profile);
-              }
-            },
-          ),
-          title: const Text(
-            'My Reports',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
+        appBar: CustomAppBar(
+          title: 'My Reports',
+          showBackButton: true,
+          showThemeToggle: true,
+          showNotification: true,
+          onBackPressed: () {
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            } else {
+              Navigator.of(context).pushReplacementNamed(RouteNames.profile);
+            }
+          },
           bottom: TabBar(
             controller: _tabController,
             indicatorColor: Colors.white,

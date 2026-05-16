@@ -8,6 +8,7 @@ import 'package:permission_handler/permission_handler.dart';
 
 import '../../../../core/routes/route_names.dart';
 import '../../../../core/widgets/platform_image.dart';
+import '../../../../core/widgets/custom_app_bar.dart';
 import '../../domain/entities/complaint.dart';
 import '../cubits/complaint_cubit.dart';
 import '../cubits/complaint_state.dart';
@@ -323,7 +324,12 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Submit Complaint')),
+      appBar: CustomAppBar(
+        title: 'Submit Complaint',
+        showBackButton: true,
+        showThemeToggle: false,
+        showNotification: false,
+      ),
       body: BlocConsumer<ComplaintCubit, ComplaintState>(
         listener: (context, state) {
           if (state is ComplaintSuccess) {
@@ -400,11 +406,15 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
                           labelText: 'Select Organization',
                           border: OutlineInputBorder(),
                         ),
+                        isExpanded: true,
                         value: _selectedOrganizationId,
                         items: _organizations.map((org) {
                           return DropdownMenuItem(
                             value: org['id'],
-                            child: Text(org['name']!),
+                            child: Text(
+                              org['name']!,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           );
                         }).toList(),
                         onChanged: (value) {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/routes/route_names.dart';
 import '../../../../core/di/injection_container.dart';
+import '../../../../core/widgets/custom_app_bar.dart';
 import '../cubits/settings_cubit.dart';
 import '../cubits/settings_state.dart';
 import '../../../complaint/presentation/cubits/profile/profile_cubit.dart';
@@ -20,41 +21,46 @@ class ProfileScreen extends StatelessWidget {
       ],
       child: Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        appBar: AppBar(
-          backgroundColor: const Color(0xFF005C45), // Deep green from image
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () => Navigator.pop(context),
-          ),
-          title: const Text(
-            'Profile',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-          ),
-          centerTitle: true,
-          elevation: 0,
+        appBar: CustomAppBar(
+          title: 'Profile',
+          showBackButton: true,
+          showThemeToggle: true,
+          showNotification: true,
+          backgroundColor: const Color(0xFF005C45),
         ),
-        body: BlocBuilder<ProfileCubit, ProfileState>(
-          builder: (context, profileState) {
-            return BlocBuilder<SettingsCubit, SettingsState>(
-              builder: (context, settingsState) {
-                if (profileState is ProfileLoading ||
-                    settingsState is SettingsLoading) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (profileState is ProfileError) {
-                  return Center(child: Text(profileState.message));
-                } else if (settingsState is SettingsError) {
-                  return Center(child: Text(settingsState.message));
-                } else if (profileState is ProfileLoaded &&
-                    settingsState is SettingsLoaded) {
-                  final settings = settingsState.settings;
+        body: BlocListener<ProfileCubit, ProfileState>(
+          listener: (context, state) {
+            if (state is ProfileUpdateSuccess) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Profile updated successfully')),
+              );
+            } else if (state is PasswordChangeSuccess) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Password changed successfully')),
+              );
+            }
+          },
+          child: BlocBuilder<ProfileCubit, ProfileState>(
+            builder: (context, profileState) {
+              return BlocBuilder<SettingsCubit, SettingsState>(
+                builder: (context, settingsState) {
+                  if (profileState is ProfileLoading ||
+                      settingsState is SettingsLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (profileState is ProfileError) {
+                    return Center(child: Text(profileState.message));
+                  } else if (settingsState is SettingsError) {
+                    return Center(child: Text(settingsState.message));
+                  } else if (profileState is ProfileLoaded &&
+                      settingsState is SettingsLoaded) {
+                    final settings = settingsState.settings;
                   final user = profileState.user;
-                  final stats = profileState.stats;
 
-                  return SingleChildScrollView(
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
+                    return SingleChildScrollView(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
                         // Profile Header
                         _buildSectionContainer(
                           context: context,
@@ -161,29 +167,19 @@ class ProfileScreen extends StatelessWidget {
                               SettingsItem(
                                 icon: Icons.edit_outlined,
                                 title: 'Edit Profile',
-                                onTap: () {},
+                                onTap: () => _showEditProfileDialog(
+                                  context,
+                                  user.name,
+                                  context.read<ProfileCubit>(),
+                                ),
                               ),
                               SettingsItem(
                                 icon: Icons.lock_outline,
                                 title: 'Change Password',
-                                onTap: () {
-                                  Navigator.pushNamed(
-                                    context,
-                                    RouteNames.forgotPassword,
-                                    arguments: {'isChangePassword': true},
-                                  );
-                                },
-                              ),
-                              SettingsItem(
-                                icon: Icons.email_outlined,
-                                title: 'Email Verification',
-                                value: 'Verified',
-                                trailing: const Icon(
-                                  Icons.check_circle_outline,
-                                  color: Colors.green,
-                                  size: 20,
+                                onTap: () => _showChangePasswordDialog(
+                                  context,
+                                  context.read<ProfileCubit>(),
                                 ),
-                                onTap: () {},
                               ),
                             ],
                           ),
@@ -209,17 +205,6 @@ class ProfileScreen extends StatelessWidget {
                                 value: settings.language,
                                 onTap: () {},
                               ),
-                              SettingsItem(
-                                icon: Icons.dark_mode_outlined,
-                                title: 'Theme Mode',
-                                trailing: _ThemeSwitch(
-                                  current: settings.themeMode,
-                                  onChanged: (val) => context
-                                      .read<SettingsCubit>()
-                                      .setThemeMode(val),
-                                ),
-                                onTap: () {},
-                              ),
                             ],
                           ),
                         ),
@@ -229,11 +214,9 @@ class ProfileScreen extends StatelessWidget {
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
-                            onPressed: () {
-                              // Handle logout logic
-                            },
+                            onPressed: () => _showLogoutDialog(context),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF005C45),
+                              backgroundColor: Colors.red,
                               foregroundColor: Colors.white,
                               padding: const EdgeInsets.symmetric(vertical: 16),
                               shape: RoundedRectangleBorder(
@@ -247,11 +230,12 @@ class ProfileScreen extends StatelessWidget {
                       ],
                     ),
                   );
-                }
-                return const SizedBox.shrink();
-              },
-            );
-          },
+                  }
+                  return const SizedBox.shrink();
+                },
+              );
+            },
+          ),
         ),
         bottomNavigationBar: _BottomNavBar(),
         floatingActionButton: _FloatingReportButton(),
@@ -272,7 +256,7 @@ class ProfileScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.3 : 0.03),
+            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.03),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -281,87 +265,242 @@ class ProfileScreen extends StatelessWidget {
       child: child,
     );
   }
-}
 
-class _StatWidget extends StatelessWidget {
-  final String title;
-  final String value;
+  void _showEditProfileDialog(
+    BuildContext context,
+    String currentName,
+    ProfileCubit profileCubit,
+  ) {
+    final nameController = TextEditingController(text: currentName);
+    final formKey = GlobalKey<FormState>();
 
-  const _StatWidget({required this.title, required this.value});
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => BlocBuilder<ProfileCubit, ProfileState>(
+        bloc: profileCubit,
+        builder: (context, state) {
+          bool isLoading = state is ProfileLoading;
 
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFFFCD703),
+          return AlertDialog(
+            title: const Text('Edit Profile'),
+            content: isLoading
+                ? const SizedBox(
+                    height: 60,
+                    child: Center(child: CircularProgressIndicator()),
+                  )
+                : Form(
+                    key: formKey,
+                    child: TextFormField(
+                      enabled: !isLoading,
+                      controller: nameController,
+                      decoration: const InputDecoration(
+                        labelText: 'Full Name',
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Name is required';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+            actions: [
+              TextButton(
+                onPressed: isLoading ? null : () => Navigator.pop(dialogContext),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: isLoading
+                    ? null
+                    : () {
+                        if (formKey.currentState!.validate()) {
+                          profileCubit
+                              .updateProfile(nameController.text)
+                              .then((_) {
+                            if (dialogContext.mounted) {
+                              Navigator.pop(dialogContext);
+                            }
+                          });
+                        }
+                      },
+                child: isLoading
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Text('Save'),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  void _showChangePasswordDialog(
+    BuildContext context,
+    ProfileCubit profileCubit,
+  ) {
+    final oldPasswordController = TextEditingController();
+    final newPasswordController = TextEditingController();
+    final confirmPasswordController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => BlocBuilder<ProfileCubit, ProfileState>(
+        bloc: profileCubit,
+        builder: (context, state) {
+          bool isLoading = state is ProfileLoading;
+
+          return AlertDialog(
+            title: const Text('Change Password'),
+            content: isLoading
+                ? const SizedBox(
+                    height: 60,
+                    child: Center(child: CircularProgressIndicator()),
+                  )
+                : Form(
+                    key: formKey,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        TextFormField(
+                          enabled: !isLoading,
+                          controller: oldPasswordController,
+                          decoration: const InputDecoration(
+                            labelText: 'Current Password',
+                            border: OutlineInputBorder(),
+                          ),
+                          obscureText: true,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Current password is required';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          enabled: !isLoading,
+                          controller: newPasswordController,
+                          decoration: const InputDecoration(
+                            labelText: 'New Password',
+                            border: OutlineInputBorder(),
+                          ),
+                          obscureText: true,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'New password is required';
+                            }
+                            if (value.length < 6) {
+                              return 'Password must be at least 6 characters';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          enabled: !isLoading,
+                          controller: confirmPasswordController,
+                          decoration: const InputDecoration(
+                            labelText: 'Confirm Password',
+                            border: OutlineInputBorder(),
+                          ),
+                          obscureText: true,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please confirm password';
+                            }
+                            if (value != newPasswordController.text) {
+                              return 'Passwords do not match';
+                            }
+                            return null;
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+            actions: [
+              TextButton(
+                onPressed: isLoading ? null : () => Navigator.pop(dialogContext),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: isLoading
+                    ? null
+                    : () {
+                        if (formKey.currentState!.validate()) {
+                          profileCubit
+                              .changePassword(
+                                oldPasswordController.text,
+                                newPasswordController.text,
+                              )
+                              .then((_) {
+                            if (dialogContext.mounted) {
+                              Navigator.pop(dialogContext);
+                            }
+                          });
+                        }
+                      },
+                child: isLoading
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Text('Update'),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Logout'),
+        content: const Text('Are you sure you want to logout?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Cancel'),
           ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          title,
-          style: TextStyle(fontSize: 14, color: Colors.grey.shade500),
-        ),
-      ],
-    );
-  }
-}
-
-class _ThemeSwitch extends StatelessWidget {
-  final String current;
-  final ValueChanged<String> onChanged;
-
-  const _ThemeSwitch({required this.current, required this.onChanged});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.grey.shade100,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [_buildOption('Light'), _buildOption('Dark')],
-      ),
-    );
-  }
-
-  Widget _buildOption(String value) {
-    bool isSelected = current == value;
-    return GestureDetector(
-      onTap: () => onChanged(value),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFFCD703) : Colors.transparent,
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Text(
-          value,
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-            color: isSelected ? Colors.black : Colors.grey,
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(dialogContext);
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                RouteNames.login,
+                (route) => false,
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+            ),
+            child: const Text('Logout'),
           ),
-        ),
+        ],
       ),
     );
   }
 }
+
 
 class _BottomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
-      currentIndex: 2, // Profile selected
+      currentIndex: 2,
       onTap: (index) {
         if (index == 0) {
-          // Navigate to Home by clearing stack
           Navigator.pushNamedAndRemoveUntil(
             context,
             RouteNames.home,
