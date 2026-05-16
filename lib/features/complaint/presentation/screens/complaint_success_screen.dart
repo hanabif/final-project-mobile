@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class ComplaintSuccessScreen extends StatelessWidget {
   final String complaintId;
@@ -10,9 +11,10 @@ class ComplaintSuccessScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Success'),
+        title: Text(l10n.success),
         automaticallyImplyLeading: false, // Prevent going back to form
       ),
       body: Center(
@@ -27,9 +29,9 @@ class ComplaintSuccessScreen extends StatelessWidget {
                 size: 100,
               ),
               const SizedBox(height: 24),
-              const Text(
-                'Complaint Submitted Successfully!',
-                style: TextStyle(
+              Text(
+                l10n.complaintSubmittedSuccessfully,
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
@@ -44,7 +46,7 @@ class ComplaintSuccessScreen extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    const Text('Complaint ID:'),
+                    Text(l10n.complaintId),
                     Text(
                       complaintId,
                       style: const TextStyle(fontWeight: FontWeight.bold),
@@ -53,8 +55,8 @@ class ComplaintSuccessScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 8),
-              const Text(
-                'Status: Submitted',
+              Text(
+                '${l10n.statusSubmitted}',
                 style: TextStyle(
                   fontSize: 16,
                   color: Colors.blue,
@@ -71,7 +73,7 @@ class ComplaintSuccessScreen extends StatelessWidget {
                     Navigator.of(context).popUntil((route) => route.isFirst);
                   }
                 },
-                child: const Text('Return to Dashboard'),
+                child: Text(l10n.returnToDashboard),
               ),
             ],
           ),

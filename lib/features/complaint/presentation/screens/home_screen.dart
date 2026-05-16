@@ -4,6 +4,9 @@ import '../../../../core/routes/route_names.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/utils/organization_logo_mapper.dart';
 import '../../../../core/widgets/custom_app_bar.dart';
+import '../../../../core/widgets/modern_bottom_navigation_bar.dart';
+import '../../../../l10n/app_localizations.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart';
 import '../../../auth/domain/repositories/session_repository.dart';
 import '../../../notification/presentation/cubit/notification_cubit.dart';
 import '../cubits/home/home_cubit.dart';
@@ -42,6 +45,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: CustomAppBar(
         title: null,
@@ -49,6 +54,9 @@ class _HomeScreenState extends State<HomeScreen> {
         showThemeToggle: true,
         showNotification: true,
         backgroundColor: const Color(0xFF005C45),
+        logoAssetPath: 'assets/icons/logo (2).png',
+        logoWidth: 110,
+        logoHeight: 32,
       ),
       body: BlocBuilder<HomeCubit, HomeState>(
         builder: (context, state) {
@@ -67,8 +75,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Complaint Statistics',
+                    Text(
+                      l10n.complaintStatistics,
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -79,7 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         Expanded(
                           child: StatCard(
-                            title: 'Total Complaints',
+                            title: l10n.totalComplaints,
                             number: state.totalComplaints.toString(),
                             onTap: () => Navigator.pushNamed(
                               context,
@@ -90,7 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         const SizedBox(width: 12),
                         Expanded(
                           child: StatCard(
-                            title: 'Resolved Cases',
+                            title: l10n.resolvedCases,
                             number: state.resolvedComplaints.toString(),
                             onTap: () => Navigator.pushNamed(
                               context,
@@ -101,7 +109,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         const SizedBox(width: 12),
                         Expanded(
                           child: StatCard(
-                            title: 'Pending Cases',
+                            title: l10n.pendingCases,
                             number: state.pendingComplaints.toString(),
                             onTap: () => Navigator.pushNamed(
                               context,
@@ -112,8 +120,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     ),
                     const SizedBox(height: 32),
-                    const Text(
-                      'Complaint Categories',
+                    Text(
+                      l10n.complaintCategories,
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -167,18 +175,11 @@ class _HomeScreenState extends State<HomeScreen> {
         child: const Icon(Icons.add),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: BottomNavigationBar(
+      bottomNavigationBar: ModernBottomNavigationBar(
         currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          // Empty item visually to make space for the FAB
-          BottomNavigationBarItem(
-            icon: Icon(Icons.edit_document, color: Colors.transparent),
-            label: 'Report',
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-        ],
+        onHomeTap: () {},
+        onReportTap: () => Navigator.pushNamed(context, RouteNames.complaintForm),
+        onProfileTap: () => Navigator.pushNamed(context, RouteNames.profile),
       ),
     );
   }

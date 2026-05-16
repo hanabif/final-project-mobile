@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart';
 import '../../features/settings/presentation/cubits/settings_cubit.dart';
 import '../../features/settings/presentation/cubits/settings_state.dart';
 import '../../features/notification/presentation/cubit/notification_cubit.dart';
-import '../../features/complaint/presentation/cubits/profile/profile_cubit.dart';
 import '../routes/route_names.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -15,6 +15,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Color? backgroundColor;
   final Color? titleColor;
   final PreferredSizeWidget? bottom;
+  final String? logoAssetPath;
+  final double logoWidth;
+  final double logoHeight;
 
   const CustomAppBar({
     super.key,
@@ -26,6 +29,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.backgroundColor,
     this.titleColor,
     this.bottom,
+    this.logoAssetPath,
+    this.logoWidth = 96,
+    this.logoHeight = 28,
   });
 
   @override
@@ -34,6 +40,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: backgroundColor ?? const Color(0xFF005C45),
       leading: showBackButton
           ? IconButton(
+              iconSize: 26,
               icon: Icon(
                 Icons.arrow_back,
                 color: titleColor ?? Colors.white,
@@ -41,16 +48,37 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               onPressed: onBackPressed ?? () => Navigator.pop(context),
             )
           : null,
-      title: title != null
-          ? Text(
-              title!,
-              style: TextStyle(
-                color: titleColor ?? Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            )
+      title: logoAssetPath != null || title != null
+          ? (logoAssetPath != null && title == null
+              ? Image.asset(
+                  logoAssetPath!,
+                  width: logoWidth,
+                  height: logoHeight,
+                  fit: BoxFit.contain,
+                )
+              : Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (logoAssetPath != null) ...[
+                      Image.asset(
+                        logoAssetPath!,
+                        width: logoWidth,
+                        height: logoHeight,
+                        fit: BoxFit.contain,
+                      ),
+                      const SizedBox(width: 8),
+                    ],
+                    Text(
+                      title!,
+                      style: TextStyle(
+                        color: titleColor ?? Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ))
           : null,
-      centerTitle: title != null,
+      centerTitle: logoAssetPath != null || title != null,
       elevation: 0,
       bottom: bottom,
       actions: [
@@ -68,12 +96,13 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           unreadCount = state.notifications.where((n) => !n.isRead).length;
         }
         return IconButton(
+          iconSize: 26,
           icon: unreadCount > 0
               ? Badge(
                   label: Text(unreadCount.toString()),
-                  child: Icon(Icons.notifications, color: titleColor ?? Colors.white, size: 30),
+                  child: Icon(Iconsax.notification, color: titleColor ?? Colors.white, size: 26),
                 )
-              : Icon(Icons.notifications, color: titleColor ?? Colors.white, size: 30),
+              : Icon(Iconsax.notification, color: titleColor ?? Colors.white, size: 26),
           onPressed: () {
             Navigator.pushNamed(context, RouteNames.notifications);
           },
@@ -88,9 +117,11 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         if (state is SettingsLoaded) {
           final isDark = state.settings.themeMode == 'Dark';
           return IconButton(
+            iconSize: 26,
             icon: Icon(
-              isDark ? Icons.light_mode : Icons.dark_mode,
+              isDark ? Iconsax.sun_1 : Iconsax.moon,
               color: titleColor ?? Colors.white,
+              size: 26,
             ),
             onPressed: () {
               final newTheme = isDark ? 'Light' : 'Dark';

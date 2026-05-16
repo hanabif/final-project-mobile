@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/routes/route_names.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/widgets/custom_app_bar.dart';
+import '../../../../core/widgets/modern_bottom_navigation_bar.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../cubits/settings_cubit.dart';
 import '../cubits/settings_state.dart';
 import '../../../complaint/presentation/cubits/profile/profile_cubit.dart';
@@ -13,6 +15,8 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return MultiBlocProvider(
       providers: [
         BlocProvider(
@@ -22,7 +26,7 @@ class ProfileScreen extends StatelessWidget {
       child: Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: CustomAppBar(
-          title: 'Profile',
+          title: l10n.profile,
           showBackButton: true,
           showThemeToggle: true,
           showNotification: true,
@@ -32,11 +36,11 @@ class ProfileScreen extends StatelessWidget {
           listener: (context, state) {
             if (state is ProfileUpdateSuccess) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Profile updated successfully')),
+                SnackBar(content: Text(l10n.profileUpdatedSuccessfully)),
               );
             } else if (state is PasswordChangeSuccess) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Password changed successfully')),
+                SnackBar(content: Text(l10n.passwordChangedSuccessfully)),
               );
             }
           },
@@ -54,68 +58,69 @@ class ProfileScreen extends StatelessWidget {
                   } else if (profileState is ProfileLoaded &&
                       settingsState is SettingsLoaded) {
                     final settings = settingsState.settings;
-                  final user = profileState.user;
+                    final user = profileState.user;
 
                     return SingleChildScrollView(
                       padding: const EdgeInsets.all(20),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                        // Profile Header
-                        _buildSectionContainer(
-                          context: context,
-                          child: Row(
-                            children: [
-                              CircleAvatar(
-                                radius: 40,
-                                backgroundColor:
-                                    Theme.of(context).brightness ==
-                                        Brightness.dark
-                                    ? Colors.grey.shade800
-                                    : Colors.grey.shade200,
-                                child: const Icon(
-                                  Icons.person,
-                                  size: 50,
-                                  color: Colors.grey,
+                          // Profile Header
+                          _buildSectionContainer(
+                            context: context,
+                            child: Row(
+                              children: [
+                                CircleAvatar(
+                                  radius: 40,
+                                  backgroundColor:
+                                      Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? Colors.grey.shade800
+                                      : Colors.grey.shade200,
+                                  child: const Icon(
+                                    Icons.person,
+                                    size: 50,
+                                    color: Colors.grey,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      user.name,
-                                      style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                        color: Theme.of(
-                                          context,
-                                        ).textTheme.titleLarge?.color,
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        user.name,
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                          color: Theme.of(
+                                            context,
+                                          ).textTheme.titleLarge?.color,
+                                        ),
                                       ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      user.email,
-                                      style: TextStyle(
-                                        color:
-                                            Theme.of(context).brightness ==
-                                                Brightness.dark
-                                            ? Colors.grey.shade400
-                                            : Colors.grey.shade600,
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        user.email,
+                                        style: TextStyle(
+                                          color:
+                                              Theme.of(context).brightness ==
+                                                  Brightness.dark
+                                              ? Colors.grey.shade400
+                                              : Colors.grey.shade600,
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
                         const SizedBox(height: 24),
 
                         // My Complaints
-                        const Text(
-                          'My Complaints',
+                        Text(
+                          l10n.myComplaints,
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -143,7 +148,7 @@ class ProfileScreen extends StatelessWidget {
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                   ),
-                                  child: const Text('View All Complaints'),
+                                  child: Text(l10n.viewAllComplaints),
                                 ),
                               ),
                             ],
@@ -152,8 +157,8 @@ class ProfileScreen extends StatelessWidget {
                         const SizedBox(height: 24),
 
                         // Account Settings
-                        const Text(
-                          'Account Settings',
+                        Text(
+                          l10n.accountSettings,
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -166,7 +171,7 @@ class ProfileScreen extends StatelessWidget {
                             children: [
                               SettingsItem(
                                 icon: Icons.edit_outlined,
-                                title: 'Edit Profile',
+                                title: l10n.editProfile,
                                 onTap: () => _showEditProfileDialog(
                                   context,
                                   user.name,
@@ -175,7 +180,7 @@ class ProfileScreen extends StatelessWidget {
                               ),
                               SettingsItem(
                                 icon: Icons.lock_outline,
-                                title: 'Change Password',
+                                title: l10n.changePassword,
                                 onTap: () => _showChangePasswordDialog(
                                   context,
                                   context.read<ProfileCubit>(),
@@ -187,8 +192,8 @@ class ProfileScreen extends StatelessWidget {
                         const SizedBox(height: 24),
 
                         // Preferences
-                        const Text(
-                          'Preferences',
+                        Text(
+                          l10n.preferences,
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -199,11 +204,52 @@ class ProfileScreen extends StatelessWidget {
                           context: context,
                           child: Column(
                             children: [
-                              SettingsItem(
-                                icon: Icons.language,
-                                title: 'Language',
-                                value: settings.language,
-                                onTap: () {},
+                              ExpansionTile(
+                                tilePadding: EdgeInsets.zero,
+                                childrenPadding: const EdgeInsets.only(
+                                  left: 8,
+                                  right: 8,
+                                  bottom: 8,
+                                ),
+                                leading: const Icon(
+                                  Icons.language,
+                                  color: Color(0xFFFCD703),
+                                ),
+                                title: Text(
+                                  l10n.language,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                subtitle: Text(
+                                  settings.language,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey.shade500,
+                                  ),
+                                ),
+                                children: [
+                                  _LanguageOptionTile(
+                                      label: l10n.english,
+                                    selected:
+                                        _normalizeLanguage(settings.language) ==
+                                        l10n.english,
+                                    onTap: () => context
+                                        .read<SettingsCubit>()
+                                        .setLanguage(l10n.english),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  _LanguageOptionTile(
+                                      label: l10n.amharic,
+                                    selected:
+                                        _normalizeLanguage(settings.language) ==
+                                        l10n.amharic,
+                                    onTap: () => context
+                                        .read<SettingsCubit>()
+                                        .setLanguage(l10n.amharic),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
@@ -223,7 +269,7 @@ class ProfileScreen extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(12),
                               ),
                             ),
-                            child: const Text('Logout'),
+                            child: Text(l10n.logout),
                           ),
                         ),
                         const SizedBox(height: 80), // Space for bottom nav
@@ -281,9 +327,10 @@ class ProfileScreen extends StatelessWidget {
         bloc: profileCubit,
         builder: (context, state) {
           bool isLoading = state is ProfileLoading;
+          final l10n = AppLocalizations.of(context)!;
 
           return AlertDialog(
-            title: const Text('Edit Profile'),
+            title: Text(l10n.editProfile),
             content: isLoading
                 ? const SizedBox(
                     height: 60,
@@ -294,13 +341,13 @@ class ProfileScreen extends StatelessWidget {
                     child: TextFormField(
                       enabled: !isLoading,
                       controller: nameController,
-                      decoration: const InputDecoration(
-                        labelText: 'Full Name',
+                      decoration: InputDecoration(
+                        labelText: l10n.fullName,
                         border: OutlineInputBorder(),
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Name is required';
+                          return l10n.nameIsRequired;
                         }
                         return null;
                       },
@@ -309,7 +356,7 @@ class ProfileScreen extends StatelessWidget {
             actions: [
               TextButton(
                 onPressed: isLoading ? null : () => Navigator.pop(dialogContext),
-                child: const Text('Cancel'),
+                child: Text(l10n.cancel),
               ),
               ElevatedButton(
                 onPressed: isLoading
@@ -331,13 +378,21 @@ class ProfileScreen extends StatelessWidget {
                         width: 20,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : const Text('Save'),
+                    : Text(l10n.update),
               ),
             ],
           );
         },
       ),
     );
+  }
+
+  String _normalizeLanguage(String language) {
+    final value = language.toLowerCase();
+    if (value.contains('am')) {
+      return 'Amharic';
+    }
+    return 'English';
   }
 
   void _showChangePasswordDialog(
@@ -356,9 +411,10 @@ class ProfileScreen extends StatelessWidget {
         bloc: profileCubit,
         builder: (context, state) {
           bool isLoading = state is ProfileLoading;
+          final l10n = AppLocalizations.of(context)!;
 
           return AlertDialog(
-            title: const Text('Change Password'),
+            title: Text(l10n.changePassword),
             content: isLoading
                 ? const SizedBox(
                     height: 60,
@@ -372,14 +428,14 @@ class ProfileScreen extends StatelessWidget {
                         TextFormField(
                           enabled: !isLoading,
                           controller: oldPasswordController,
-                          decoration: const InputDecoration(
-                            labelText: 'Current Password',
+                          decoration: InputDecoration(
+                            labelText: l10n.currentPassword,
                             border: OutlineInputBorder(),
                           ),
                           obscureText: true,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Current password is required';
+                              return l10n.currentPasswordIsRequired;
                             }
                             return null;
                           },
@@ -388,17 +444,17 @@ class ProfileScreen extends StatelessWidget {
                         TextFormField(
                           enabled: !isLoading,
                           controller: newPasswordController,
-                          decoration: const InputDecoration(
-                            labelText: 'New Password',
+                          decoration: InputDecoration(
+                            labelText: l10n.newPassword,
                             border: OutlineInputBorder(),
                           ),
                           obscureText: true,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'New password is required';
+                              return l10n.newPasswordIsRequired;
                             }
                             if (value.length < 6) {
-                              return 'Password must be at least 6 characters';
+                              return l10n.passwordMustBeAtLeast6Characters;
                             }
                             return null;
                           },
@@ -407,17 +463,17 @@ class ProfileScreen extends StatelessWidget {
                         TextFormField(
                           enabled: !isLoading,
                           controller: confirmPasswordController,
-                          decoration: const InputDecoration(
-                            labelText: 'Confirm Password',
+                          decoration: InputDecoration(
+                            labelText: l10n.confirmPassword,
                             border: OutlineInputBorder(),
                           ),
                           obscureText: true,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Please confirm password';
+                              return l10n.pleaseConfirmPassword;
                             }
                             if (value != newPasswordController.text) {
-                              return 'Passwords do not match';
+                              return l10n.passwordsDoNotMatch;
                             }
                             return null;
                           },
@@ -428,7 +484,7 @@ class ProfileScreen extends StatelessWidget {
             actions: [
               TextButton(
                 onPressed: isLoading ? null : () => Navigator.pop(dialogContext),
-                child: const Text('Cancel'),
+                child: Text(l10n.cancel),
               ),
               ElevatedButton(
                 onPressed: isLoading
@@ -453,7 +509,7 @@ class ProfileScreen extends StatelessWidget {
                         width: 20,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : const Text('Update'),
+                    : Text(l10n.save),
               ),
             ],
           );
@@ -463,15 +519,19 @@ class ProfileScreen extends StatelessWidget {
   }
 
   void _showLogoutDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Logout'),
-        content: const Text('Are you sure you want to logout?'),
+        title: Text(l10n.logout),
+        content: Text(
+          l10n.areYouSureLogout,
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -485,9 +545,40 @@ class ProfileScreen extends StatelessWidget {
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red,
             ),
-            child: const Text('Logout'),
+            child: Text(l10n.logout),
           ),
         ],
+      ),
+    );
+  }
+
+}
+
+class _LanguageOptionTile extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _LanguageOptionTile({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: selected
+          ? const Color(0xFFFCD703).withValues(alpha: 0.12)
+          : Colors.transparent,
+      borderRadius: BorderRadius.circular(12),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+        title: Text(label),
+        trailing: selected
+            ? const Icon(Icons.check_circle, color: Color(0xFF005C45))
+            : const Icon(Icons.circle_outlined, color: Colors.grey),
+        onTap: onTap,
       ),
     );
   }
@@ -497,25 +588,17 @@ class ProfileScreen extends StatelessWidget {
 class _BottomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return BottomNavigationBar(
+    return ModernBottomNavigationBar(
       currentIndex: 2,
-      onTap: (index) {
-        if (index == 0) {
-          Navigator.pushNamedAndRemoveUntil(
-            context,
-            RouteNames.home,
-            (route) => false,
-          );
-        }
+      onHomeTap: () {
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          RouteNames.home,
+          (route) => false,
+        );
       },
-      items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.home_outlined), label: 'Home'),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.edit_document, color: Colors.transparent),
-          label: 'Report',
-        ),
-        BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-      ],
+      onReportTap: () => Navigator.pushNamed(context, RouteNames.complaintForm),
+      onProfileTap: () {},
     );
   }
 }
@@ -524,9 +607,10 @@ class _FloatingReportButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FloatingActionButton(
+      shape: const CircleBorder(),
       onPressed: () => Navigator.pushNamed(context, RouteNames.complaintForm),
       backgroundColor: const Color(0xFF005C45),
-      child: const Icon(Icons.add, color: Colors.white, size: 30),
+      child: const Icon(Icons.add, color: Colors.white, size: 28),
     );
   }
 }

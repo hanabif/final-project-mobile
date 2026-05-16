@@ -9,6 +9,7 @@ import 'package:permission_handler/permission_handler.dart';
 import '../../../../core/routes/route_names.dart';
 import '../../../../core/widgets/platform_image.dart';
 import '../../../../core/widgets/custom_app_bar.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/complaint.dart';
 import '../cubits/complaint_cubit.dart';
 import '../cubits/complaint_state.dart';
@@ -48,6 +49,7 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
   }
 
   Future<void> _loadOrganizations() async {
+    final l10n = AppLocalizations.of(context)!;
     try {
       final getOrganizationsUseCase = sl<GetOrganizationsUseCase>();
       final orgsResponse = await getOrganizationsUseCase.call();
@@ -77,7 +79,7 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
           _isLoadingOrganizations = false;
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to load organizations: $e')),
+          SnackBar(content: Text('${l10n.failedToLoadOrganizationsPrefix}$e')),
         );
       }
     }
@@ -91,6 +93,7 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
   }
 
   Future<void> _getCurrentLocation() async {
+    final l10n = AppLocalizations.of(context)!;
     setState(() {
       _isGettingLocation = true;
     });
@@ -103,12 +106,10 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
       if (!serviceEnabled) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                'You should turn on your location to submit complaints.',
-              ),
+            SnackBar(
+              content: Text(l10n.locationServiceRequired),
               action: SnackBarAction(
-                label: 'Settings',
+                label: l10n.locationSettings,
                 onPressed: Geolocator.openLocationSettings,
               ),
             ),
@@ -125,10 +126,10 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
         if (status.isPermanentlyDenied) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Location permissions are permanently denied.'),
+              SnackBar(
+                content: Text(l10n.locationPermissionsPermanentlyDenied),
                 action: SnackBarAction(
-                  label: 'Settings',
+                  label: l10n.locationSettings,
                   onPressed: openAppSettings,
                 ),
               ),
@@ -145,9 +146,7 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
           if (permission == LocationPermission.denied) {
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Location permissions are denied'),
-                ),
+                SnackBar(content: Text(l10n.locationPermissionsDenied)),
               );
             }
             setState(() => _isGettingLocation = false);
@@ -159,12 +158,10 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
       if (permission == LocationPermission.deniedForever) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                'Location permissions are permanently denied, we cannot request permissions.',
-              ),
+            SnackBar(
+              content: Text(l10n.locationPermissionsPermanentlyDeniedNoRequest),
               action: SnackBarAction(
-                label: 'Settings',
+                label: l10n.locationSettings,
                 onPressed: openAppSettings,
               ),
             ),
@@ -182,7 +179,7 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error getting location: ${e.toString()}')),
+          SnackBar(content: Text('${l10n.locationErrorPrefix}${e.toString()}')),
         );
       }
       setState(() => _isGettingLocation = false);
@@ -190,6 +187,7 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
   }
 
   Future<void> _pickImage(ImageSource source) async {
+    final l10n = AppLocalizations.of(context)!;
     final picker = ImagePicker();
     try {
       // Request permissions before picking
@@ -198,7 +196,7 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
         if (status.isDenied) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Camera permission is required')),
+              SnackBar(content: Text(l10n.cameraPermissionRequired)),
             );
           }
           return;
@@ -211,7 +209,7 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
         if (photoStatus.isDenied && storageStatus.isDenied) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Gallery permission is required')),
+              SnackBar(content: Text(l10n.galleryPermissionRequired)),
             );
           }
           return;
@@ -229,7 +227,7 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
             } else {
               if (mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('${file.name} exceeds 5MB limit')),
+                  SnackBar(content: Text('${file.name} ${l10n.imageExceeds5MbLimitSuffix}')),
                 );
               }
             }
@@ -240,7 +238,7 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
             if (_selectedImages.length > 5) {
               _selectedImages = _selectedImages.sublist(0, 5);
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Maximum 5 images allowed')),
+                SnackBar(content: Text(l10n.maximum5ImagesAllowed)),
               );
             }
           });
@@ -255,14 +253,14 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
                 _selectedImages.add(pickedFile);
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Maximum 5 images allowed')),
+                  SnackBar(content: Text(l10n.maximum5ImagesAllowed)),
                 );
               }
             });
           } else {
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('${pickedFile.name} exceeds 5MB limit')),
+                SnackBar(content: Text('${pickedFile.name} ${l10n.imageExceeds5MbLimitSuffix}')),
               );
             }
           }
@@ -271,7 +269,7 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error picking image: ${e.toString()}')),
+          SnackBar(content: Text('${l10n.imagePickingErrorPrefix}${e.toString()}')),
         );
       }
     }
@@ -284,11 +282,12 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
   }
 
   void _submitForm() {
+    final l10n = AppLocalizations.of(context)!;
     if (_formKey.currentState!.validate()) {
       if (_currentPosition == null) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text('Location is required')));
+        ).showSnackBar(SnackBar(content: Text(l10n.locationIsRequired)));
         return;
       }
 
@@ -323,9 +322,11 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: CustomAppBar(
-        title: 'Submit Complaint',
+        title: l10n.submitComplaint,
         showBackButton: true,
         showThemeToggle: false,
         showNotification: false,
@@ -334,8 +335,8 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
         listener: (context, state) {
           if (state is ComplaintSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Complaint submitted successfully!'),
+              SnackBar(
+                content: Text(l10n.complaintSubmittedSuccessfully),
               ),
             );
             // In a real app we'd get the actual ID from the state/response if it's generated on backend
@@ -363,16 +364,16 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
                 children: [
                   TextFormField(
                     controller: _titleController,
-                    decoration: const InputDecoration(
-                      labelText: 'Complaint Title',
+                    decoration: InputDecoration(
+                      labelText: l10n.complaintTitle,
                       border: OutlineInputBorder(),
                     ),
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
-                        return 'Title is required';
+                        return l10n.titleIsRequired;
                       }
                       if (value.trim().length < 5) {
-                        return 'Title must be at least 5 characters';
+                        return l10n.titleMustBeAtLeast5Characters;
                       }
                       return null;
                     },
@@ -380,18 +381,18 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
                   const SizedBox(height: 16),
                   TextFormField(
                     controller: _descriptionController,
-                    decoration: const InputDecoration(
-                      labelText: 'Description',
+                    decoration: InputDecoration(
+                      labelText: l10n.description,
                       border: OutlineInputBorder(),
                       alignLabelWithHint: true,
                     ),
                     maxLines: 5,
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
-                        return 'Description is required';
+                        return l10n.descriptionIsRequired;
                       }
                       if (value.trim().length < 20) {
-                        return 'Description must be at least 20 characters';
+                        return l10n.descriptionMustBeAtLeast20Characters;
                       }
                       return null;
                     },
@@ -402,8 +403,8 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
                       const Center(child: CircularProgressIndicator())
                     else
                       DropdownButtonFormField<String>(
-                        decoration: const InputDecoration(
-                          labelText: 'Select Organization',
+                        decoration: InputDecoration(
+                          labelText: l10n.selectOrganization,
                           border: OutlineInputBorder(),
                         ),
                         isExpanded: true,
@@ -424,15 +425,15 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
                         },
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please select an organization';
+                            return l10n.pleaseSelectOrganization;
                           }
                           return null;
                         },
                       ),
                   ],
                   const SizedBox(height: 24),
-                  const Text(
-                    'Attach Images (Optional)',
+                  Text(
+                    l10n.attachImagesOptional,
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                   const SizedBox(height: 8),
@@ -442,12 +443,12 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
                       ElevatedButton.icon(
                         onPressed: () => _pickImage(ImageSource.camera),
                         icon: const Icon(Icons.camera_alt),
-                        label: const Text('Camera'),
+                        label: Text(l10n.camera),
                       ),
                       ElevatedButton.icon(
                         onPressed: () => _pickImage(ImageSource.gallery),
                         icon: const Icon(Icons.photo_library),
-                        label: const Text('Gallery'),
+                        label: Text(l10n.gallery),
                       ),
                     ],
                   ),
@@ -457,8 +458,8 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Selected Images:',
+                        Text(
+                          l10n.selectedImages,
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 8),
@@ -508,8 +509,8 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
                       ],
                     ),
                   if (_selectedImages.isEmpty)
-                    const Text(
-                      'No images selected',
+                    Text(
+                      l10n.noImagesSelected,
                       style: TextStyle(color: Colors.grey),
                       textAlign: TextAlign.center,
                     ),
@@ -528,18 +529,18 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
                                   )
                                 : _currentPosition != null
                                 ? Text(
-                                    'Lat: ${_currentPosition!.latitude.toStringAsFixed(4)}\n'
-                                    'Lng: ${_currentPosition!.longitude.toStringAsFixed(4)}',
+                                    '${l10n.latitude}: ${_currentPosition!.latitude.toStringAsFixed(4)}\n'
+                                    '${l10n.longitude}: ${_currentPosition!.longitude.toStringAsFixed(4)}',
                                   )
-                                : const Text(
-                                    'Location not available',
+                                : Text(
+                                    l10n.locationNotAvailable,
                                     style: TextStyle(color: Colors.red),
                                   ),
                           ),
                           IconButton(
                             icon: const Icon(Icons.refresh),
                             onPressed: _getCurrentLocation,
-                            tooltip: 'Refresh Location',
+                            tooltip: l10n.refreshLocation,
                           ),
                         ],
                       ),
@@ -558,12 +559,10 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
 
                         String? callCenterText;
                         if (orgName.contains('electric')) {
-                          callCenterText =
-                              'or report through their call center 905 for Ethiopian Electric Utility';
+                          callCenterText = l10n.reportThroughCallCenterElectric;
                         } else if (orgName.contains('water') ||
                             orgName.contains('sewerage')) {
-                          callCenterText =
-                              'or report through their call center +251116674036 for Addis Ababa Water and Sewerage Authority';
+                          callCenterText = l10n.reportThroughCallCenterWater;
                         }
 
                         if (callCenterText != null) {
@@ -593,8 +592,8 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
                     ),
                     child: state is ComplaintSubmitting
                         ? const CircularProgressIndicator()
-                        : const Text(
-                            'Submit Complaint',
+                        : Text(
+                            l10n.submit,
                             style: TextStyle(fontSize: 16),
                           ),
                   ),
@@ -602,8 +601,10 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
               ),
             ),
           );
+
         },
       ),
     );
   }
+
 }

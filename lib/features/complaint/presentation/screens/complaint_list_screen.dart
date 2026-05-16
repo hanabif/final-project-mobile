@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/routes/route_names.dart';
 import '../../../../core/widgets/custom_app_bar.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../cubits/complaint_list_cubit.dart';
 import '../cubits/complaint_list_state.dart';
 import '../widgets/complaint_card.dart';
@@ -32,11 +33,13 @@ class _ComplaintListScreenState extends State<ComplaintListScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return BlocProvider(
       create: (context) => sl<ComplaintListCubit>()..fetchComplaints(),
       child: Scaffold(
         appBar: CustomAppBar(
-          title: 'My Reports',
+          title: l10n.myReports,
           showBackButton: true,
           showThemeToggle: true,
           showNotification: true,
@@ -53,10 +56,10 @@ class _ComplaintListScreenState extends State<ComplaintListScreen>
             indicatorWeight: 3,
             labelColor: Colors.white,
             unselectedLabelColor: Colors.white70,
-            tabs: const [
-              Tab(text: 'All'),
-              Tab(text: 'Active'),
-              Tab(text: 'Resolved'),
+            tabs: [
+              Tab(text: l10n.all),
+              Tab(text: l10n.active),
+              Tab(text: l10n.resolved),
             ],
           ),
         ),
@@ -70,11 +73,11 @@ class _ComplaintListScreenState extends State<ComplaintListScreen>
               return TabBarView(
                 controller: _tabController,
                 children: [
-                  _buildComplaintList(state.complaints),
-                  _buildComplaintList(state.complaints
+                  _buildComplaintList(context, l10n, state.complaints),
+                  _buildComplaintList(context, l10n, state.complaints
                       .where((c) => c.status.toLowerCase() != 'resolved')
                       .toList()),
-                  _buildComplaintList(state.complaints
+                  _buildComplaintList(context, l10n, state.complaints
                       .where((c) => c.status.toLowerCase() == 'resolved')
                       .toList()),
                 ],
@@ -95,7 +98,11 @@ class _ComplaintListScreenState extends State<ComplaintListScreen>
     );
   }
 
-  Widget _buildComplaintList(List complaints) {
+  Widget _buildComplaintList(
+    BuildContext context,
+    AppLocalizations l10n,
+    List complaints,
+  ) {
     if (complaints.isEmpty) {
       return Center(
         child: Column(
@@ -107,8 +114,8 @@ class _ComplaintListScreenState extends State<ComplaintListScreen>
               color: Colors.grey.shade300,
             ),
             const SizedBox(height: 16),
-            const Text(
-              'No more issues to show.',
+            Text(
+              l10n.noMoreIssuesToShow,
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -117,7 +124,7 @@ class _ComplaintListScreenState extends State<ComplaintListScreen>
             ),
             const SizedBox(height: 8),
             Text(
-              "Tap the '+' to file a new report.",
+              l10n.tapPlusToFileNewReport,
               style: TextStyle(
                 fontSize: 14,
                 color: Colors.grey.shade500,
@@ -146,4 +153,5 @@ class _ComplaintListScreenState extends State<ComplaintListScreen>
           .toList(),
     );
   }
+
 }

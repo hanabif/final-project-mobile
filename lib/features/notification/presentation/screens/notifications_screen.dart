@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../cubit/notification_cubit.dart';
 import '../../domain/entities/notification_item.dart';
 
@@ -17,13 +18,15 @@ class NotificationsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Notifications'),
+        title: Text(l10n.notifications),
         actions: [
           Builder(
             builder: (appBarContext) => IconButton(
-              tooltip: 'Mark all as read',
+              tooltip: l10n.markAllAsRead,
               icon: const Icon(Icons.done_all),
               onPressed: () =>
                   appBarContext.read<NotificationCubit>().markAllAsRead(),
@@ -46,7 +49,7 @@ class NotificationsScreen extends StatelessWidget {
             } else if (state is NotificationLoaded) {
               final notifications = state.notifications;
               if (notifications.isEmpty) {
-                return const Center(child: Text('No notifications yet.'));
+                return Center(child: Text(l10n.noNotificationsYet));
               }
               return ListView.separated(
                 padding: const EdgeInsets.all(16),
@@ -95,19 +98,17 @@ class NotificationsScreen extends StatelessWidget {
                                     notif.id,
                                   );
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text(
-                                        'This notification is marked as read',
-                                      ),
+                                    SnackBar(
+                                      content: Text(l10n.notificationMarkedAsRead),
                                       duration: Duration(seconds: 2),
                                     ),
                                   );
                                 }
                               },
                               itemBuilder: (BuildContext context) => [
-                                const PopupMenuItem(
+                                PopupMenuItem(
                                   value: 'markAsRead',
-                                  child: Text('Mark as read'),
+                                    child: Text(l10n.markAsRead),
                                 ),
                               ],
                             ),
@@ -124,4 +125,5 @@ class NotificationsScreen extends StatelessWidget {
       ),
     );
   }
+
 }

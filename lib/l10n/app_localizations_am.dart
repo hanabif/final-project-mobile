@@ -24,6 +24,9 @@ class AppLocalizationsAm extends AppLocalizations {
   String get password => 'የይለፍ ቃል';
 
   @override
+  String get fullName => 'ሙሉ ስም';
+
+  @override
   String get forgotPassword => 'የይለፍ ቃል ረሳሁ?';
 
   @override
@@ -31,6 +34,30 @@ class AppLocalizationsAm extends AppLocalizations {
 
   @override
   String get yesAccount => 'አካውንት አለዎት?';
+
+  @override
+  String get english => 'እንግሊዝኛ';
+
+  @override
+  String get amharic => 'አማርኛ';
+
+  @override
+  String get settings => 'ቅንብሮች';
+
+  @override
+  String get save => 'አስቀምጥ';
+
+  @override
+  String get update => 'አዘምን';
+
+  @override
+  String get currentPassword => 'የአሁኑ የይለፍ ቃል';
+
+  @override
+  String get newPassword => 'አዲስ የይለፍ ቃል';
+
+  @override
+  String get confirmPassword => 'የይለፍ ቃል አረጋግጥ';
 
   @override
   String get home => 'ዋና ገጽ';
@@ -93,6 +120,9 @@ class AppLocalizationsAm extends AppLocalizations {
   String get notifications => 'ማስታወቂያዎች';
 
   @override
+  String get markAllAsRead => 'ሁሉንም እንደተነበበ ምልክት አድርግ';
+
+  @override
   String get complaintStatusUpdated => 'የቅሬታ ሁኔታ ተዘምኗል';
 
   @override
@@ -108,6 +138,15 @@ class AppLocalizationsAm extends AppLocalizations {
   String get weAreWorkingOnIt => 'እየሰራንበት ነው';
 
   @override
+  String get noNotificationsYet => 'እስካሁን ምንም ማስታወቂያ የለም';
+
+  @override
+  String get notificationMarkedAsRead => 'ይህ ማስታወቂያ እንደተነበበ ተመድቧል';
+
+  @override
+  String get markAsRead => 'እንደተነበበ ምልክት አድርግ';
+
+  @override
   String get myReports => 'ቅሬታዎቼ';
 
   @override
@@ -118,6 +157,12 @@ class AppLocalizationsAm extends AppLocalizations {
 
   @override
   String get submitted => 'የተላከ';
+
+  @override
+  String get noMoreIssuesToShow => 'የሚታዩ ጉዳዮች የሉም።';
+
+  @override
+  String get tapPlusToFileNewReport => 'አዲስ ሪፖርት ለማስገባት \'+\' ይጫኑ።';
 
   @override
   String get myComplaints => 'ቅሬታዎቼ';
@@ -168,6 +213,33 @@ class AppLocalizationsAm extends AppLocalizations {
   String get logout => 'ውጣ';
 
   @override
+  String get profileUpdatedSuccessfully => 'መገለጫው በተሳካ ሁኔታ ተዘምኗል';
+
+  @override
+  String get passwordChangedSuccessfully => 'የይለፍ ቃሉ በተሳካ ሁኔታ ተቀይሯል';
+
+  @override
+  String get nameIsRequired => 'ስሙ አስፈላጊ ነው';
+
+  @override
+  String get currentPasswordIsRequired => 'የአሁኑ የይለፍ ቃል አስፈላጊ ነው';
+
+  @override
+  String get newPasswordIsRequired => 'አዲስ የይለፍ ቃል አስፈላጊ ነው';
+
+  @override
+  String get passwordMustBeAtLeast6Characters => 'የይለፍ ቃሉ ቢያንስ 6 ፊደላት መሆን አለበት';
+
+  @override
+  String get pleaseConfirmPassword => 'እባክዎ የይለፍ ቃሉን ያረጋግጡ';
+
+  @override
+  String get passwordsDoNotMatch => 'የይለፍ ቃሎቹ አይመሳሰሉም';
+
+  @override
+  String get areYouSureLogout => 'መውጣት እርግጠኛ ነዎት?';
+
+  @override
   String get statusSubmitted => 'ተልኳል';
 
   @override
@@ -193,4 +265,93 @@ class AppLocalizationsAm extends AppLocalizations {
 
   @override
   String get noData => 'ምንም መረጃ የለም';
+
+  @override
+  String get failedToLoadOrganizationsPrefix => 'ድርጅቶችን ማስጫን አልተቻለም: ';
+
+  @override
+  String get locationServiceRequired => 'ቅሬታ ለማስገባት የአካባቢ አገልግሎት ማብራት አለብዎት።';
+
+  @override
+  String get locationSettings => 'ቅንብሮች';
+
+  @override
+  String get locationPermissionsPermanentlyDenied =>
+      'የአካባቢ ፈቃዶች በቋሚነት ተከልክለዋል።';
+
+  @override
+  String get locationPermissionsDenied => 'የአካባቢ ፈቃዶች ተከልክለዋል';
+
+  @override
+  String get locationPermissionsPermanentlyDeniedNoRequest =>
+      'የአካባቢ ፈቃዶች በቋሚነት ተከልክለዋል፣ ፈቃድ መጠየቅ አንችልም።';
+
+  @override
+  String get locationErrorPrefix => 'የአካባቢ መግኘት ስህተት: ';
+
+  @override
+  String get cameraPermissionRequired => 'የካሜራ ፈቃድ ያስፈልጋል';
+
+  @override
+  String get galleryPermissionRequired => 'የማህደር ፈቃድ ያስፈልጋል';
+
+  @override
+  String get maximum5ImagesAllowed => 'ከፍተኛው 5 ምስሎች ብቻ ይፈቀዳሉ';
+
+  @override
+  String get imageExceeds5MbLimitSuffix => 'ከ5MB ድርጊት በላይ ነው';
+
+  @override
+  String get imagePickingErrorPrefix => 'ምስል ማምረጥ ስህተት: ';
+
+  @override
+  String get locationIsRequired => 'አካባቢ ያስፈልጋል';
+
+  @override
+  String get complaintSubmittedSuccessfully => 'ቅሬታው በተሳካ ሁኔታ ተልኳል!';
+
+  @override
+  String get titleIsRequired => 'የርዕስ መስክ አስፈላጊ ነው';
+
+  @override
+  String get titleMustBeAtLeast5Characters => 'ርዕሱ ቢያንስ 5 ፊደላት መሆን አለበት';
+
+  @override
+  String get descriptionIsRequired => 'መግለጫው አስፈላጊ ነው';
+
+  @override
+  String get descriptionMustBeAtLeast20Characters =>
+      'መግለጫው ቢያንስ 20 ፊደላት መሆን አለበት';
+
+  @override
+  String get selectOrganization => 'ድርጅት ይምረጡ';
+
+  @override
+  String get pleaseSelectOrganization => 'እባክዎ ድርጅት ይምረጡ';
+
+  @override
+  String get selectedImages => 'የተመረጡ ምስሎች:';
+
+  @override
+  String get locationNotAvailable => 'አሁን ያለበት ቦታ አልተገኘም';
+
+  @override
+  String get refreshLocation => 'ቦታ አድስ';
+
+  @override
+  String get reportThroughCallCenterElectric =>
+      'ወይም ለኢትዮጵያ ኤሌክትሪክ ኩባንያ በ905 ይደውሉ';
+
+  @override
+  String get reportThroughCallCenterWater =>
+      'ወይም ለአዲስ አበባ ውሃና ፍሳሽ ባለስልጣን +251116674036 ይደውሉ';
+
+  @override
+  String get success => 'ተሳክቷል';
+
+  @override
+  String get complaintId => 'የቅሬታ መለያ:';
+
+  @override
+  String get returnToDashboard => 'ወደ ዳሽቦርድ ተመለስ';
 }
