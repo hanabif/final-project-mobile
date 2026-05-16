@@ -113,17 +113,10 @@ class ComplaintModel extends Complaint {
     return {
       'title': title,
       'description': description,
-      'imageUrl': imageUrl,
-      'images': images,
-      'location': {
-        'latitude': latitude,
-        'longitude': longitude,
-      },
       'organizationId': organizationId,
-      'status': status,
-      'category': category,
-      'priority': priority,
-      'department': department,
+      'attachments': images.map((url) => {'url': url}).toList(),
+      'latitude': latitude,
+      'longitude': longitude,
     };
   }
 

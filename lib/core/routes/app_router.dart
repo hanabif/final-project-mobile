@@ -45,9 +45,8 @@ class AppRouter {
         );
 
       case RouteNames.complaintSuccess:
-        final complaintId = settings.arguments as String;
         return MaterialPageRoute(
-          builder: (_) => ComplaintSuccessScreen(complaintId: complaintId),
+          builder: (_) => const ComplaintSuccessScreen(),
         );
 
       case RouteNames.complaintStatus:

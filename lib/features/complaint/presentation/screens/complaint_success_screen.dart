@@ -2,11 +2,9 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 
 class ComplaintSuccessScreen extends StatelessWidget {
-  final String complaintId;
 
   const ComplaintSuccessScreen({
-    super.key,
-    required this.complaintId,
+    super.key
   });
 
   @override
@@ -38,23 +36,7 @@ class ComplaintSuccessScreen extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade200,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Column(
-                  children: [
-                    Text(l10n.complaintId),
-                    Text(
-                      complaintId,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 8),
+
               Text(
                 '${l10n.statusSubmitted}',
                 style: TextStyle(
