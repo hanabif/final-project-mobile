@@ -88,8 +88,16 @@ class ApiClient {
           return handler.next(options);
         },
         onError: (DioException e, handler) async {
-          if (e.response?.statusCode == 401) {
-            debugPrint('Received 401 Unauthorized - attempting token refresh');
+          bool isTokenExpiredMsg = false;
+          if (e.response != null && e.response?.data != null) {
+            final data = e.response?.data;
+            if (data is Map && data['message'] == 'Access token expired') {
+              isTokenExpiredMsg = true;
+            }
+          }
+
+          if (e.response?.statusCode == 401 || isTokenExpiredMsg) {
+            debugPrint('Received 401 or token expired message - attempting token refresh');
             try {
               final refreshToken = await sessionRepository.getRefreshToken();
               if (refreshToken != null && refreshToken.isNotEmpty) {

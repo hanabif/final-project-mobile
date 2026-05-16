@@ -36,8 +36,7 @@ class SessionRepositoryImpl implements SessionRepository {
   @override
   Future<bool> hasValidSession() async {
     final token = await _secureStorage.getToken();
-    if (token == null) return false;
-    return !_isTokenExpired(token);
+    return token != null && token.isNotEmpty;
   }
 
   bool _isTokenExpired(String token) {
