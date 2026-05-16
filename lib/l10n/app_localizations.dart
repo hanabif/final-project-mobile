@@ -218,6 +218,24 @@ abstract class AppLocalizations {
   /// **'Profile'**
   String get profile;
 
+  /// No description provided for @yourVoiceMatters.
+  ///
+  /// In en, this message translates to:
+  /// **'Your voice matters'**
+  String get yourVoiceMatters;
+
+  /// No description provided for @reportIssuesInYourCommunity.
+  ///
+  /// In en, this message translates to:
+  /// **'Report issues in your community and help us improve services.'**
+  String get reportIssuesInYourCommunity;
+
+  /// No description provided for @fileReport.
+  ///
+  /// In en, this message translates to:
+  /// **'File Report'**
+  String get fileReport;
+
   /// No description provided for @complaintStatistics.
   ///
   /// In en, this message translates to:
@@ -302,6 +320,12 @@ abstract class AppLocalizations {
   /// **'Lng'**
   String get longitude;
 
+  /// No description provided for @location.
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get location;
+
   /// No description provided for @submit.
   ///
   /// In en, this message translates to:
@@ -379,6 +403,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'My Reports'**
   String get myReports;
+
+  /// No description provided for @complaintDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Complaint Details'**
+  String get complaintDetails;
+
+  /// No description provided for @complaintProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Complaint Progress'**
+  String get complaintProgress;
+
+  /// No description provided for @issueDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Issue Description'**
+  String get issueDescription;
+
+  /// No description provided for @photos.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos'**
+  String get photos;
+
+  /// No description provided for @locationDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Location Details'**
+  String get locationDetails;
+
+  /// No description provided for @submittedOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Submitted on'**
+  String get submittedOn;
+
+  /// No description provided for @resolvedOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Resolved on'**
+  String get resolvedOn;
+
+  /// No description provided for @failedToLoadImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load'**
+  String get failedToLoadImage;
 
   /// No description provided for @all.
   ///

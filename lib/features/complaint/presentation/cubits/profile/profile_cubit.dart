@@ -62,7 +62,11 @@ class ProfileCubit extends Cubit<ProfileState> {
     required this.changePasswordUseCase,
   }) : super(ProfileInitial());
 
-  Future<void> loadProfileData() async {
+  Future<void> loadProfileData({bool forceRefresh = false}) async {
+    if (!forceRefresh && state is ProfileLoaded) {
+      return;
+    }
+
     emit(ProfileLoading());
     try {
       // Run both calls in parallel
@@ -120,5 +124,9 @@ class ProfileCubit extends Cubit<ProfileState> {
     } catch (e) {
       emit(ProfileError(e.toString()));
     }
+  }
+
+  void clearCache() {
+    emit(ProfileInitial());
   }
 }

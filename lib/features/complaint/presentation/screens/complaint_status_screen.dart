@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../../../core/di/injection_container.dart';
+import '../../../../core/widgets/custom_app_bar.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/complaint.dart';
 import '../cubits/complaint_detail_cubit.dart';
 import '../cubits/complaint_detail_state.dart';
@@ -17,23 +20,20 @@ class ComplaintStatusScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return BlocProvider(
       create: (context) =>
           sl<ComplaintDetailCubit>()..loadFromComplaint(complaint),
       child: Scaffold(
         backgroundColor: const Color(0xFFF9FAFB),
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
-            onPressed: () => Navigator.pop(context),
-          ),
-          title: const Text(
-            'Complaint Details',
-            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-          ),
-          centerTitle: true,
+        appBar: CustomAppBar(
+          title: l10n.complaintDetails,
+          showBackButton: true,
+          showThemeToggle: false,
+          showNotification: false,
+          backgroundColor: const Color(0xFF005C45),
+          titleColor: Colors.white,
         ),
         body: BlocBuilder<ComplaintDetailCubit, ComplaintDetailState>(
           builder: (context, state) {
@@ -97,7 +97,7 @@ class ComplaintStatusScreen extends StatelessWidget {
                                   size: 13, color: Colors.grey),
                               const SizedBox(width: 4),
                               Text(
-                                'Submitted ${_formatDate(complaint.createdAt)}',
+                                '${l10n.submittedOn} ${_formatDate(context, complaint.createdAt)}',
                                 style: TextStyle(
                                   fontSize: 13,
                                   color: Colors.grey.shade500,
@@ -113,7 +113,7 @@ class ComplaintStatusScreen extends StatelessWidget {
                                     size: 13, color: Color(0xFF005C45)),
                                 const SizedBox(width: 4),
                                 Text(
-                                  'Resolved on ${_formatDate(complaint.resolvedAt!)}',
+                                  '${l10n.resolvedOn} ${_formatDate(context, complaint.resolvedAt!)}',
                                   style: const TextStyle(
                                     fontSize: 13,
                                     color: Color(0xFF005C45),
@@ -134,7 +134,7 @@ class ComplaintStatusScreen extends StatelessWidget {
 
                     // Issue Description
                     _buildSectionContainer(
-                      title: 'Issue Description',
+                      title: l10n.issueDescription,
                       child: Text(
                         complaint.description,
                         style: TextStyle(
@@ -147,9 +147,9 @@ class ComplaintStatusScreen extends StatelessWidget {
                     const SizedBox(height: 20),
 
                     if (complaint.images.isNotEmpty) ...[
-                      const Text(
-                        'Photos',
-                        style: TextStyle(
+                      Text(
+                        l10n.photos,
+                        style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
@@ -172,9 +172,9 @@ class ComplaintStatusScreen extends StatelessWidget {
 
                     // Location — only shown when the API returned coordinates
                     if (hasLocation) ...[
-                      const Text(
-                        'Location Details',
-                        style: TextStyle(
+                      Text(
+                        l10n.locationDetails,
+                        style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
@@ -191,8 +191,8 @@ class ComplaintStatusScreen extends StatelessWidget {
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
-                                    'Lat: ${complaint.latitude.toStringAsFixed(6)}, '
-                                    'Lng: ${complaint.longitude.toStringAsFixed(6)}',
+                                    '${l10n.latitude}: ${complaint.latitude.toStringAsFixed(6)}, '
+                                    '${l10n.longitude}: ${complaint.longitude.toStringAsFixed(6)}',
                                     style:
                                         TextStyle(color: Colors.grey.shade700),
                                   ),
@@ -204,11 +204,29 @@ class ComplaintStatusScreen extends StatelessWidget {
                               borderRadius: BorderRadius.circular(16),
                               child: AspectRatio(
                                 aspectRatio: 16 / 9,
-                                child: Container(
-                                  color: Colors.grey.shade100,
-                                  child: const Center(
-                                    child: Icon(Icons.map_outlined,
-                                        size: 50, color: Colors.grey),
+                                child: CachedNetworkImage(
+                                  imageUrl: _buildStaticMapUrl(
+                                    complaint.latitude,
+                                    complaint.longitude,
+                                  ),
+                                  fit: BoxFit.cover,
+                                  placeholder: (context, url) => Container(
+                                    color: Colors.grey.shade100,
+                                    child: const Center(
+                                      child: CircularProgressIndicator(
+                                        color: Color(0xFF005C45),
+                                      ),
+                                    ),
+                                  ),
+                                  errorWidget: (context, url, error) => Container(
+                                    color: Colors.grey.shade100,
+                                    child: const Center(
+                                      child: Icon(
+                                        Icons.map_outlined,
+                                        size: 50,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
@@ -267,7 +285,13 @@ class ComplaintStatusScreen extends StatelessWidget {
     Color textColor = Colors.black;
 
     switch (status.toLowerCase()) {
+      case 'manual review':
+      case 'manual_review':
+      case 'under review':
+        backgroundColor = const Color(0xFFFFD166);
+        break;
       case 'in progress':
+      case 'in_progress':
       case 'submitted':
       case 'pending':
         backgroundColor = const Color(0xFFFCD703);
@@ -275,6 +299,10 @@ class ComplaintStatusScreen extends StatelessWidget {
       case 'resolved':
       case 'completed':
         backgroundColor = const Color(0xFF005C45);
+        textColor = Colors.white;
+        break;
+      case 'rejected':
+        backgroundColor = const Color(0xFFE76F51);
         textColor = Colors.white;
         break;
       default:
@@ -298,12 +326,14 @@ class ComplaintStatusScreen extends StatelessWidget {
     );
   }
 
-  String _formatDate(DateTime date) {
-    final months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-    ];
-    return '${months[date.month - 1]} ${date.day}, ${date.year}';
+  String _formatDate(BuildContext context, DateTime date) {
+    return MaterialLocalizations.of(context).formatMediumDate(date);
+  }
+
+  String _buildStaticMapUrl(double latitude, double longitude) {
+    final lat = latitude.toStringAsFixed(6);
+    final lng = longitude.toStringAsFixed(6);
+    return 'https://staticmap.openstreetmap.de/staticmap.php?center=$lat,$lng&zoom=15&size=640x360&markers=$lat,$lng,red-pushpin';
   }
 
   Widget _buildPhotoPlaceholder(String imageUrl, BuildContext context) {
@@ -317,23 +347,18 @@ class ComplaintStatusScreen extends StatelessWidget {
             width: 150,
             height: 150,
             color: Colors.grey.shade200,
-            child: Image.network(
-              imageUrl,
+            child: CachedNetworkImage(
+              imageUrl: imageUrl,
               fit: BoxFit.cover,
-              loadingBuilder: (context, child, loadingProgress) {
-                if (loadingProgress == null) return child;
-                return Center(
+              placeholder: (context, url) {
+                return const Center(
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    value: loadingProgress.expectedTotalBytes != null
-                        ? loadingProgress.cumulativeBytesLoaded /
-                            loadingProgress.expectedTotalBytes!
-                        : null,
-                    color: const Color(0xFF005C45),
+                    color: Color(0xFF005C45),
                   ),
                 );
               },
-              errorBuilder: (context, error, stackTrace) {
+              errorWidget: (context, url, error) {
                 return Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -341,7 +366,7 @@ class ComplaintStatusScreen extends StatelessWidget {
                         size: 36, color: Colors.grey.shade400),
                     const SizedBox(height: 4),
                     Text(
-                      'Failed to load',
+                      AppLocalizations.of(context)!.failedToLoadImage,
                       style: TextStyle(
                         fontSize: 10,
                         color: Colors.grey.shade500,
@@ -371,12 +396,6 @@ class ComplaintStatusScreen extends StatelessWidget {
               child: Image.network(
                 imageUrl,
                 fit: BoxFit.contain,
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) return child;
-                  return const Center(
-                    child: CircularProgressIndicator(color: Colors.white),
-                  );
-                },
                 errorBuilder: (context, error, stackTrace) => const Icon(
                   Icons.broken_image_outlined,
                   color: Colors.white54,

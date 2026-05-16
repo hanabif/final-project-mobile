@@ -23,6 +23,9 @@
   "home": "Home",
   "report": "Report",
   "profile": "Profile",
+  "yourVoiceMatters": "Your voice matters",
+  "reportIssuesInYourCommunity": "Report issues in your community and help us improve services.",
+  "fileReport": "File Report",
   
  
   "complaintStatistics": "Complaint Statistics",
@@ -43,6 +46,7 @@
   "noImagesSelected": "No images selected",
   "latitude": "Lat",
   "longitude": "Lng",
+  "location": "Location",
   "submit": "Submit Complaint",
   "reportThroughCallCenter": "or report through their call center",
   
@@ -60,6 +64,14 @@
   
   
   "myReports": "My Reports",
+  "complaintDetails": "Complaint Details",
+  "complaintProgress": "Complaint Progress",
+  "issueDescription": "Issue Description",
+  "photos": "Photos",
+  "locationDetails": "Location Details",
+  "submittedOn": "Submitted on",
+  "resolvedOn": "Resolved on",
+  "failedToLoadImage": "Failed to load",
   "all": "All",
   "active": "Active",
   "resolved": "Resolved",

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../features/auth/presentation/pages/splash_page.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/register_page.dart';
@@ -8,11 +9,13 @@ import '../../features/complaint/presentation/screens/complaint_form_screen.dart
 import '../../features/complaint/presentation/screens/complaint_success_screen.dart';
 import '../../features/complaint/presentation/screens/complaint_status_screen.dart';
 import '../../features/complaint/presentation/screens/complaint_list_screen.dart';
+import '../../features/complaint/presentation/cubits/organizations_cubit.dart';
 import '../../features/settings/presentation/screens/profile_screen.dart';
 import '../../features/auth/presentation/pages/forgot_password_page.dart';
 import '../../features/auth/presentation/pages/verify_code_page.dart';
 import '../../features/auth/presentation/pages/reset_password_page.dart';
 import '../../features/notification/presentation/screens/notifications_screen.dart';
+import '../../core/di/injection_container.dart';
 import 'route_names.dart';
 
 class AppRouter {
@@ -41,7 +44,10 @@ class AppRouter {
       case RouteNames.complaintForm:
         final organizationId = settings.arguments as String?;
         return MaterialPageRoute(
-          builder: (_) => ComplaintFormScreen(organizationId: organizationId),
+          builder: (_) => BlocProvider<OrganizationsCubit>.value(
+            value: sl<OrganizationsCubit>(),
+            child: ComplaintFormScreen(organizationId: organizationId),
+          ),
         );
 
       case RouteNames.complaintSuccess:

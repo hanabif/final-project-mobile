@@ -39,6 +39,7 @@ import '../../../features/complaint/domain/usecases/get_complaint_detail_usecase
 import '../../../features/complaint/presentation/cubits/complaint_cubit.dart';
 import '../../../features/complaint/presentation/cubits/complaint_list_cubit.dart';
 import '../../../features/complaint/presentation/cubits/complaint_detail_cubit.dart';
+import '../../../features/complaint/presentation/cubits/organizations_cubit.dart';
 import '../../../features/complaint/presentation/cubits/home/home_cubit.dart';
 import '../../../features/complaint/domain/usecases/get_citizen_analytics_usecase.dart';
 import '../../../features/complaint/domain/usecases/get_organizations_usecase.dart';
@@ -73,7 +74,7 @@ Future<void> init() async {
   sl.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(sl()));
   sl.registerLazySingleton<SecureStorageService>(() => SecureStorageService());
   sl.registerLazySingleton<SessionRepository>(
-    () => SessionRepositoryImpl(sl()),
+    () => SessionRepositoryImpl(sl(), sl()),
   );
   // Support
   sl.registerLazySingleton<ApiClient>(() => ApiClient(sl()));
@@ -178,6 +179,9 @@ Future<void> init() async {
   );
   sl.registerFactory(() => ComplaintCubit(submitComplaintUseCase: sl()));
   sl.registerFactory(() => ComplaintListCubit(getUserComplaintsUseCase: sl()));
+  sl.registerLazySingleton(
+    () => OrganizationsCubit(getOrganizationsUseCase: sl()),
+  );
   sl.registerFactory(
     () => ComplaintDetailCubit(getComplaintDetailUseCase: sl()),
   );
@@ -188,7 +192,7 @@ Future<void> init() async {
       sl<MarkNotificationAsReadUseCase>(),
     ),
   );
-  sl.registerFactory(
+  sl.registerLazySingleton(
     () => ProfileCubit(
       getProfileUseCase: sl(),
       getCitizenAnalyticsUseCase: sl(),

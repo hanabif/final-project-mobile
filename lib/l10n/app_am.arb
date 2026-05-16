@@ -24,6 +24,9 @@
   "home": "ዋና ገጽ",
   "report": "ሪፖርት አድርግ",
   "profile": "መገለጫ",
+  "yourVoiceMatters": "ድምጽዎ ዋጋ አለው",
+  "reportIssuesInYourCommunity": "በማህበረሰብዎ ያሉ ችግሮችን ሪፖርት በማድረግ አገልግሎቶችን እንድናሻሽል ያግዙ።",
+  "fileReport": "ሪፖርት አስገባ",
   
 
   "complaintStatistics": "የቅሬታ ስታቲስቲክስ",
@@ -44,6 +47,7 @@
   "noImagesSelected": "ምንም ምስሎች አልተመረጡም",
   "latitude": "ኬክሮስ",
   "longitude": "ኬንትሮስ",
+  "location": "አካባቢ",
   "submit": "ቅሬታ አስገባ",
   "reportThroughCallCenter": "ወይም በስልክ ቁጥራቸው ሪፖርት ያድርጉ",
   
@@ -61,6 +65,14 @@
   
   
   "myReports": "ቅሬታዎቼ",
+  "complaintDetails": "የቅሬታ ዝርዝሮች",
+  "complaintProgress": "የቅሬታ እድገት",
+  "issueDescription": "የችግሩ መግለጫ",
+  "photos": "ፎቶዎች",
+  "locationDetails": "የአካባቢ ዝርዝሮች",
+  "submittedOn": "የቀረበበት",
+  "resolvedOn": "የተፈታበት",
+  "failedToLoadImage": "መጫን አልተሳካም",
   "all": "ሁሉም",
   "active": "ንቁ",
   "resolved": "የተፈቱ",

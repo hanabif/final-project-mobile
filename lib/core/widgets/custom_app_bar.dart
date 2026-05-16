@@ -18,6 +18,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String? logoAssetPath;
   final double logoWidth;
   final double logoHeight;
+  final List<Widget>? actions;
 
   const CustomAppBar({
     super.key,
@@ -32,6 +33,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.logoAssetPath,
     this.logoWidth = 96,
     this.logoHeight = 28,
+    this.actions,
   });
 
   @override
@@ -84,6 +86,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       actions: [
         if (showThemeToggle) _buildThemeToggleButton(context),
         if (showNotification) _buildNotificationButton(context),
+        ...?actions,
       ],
     );
   }

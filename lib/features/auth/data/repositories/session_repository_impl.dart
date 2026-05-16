@@ -1,12 +1,16 @@
 import 'dart:convert';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../../../core/utils/secure_storage.dart';
 import '../../domain/repositories/session_repository.dart';
+import '../../../complaint/data/datasources/complaint_local_data_source.dart';
 
 class SessionRepositoryImpl implements SessionRepository {
   final SecureStorageService _secureStorage;
+  final SharedPreferences _sharedPreferences;
 
-  SessionRepositoryImpl(this._secureStorage);
+  SessionRepositoryImpl(this._secureStorage, this._sharedPreferences);
 
   @override
   Future<void> saveToken(String token) {
@@ -19,8 +23,15 @@ class SessionRepositoryImpl implements SessionRepository {
   }
 
   @override
-  Future<void> clearSession() {
-    return _secureStorage.clearToken();
+  Future<void> clearSession() async {
+    await _secureStorage.clearToken();
+    try {
+      await _sharedPreferences.remove(CACHED_ORGANIZATIONS);
+      await _sharedPreferences.remove(CACHED_COMPLAINTS);
+      await _sharedPreferences.remove(CACHED_UNSUBMITTED_COMPLAINTS);
+    } catch (_) {
+      // ignore errors when clearing optional cached keys
+    }
   }
 
   @override

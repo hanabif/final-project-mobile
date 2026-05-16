@@ -69,6 +69,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profile => 'Profile';
 
   @override
+  String get yourVoiceMatters => 'Your voice matters';
+
+  @override
+  String get reportIssuesInYourCommunity =>
+      'Report issues in your community and help us improve services.';
+
+  @override
+  String get fileReport => 'File Report';
+
+  @override
   String get complaintStatistics => 'Complaint Statistics';
 
   @override
@@ -111,6 +121,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get longitude => 'Lng';
 
   @override
+  String get location => 'Location';
+
+  @override
   String get submit => 'Submit Complaint';
 
   @override
@@ -148,6 +161,30 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get myReports => 'My Reports';
+
+  @override
+  String get complaintDetails => 'Complaint Details';
+
+  @override
+  String get complaintProgress => 'Complaint Progress';
+
+  @override
+  String get issueDescription => 'Issue Description';
+
+  @override
+  String get photos => 'Photos';
+
+  @override
+  String get locationDetails => 'Location Details';
+
+  @override
+  String get submittedOn => 'Submitted on';
+
+  @override
+  String get resolvedOn => 'Resolved on';
+
+  @override
+  String get failedToLoadImage => 'Failed to load';
 
   @override
   String get all => 'All';

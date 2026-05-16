@@ -69,6 +69,16 @@ class AppLocalizationsAm extends AppLocalizations {
   String get profile => 'መገለጫ';
 
   @override
+  String get yourVoiceMatters => 'ድምጽዎ ዋጋ አለው';
+
+  @override
+  String get reportIssuesInYourCommunity =>
+      'በማህበረሰብዎ ያሉ ችግሮችን ሪፖርት በማድረግ አገልግሎቶችን እንድናሻሽል ያግዙ።';
+
+  @override
+  String get fileReport => 'ሪፖርት አስገባ';
+
+  @override
   String get complaintStatistics => 'የቅሬታ ስታቲስቲክስ';
 
   @override
@@ -111,6 +121,9 @@ class AppLocalizationsAm extends AppLocalizations {
   String get longitude => 'ኬንትሮስ';
 
   @override
+  String get location => 'አካባቢ';
+
+  @override
   String get submit => 'ቅሬታ አስገባ';
 
   @override
@@ -148,6 +161,30 @@ class AppLocalizationsAm extends AppLocalizations {
 
   @override
   String get myReports => 'ቅሬታዎቼ';
+
+  @override
+  String get complaintDetails => 'የቅሬታ ዝርዝሮች';
+
+  @override
+  String get complaintProgress => 'የቅሬታ እድገት';
+
+  @override
+  String get issueDescription => 'የችግሩ መግለጫ';
+
+  @override
+  String get photos => 'ፎቶዎች';
+
+  @override
+  String get locationDetails => 'የአካባቢ ዝርዝሮች';
+
+  @override
+  String get submittedOn => 'የቀረበበት';
+
+  @override
+  String get resolvedOn => 'የተፈታበት';
+
+  @override
+  String get failedToLoadImage => 'መጫን አልተሳካም';
 
   @override
   String get all => 'ሁሉም';

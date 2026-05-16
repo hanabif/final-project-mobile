@@ -1,4 +1,4 @@
-﻿import 'package:complaint_resolution_app/core/network/network_info.dart';
+import 'package:complaint_resolution_app/core/network/network_info.dart';
 import 'package:complaint_resolution_app/features/complaint/data/datasources/complaint_local_data_source.dart';
 import 'package:complaint_resolution_app/features/complaint/data/models/organization_model.dart';
 import 'package:complaint_resolution_app/features/complaint/domain/entities/organization.dart';
@@ -50,6 +50,11 @@ class ComplaintRepositoryImpl implements ComplaintRepository {
 
   @override
   Future<List<Complaint>> getUserComplaints() async {
+    final localComplaints = await localDataSource.getComplaints();
+    if (localComplaints.isNotEmpty && _hasUsableComplaintCache(localComplaints)) {
+      return localComplaints;
+    }
+
     if (await networkInfo.isConnected) {
       try {
         final remoteComplaints = await remoteDataSource.getUserComplaints();
@@ -59,8 +64,15 @@ class ComplaintRepositoryImpl implements ComplaintRepository {
         rethrow;
       }
     } else {
-      return await localDataSource.getComplaints();
+      return localComplaints;
     }
+  }
+
+  bool _hasUsableComplaintCache(List<Complaint> complaints) {
+    return complaints.any((complaint) {
+      final status = complaint.status.trim().toLowerCase();
+      return status.isNotEmpty && status != 'pending';
+    });
   }
 
   @override
@@ -117,6 +129,11 @@ class ComplaintRepositoryImpl implements ComplaintRepository {
 
   @override
   Future<List<Organization>> getOrganizations() async {
+    final localOrgs = await localDataSource.getOrganizations();
+    if (localOrgs.isNotEmpty) {
+      return localOrgs;
+    }
+
     if (await networkInfo.isConnected) {
       try {
         final remoteOrgs = await remoteDataSource.getOrganizations();
@@ -129,7 +146,7 @@ class ComplaintRepositoryImpl implements ComplaintRepository {
         rethrow;
       }
     } else {
-      return await localDataSource.getOrganizations();
+      return localOrgs;
     }
   }
 }

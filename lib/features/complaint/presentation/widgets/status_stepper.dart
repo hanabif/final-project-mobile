@@ -13,13 +13,17 @@ class StatusStepper extends StatelessWidget {
     // Determine current step index
     int currentStep = 0;
     String normalizedStatus = status.toLowerCase();
-    
     if (normalizedStatus == 'submitted' || normalizedStatus == 'pending') {
       currentStep = 0;
-    } else if (normalizedStatus == 'in progress') {
+    } else if (normalizedStatus == 'manual review' || normalizedStatus == 'manual_review' || normalizedStatus == 'under review') {
       currentStep = 1;
-    } else if (normalizedStatus == 'resolved' || normalizedStatus == 'completed') {
+    } else if (normalizedStatus == 'in progress' || normalizedStatus == 'in_progress') {
       currentStep = 2;
+    } else if (normalizedStatus == 'resolved' || normalizedStatus == 'completed') {
+      currentStep = 3;
+    } else if (normalizedStatus == 'rejected') {
+      // represent rejected with a special flag by setting to final step but UI will be red
+      currentStep = 4;
     }
 
     return Container(
@@ -46,19 +50,35 @@ class StatusStepper extends StatelessWidget {
           ),
           _buildConnector(isActive: currentStep >= 1),
           _buildStep(
-            icon: Icons.refresh_rounded,
-            label: 'In Progress',
+            icon: Icons.hourglass_top,
+            label: 'Manual Review',
             isActive: currentStep >= 1,
             isCompleted: currentStep > 1,
           ),
           _buildConnector(isActive: currentStep >= 2),
           _buildStep(
-            icon: Icons.flag_outlined,
-            label: 'Resolved',
+            icon: Icons.refresh_rounded,
+            label: 'In Progress',
             isActive: currentStep >= 2,
             isCompleted: currentStep > 2,
-            isLast: true,
           ),
+          _buildConnector(isActive: currentStep >= 3),
+          if (currentStep == 4)
+            _buildStep(
+              icon: Icons.block,
+              label: 'Rejected',
+              isActive: true,
+              isCompleted: false,
+              isLast: true,
+            )
+          else
+            _buildStep(
+              icon: Icons.flag_outlined,
+              label: 'Resolved',
+              isActive: currentStep >= 3,
+              isCompleted: currentStep > 3,
+              isLast: true,
+            ),
         ],
       ),
     );
