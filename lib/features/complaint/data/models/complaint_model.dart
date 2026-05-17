@@ -24,22 +24,30 @@ class ComplaintModel extends Complaint {
     // Handle location object if present, otherwise default to 0.0
     double lat = 0.0;
     double lng = 0.0;
+
+    double sanitizeCoordinate(dynamic value) {
+      if (value is num) {
+        final coordinate = value.toDouble();
+        return coordinate.isFinite ? coordinate : 0.0;
+      }
+      return 0.0;
+    }
     
     if (json['location'] != null && json['location'] is Map) {
       final loc = json['location'] as Map<String, dynamic>;
       // Check for 'latitude'/'longitude' directly
       if (loc['latitude'] != null && loc['longitude'] != null) {
-        lat = (loc['latitude'] as num).toDouble();
-        lng = (loc['longitude'] as num).toDouble();
+        lat = sanitizeCoordinate(loc['latitude']);
+        lng = sanitizeCoordinate(loc['longitude']);
       } 
       // Check for GeoJSON 'coordinates' [lng, lat]
       else if (loc['coordinates'] != null && loc['coordinates'] is List && (loc['coordinates'] as List).length >= 2) {
-        lng = (loc['coordinates'][0] as num).toDouble();
-        lat = (loc['coordinates'][1] as num).toDouble();
+        lng = sanitizeCoordinate((loc['coordinates'] as List)[0]);
+        lat = sanitizeCoordinate((loc['coordinates'] as List)[1]);
       }
     } else if (json['latitude'] != null && json['longitude'] != null) {
-      lat = (json['latitude'] as num).toDouble();
-      lng = (json['longitude'] as num).toDouble();
+      lat = sanitizeCoordinate(json['latitude']);
+      lng = sanitizeCoordinate(json['longitude']);
     }
 
     String extractId(dynamic val) {

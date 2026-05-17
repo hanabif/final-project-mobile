@@ -183,7 +183,10 @@ Future<void> init() async {
     () => OrganizationsCubit(getOrganizationsUseCase: sl()),
   );
   sl.registerFactory(
-    () => ComplaintDetailCubit(getComplaintDetailUseCase: sl()),
+    () => ComplaintDetailCubit(
+      getComplaintDetailUseCase: sl(),
+      getUserComplaintsUseCase: sl(),
+    ),
   );
   sl.registerFactory(
     () => NotificationCubit(
