@@ -4,8 +4,10 @@ import '../../../../core/routes/route_names.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/widgets/custom_app_bar.dart';
 import '../../../../core/widgets/modern_bottom_navigation_bar.dart';
+import '../../../../core/utils/qr_complaint_parser.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../complaint/presentation/cubits/home/home_cubit.dart';
+import '../../../complaint/presentation/widgets/qr_scanner_modal.dart';
 import '../cubits/settings_cubit.dart';
 import '../cubits/settings_state.dart';
 import '../../../complaint/presentation/cubits/profile/profile_cubit.dart';
@@ -23,6 +25,7 @@ class ProfileScreen extends StatelessWidget {
     return BlocProvider.value(
       value: sl<ProfileCubit>()..loadProfileData(),
       child: Scaffold(
+        extendBody: true,
         backgroundColor:
             isDark ? const Color(0xFF0F1117) : const Color(0xFFF5F6FA),
         appBar: CustomAppBar(
@@ -153,10 +156,11 @@ class ProfileScreen extends StatelessWidget {
             },
           ),
         ),
-        bottomNavigationBar: _BottomNavBar(),
-        floatingActionButton: _FloatingReportButton(),
-        floatingActionButtonLocation:
-            FloatingActionButtonLocation.centerDocked,
+        bottomNavigationBar: Padding(
+          padding: const EdgeInsets.only(top: 10.0),
+          child: _BottomNavBar(),
+        ),
+        floatingActionButton: _FloatingQRButton(),
       ),
     );
   }
@@ -764,15 +768,35 @@ class _BottomNavBar extends StatelessWidget {
   }
 }
 
-class _FloatingReportButton extends StatelessWidget {
+class _FloatingQRButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FloatingActionButton(
       shape: const CircleBorder(),
-      onPressed: () =>
-          Navigator.pushNamed(context, RouteNames.complaintForm),
+      onPressed: () async {
+        final navigator = Navigator.of(context);
+        final qrData = await showDialog<QRComplaintData>(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => const QRScannerModal(),
+        );
+
+        if (qrData != null) {
+          navigator.pushNamed(
+            RouteNames.complaintForm,
+            arguments: {
+              'organizationId': qrData.organizationId,
+              'title': qrData.title,
+              'description': qrData.description,
+              'latitude': qrData.latitude,
+              'longitude': qrData.longitude,
+              'locationLabel': qrData.locationLabel,
+            },
+          );
+        }
+      },
       backgroundColor: const Color(0xFF005C45),
-      child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
+      child: const Icon(Icons.qr_code_scanner_rounded, color: Colors.white, size: 28),
     );
   }
 }

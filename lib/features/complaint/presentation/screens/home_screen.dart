@@ -1,7 +1,7 @@
+import 'package:complaint_resolution_app/core/utils/qr_complaint_parser.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/routes/route_names.dart';
-import '../../../../core/di/injection_container.dart';
 import '../../../../core/utils/organization_logo_mapper.dart';
 import '../../../../core/widgets/custom_app_bar.dart';
 import '../../../../core/widgets/modern_bottom_navigation_bar.dart';
@@ -9,8 +9,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../notification/presentation/cubit/notification_cubit.dart';
 import '../cubits/home/home_cubit.dart';
 import '../cubits/home/home_state.dart';
-import '../widgets/stat_card.dart';
-import '../widgets/organization_card.dart';
+import '../widgets/qr_scanner_modal.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -27,12 +26,38 @@ class _HomeScreenState extends State<HomeScreen> {
     context.read<NotificationCubit>().fetchNotifications();
   }
 
+
+  void _openQRScanner(BuildContext context) async {
+    final navigator = Navigator.of(context);
+
+    final qrData = await showDialog<QRComplaintData>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const QRScannerModal(),
+    );
+
+    if (qrData != null) {
+      navigator.pushNamed(
+        RouteNames.complaintForm,
+        arguments: {
+          'organizationId': qrData.organizationId,
+          'title': qrData.title,
+          'description': qrData.description,
+          'latitude': qrData.latitude,
+          'longitude': qrData.longitude,
+          'locationLabel': qrData.locationLabel,
+        },
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n   = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
+      extendBody: true,
       backgroundColor: isDark ? const Color(0xFF0F1117) : const Color(0xFFF5F6FA),
       appBar: CustomAppBar(
         title: null,
@@ -40,7 +65,7 @@ class _HomeScreenState extends State<HomeScreen> {
         showThemeToggle: true,
         showNotification: true,
         backgroundColor: const Color(0xFF005C45),
-        logoAssetPath: 'assets/icons/logo (2).png',
+        // logoAssetPath: 'assets/icons/logo (2).png',
         logoWidth: 110,
         logoHeight: 32,
       ),
@@ -89,8 +114,6 @@ class _HomeScreenState extends State<HomeScreen> {
                               icon: Icons.bar_chart_rounded,
                               color: const Color(0xFF3B82F6),
                               isDark: isDark,
-                              onTap: () => Navigator.pushNamed(
-                                  context, RouteNames.complaintList),
                             ),
                           ),
                           const SizedBox(width: 10),
@@ -101,8 +124,6 @@ class _HomeScreenState extends State<HomeScreen> {
                               icon: Icons.check_circle_rounded,
                               color: const Color(0xFF22C55E),
                               isDark: isDark,
-                              onTap: () => Navigator.pushNamed(
-                                  context, RouteNames.complaintList),
                             ),
                           ),
                           const SizedBox(width: 10),
@@ -113,8 +134,6 @@ class _HomeScreenState extends State<HomeScreen> {
                               icon: Icons.hourglass_top_rounded,
                               color: const Color(0xFFF59E0B),
                               isDark: isDark,
-                              onTap: () => Navigator.pushNamed(
-                                  context, RouteNames.complaintList),
                             ),
                           ),
                         ],
@@ -170,23 +189,24 @@ class _HomeScreenState extends State<HomeScreen> {
           return const SizedBox.shrink();
         },
       ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.only(top: 10.0),
+        child: ModernBottomNavigationBar(
+          currentIndex: 0,
+          onHomeTap: () {},
+          onReportTap: () =>
+              Navigator.pushNamed(context, RouteNames.complaintForm),
+          onProfileTap: () =>
+              Navigator.pushNamed(context, RouteNames.profile),
+        ),
+      ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () =>
-            Navigator.pushNamed(context, RouteNames.complaintForm),
+        onPressed: () => _openQRScanner(context),
         backgroundColor: const Color(0xFF005C45),
         foregroundColor: Colors.white,
         elevation: 6,
         shape: const CircleBorder(),
-        child: const Icon(Icons.add_rounded, size: 28),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: ModernBottomNavigationBar(
-        currentIndex: 0,
-        onHomeTap: () {},
-        onReportTap: () =>
-            Navigator.pushNamed(context, RouteNames.complaintForm),
-        onProfileTap: () =>
-            Navigator.pushNamed(context, RouteNames.profile),
+        child: const Icon(Icons.qr_code_scanner_rounded, size: 28),
       ),
     );
   }
@@ -215,7 +235,7 @@ class _HeroBanner extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF005C45).withOpacity(0.38),
+            color: const Color(0xFF005C45).withValues(alpha: 0.38),
             blurRadius: 24,
             offset: const Offset(0, 10),
           ),
@@ -232,7 +252,7 @@ class _HeroBanner extends StatelessWidget {
               height: 140,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.07),
+                color: Colors.white.withValues(alpha: 0.07),
               ),
             ),
           ),
@@ -244,7 +264,7 @@ class _HeroBanner extends StatelessWidget {
               height: 110,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.05),
+                color: Colors.white.withValues(alpha: 0.05),
               ),
             ),
           ),
@@ -262,7 +282,7 @@ class _HeroBanner extends StatelessWidget {
                     height: 90,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.white.withOpacity(0.12),
+                      color: Colors.white.withValues(alpha: 0.12),
                     ),
                   ),
                   const Icon(
@@ -298,38 +318,9 @@ class _HeroBanner extends StatelessWidget {
                 Text(
                   l10n.reportIssuesInYourCommunity,
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.80),
+                    color: Colors.white.withValues(alpha: 0.80),
                     fontSize: 12,
                     height: 1.4,
-                  ),
-                ),
-                const SizedBox(height: 14),
-                GestureDetector(
-                  onTap: () =>
-                      Navigator.pushNamed(context, RouteNames.complaintForm),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 14, vertical: 7),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.add_rounded,
-                            size: 14, color: Color(0xFF005C45)),
-                        const SizedBox(width: 4),
-                        Text(
-                          l10n.fileReport,
-                          style: const TextStyle(
-                            color: Color(0xFF005C45),
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ],
-                    ),
                   ),
                 ),
               ],
@@ -388,7 +379,6 @@ class _ModernStatCard extends StatelessWidget {
     required this.icon,
     required this.color,
     required this.isDark,
-    required this.onTap,
   });
 
   final String label;
@@ -396,20 +386,17 @@ class _ModernStatCard extends StatelessWidget {
   final IconData icon;
   final Color color;
   final bool isDark;
-  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
+    return Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           color: isDark ? const Color(0xFF1C1F2E) : Colors.white,
           borderRadius: BorderRadius.circular(18),
           boxShadow: [
             BoxShadow(
-              color: color.withOpacity(0.13),
+              color: color.withValues(alpha: 0.13),
               blurRadius: 14,
               offset: const Offset(0, 4),
             ),
@@ -421,7 +408,7 @@ class _ModernStatCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(7),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.13),
+                color: color.withValues(alpha: 0.13),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(icon, size: 18, color: color),
@@ -447,8 +434,7 @@ class _ModernStatCard extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
+      );
   }
 }
 
@@ -480,8 +466,8 @@ class _ModernOrgCard extends StatelessWidget {
           boxShadow: [
             BoxShadow(
               color: isDark
-                  ? Colors.black.withOpacity(0.25)
-                  : Colors.black.withOpacity(0.06),
+                  ? Colors.black.withValues(alpha: 0.25)
+                  : Colors.black.withValues(alpha: 0.06),
               blurRadius: 16,
               offset: const Offset(0, 4),
             ),
@@ -496,7 +482,7 @@ class _ModernOrgCard extends StatelessWidget {
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 color: isDark
-                    ? Colors.white.withOpacity(0.07)
+                    ? Colors.white.withValues(alpha: 0.07)
                     : const Color(0xFFF0FAF5),
                 borderRadius: BorderRadius.circular(16),
               ),
@@ -531,7 +517,7 @@ class _ModernOrgCard extends StatelessWidget {
               padding:
                   const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
-                color: const Color(0xFF005C45).withOpacity(0.10),
+                color: const Color(0xFF005C45).withValues(alpha: 0.10),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: const Text(

@@ -1,13 +1,13 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 
-import '../../l10n/app_localizations.dart';
-
-class ModernBottomNavigationBar extends StatelessWidget {
+class ModernBottomNavigationBar extends StatefulWidget {
   final int currentIndex;
-  final VoidCallback onHomeTap;
-  final VoidCallback onReportTap;
-  final VoidCallback onProfileTap;
+  final FutureOr<void> Function() onHomeTap;
+  final FutureOr<void> Function() onReportTap;
+  final FutureOr<void> Function() onProfileTap;
 
   const ModernBottomNavigationBar({
     super.key,
@@ -18,48 +18,92 @@ class ModernBottomNavigationBar extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
+  State<ModernBottomNavigationBar> createState() => _ModernBottomNavigationBarState();
+}
 
-    return BottomNavigationBar(
-      currentIndex: currentIndex,
-      type: BottomNavigationBarType.fixed,
-      iconSize: 26,
-      selectedFontSize: 12,
-      unselectedFontSize: 12,
-      selectedItemColor: const Color(0xFF005C45),
-      unselectedItemColor: Colors.grey.shade600,
-      onTap: (index) {
-        if (index == 0) {
-          onHomeTap();
-        } else if (index == 1) {
-          onReportTap();
-        } else if (index == 2) {
-          onProfileTap();
-        }
-      },
+class _ModernBottomNavigationBarState extends State<ModernBottomNavigationBar> {
+  final GlobalKey<CurvedNavigationBarState> _navKey = GlobalKey();
+  late int _internalIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    _internalIndex = widget.currentIndex;
+  }
+
+  @override
+  void didUpdateWidget(ModernBottomNavigationBar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.currentIndex != widget.currentIndex) {
+      _internalIndex = widget.currentIndex;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final screenHeight = MediaQuery.of(context).size.height;
+    
+    // Making it responsive based on screen height
+    final double navBarHeight = screenHeight > 800 ? 75.0 : 60.0;
+
+    return CurvedNavigationBar(
+      key: _navKey,
+      index: widget.currentIndex,
+      height: navBarHeight,
+      color: isDark ? const Color(0xFF1C1F2E) : Colors.white,
+      buttonBackgroundColor: const Color(0xFF005C45),
+      backgroundColor: Colors.transparent, // transparent to blend with the scaffold background
+      animationDuration: const Duration(milliseconds: 300), // Smooth transition
       items: [
-        BottomNavigationBarItem(
-          icon: const Icon(Iconsax.home),
-          label: l10n.home,
+        Icon(
+          Iconsax.home,
+          size: 30,
+          color: _internalIndex == 0 ? Colors.white : (isDark ? Colors.white70 : Colors.black87),
         ),
-        BottomNavigationBarItem(
-          icon: Icon(
-            Iconsax.document_text,
-            size: 26,
-            color: Colors.grey.shade600,
-          ),
-          activeIcon: const Icon(
-            Iconsax.document_text,
-            size: 26,
-          ),
-          label: l10n.report,
+        Icon(
+          Iconsax.document_text,
+          size: 30,
+          color: _internalIndex == 1 ? Colors.white : (isDark ? Colors.white70 : Colors.black87),
         ),
-        BottomNavigationBarItem(
-          icon: const Icon(Iconsax.user),
-          label: l10n.profile,
+        Icon(
+          Iconsax.user,
+          size: 30,
+          color: _internalIndex == 2 ? Colors.white : (isDark ? Colors.white70 : Colors.black87),
         ),
       ],
+      onTap: (index) async {
+        if (index == _internalIndex) return;
+
+        setState(() {
+          _internalIndex = index;
+        });
+
+        // Give the CurvedNavigationBar time to show its smooth transition animation
+        await Future.delayed(const Duration(milliseconds: 300));
+
+        if (index == 0) {
+          await widget.onHomeTap();
+          if (mounted && _internalIndex != widget.currentIndex) {
+            setState(() => _internalIndex = widget.currentIndex);
+            _navKey.currentState?.setPage(widget.currentIndex);
+          }
+        } else if (index == 1) {
+          await widget.onReportTap();
+          // Reset index after returning from Report screen
+          if (mounted && _internalIndex != widget.currentIndex) {
+            setState(() => _internalIndex = widget.currentIndex);
+            _navKey.currentState?.setPage(widget.currentIndex);
+          }
+        } else if (index == 2) {
+          await widget.onProfileTap();
+          // Reset index after returning from Profile screen
+          if (mounted && _internalIndex != widget.currentIndex) {
+            setState(() => _internalIndex = widget.currentIndex);
+            _navKey.currentState?.setPage(widget.currentIndex);
+          }
+        }
+      },
     );
   }
 }

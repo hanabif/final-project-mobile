@@ -19,7 +19,21 @@ import '../../../../core/di/injection_container.dart';
 
 class ComplaintFormScreen extends StatefulWidget {
   final String? organizationId;
-  const ComplaintFormScreen({super.key, this.organizationId});
+  final String? title;
+  final String? description;
+  final double? latitude;
+  final double? longitude;
+  final String? locationLabel;
+
+  const ComplaintFormScreen({
+    super.key,
+    this.organizationId,
+    this.title,
+    this.description,
+    this.latitude,
+    this.longitude,
+    this.locationLabel,
+  });
 
   @override
   State<ComplaintFormScreen> createState() => _ComplaintFormScreenState();
@@ -41,8 +55,36 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
     if (widget.organizationId != null) {
       _selectedOrganizationId = widget.organizationId;
     }
+    // Pre-fill form fields from QR data
+    if (widget.title != null) {
+      _titleController.text = widget.title!;
+    }
+    if (widget.description != null) {
+      _descCtrl.text = widget.description!;
+    }
+
+     WidgetsBinding.instance.addPostFrameCallback((_) {
+    if (!mounted) return;
+
     context.read<OrganizationsCubit>().fetchOrganizations();
-    _getCurrentLocation();
+    // If QR provided coordinates, use them; otherwise get device location
+    if (widget.latitude != null && widget.longitude != null) {
+      _currentPosition = Position(
+        longitude: widget.longitude!,
+        latitude: widget.latitude!,
+        timestamp: DateTime.now(),
+        accuracy: 0,
+        altitude: 0,
+        altitudeAccuracy: 0,
+        heading: 0,
+        headingAccuracy: 0,
+        speed: 0,
+        speedAccuracy: 0,
+      );
+    } else {
+      _getCurrentLocation();
+    }
+  });
   }
 
   @override

@@ -1,3 +1,4 @@
+import 'package:complaint_resolution_app/features/complaint/presentation/widgets/qr_scanner_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../features/auth/presentation/pages/splash_page.dart';
@@ -42,11 +43,37 @@ class AppRouter {
         );
 
       case RouteNames.complaintForm:
-        final organizationId = settings.arguments as String?;
+        String? organizationId;
+        String? title;
+        String? description;
+        double? latitude;
+        double? longitude;
+        String? locationLabel;
+
+        // Handle both string (organizationId) and map (with QR data) arguments
+        if (settings.arguments is String) {
+          organizationId = settings.arguments as String;
+        } else if (settings.arguments is Map) {
+          final args = settings.arguments as Map<String, dynamic>;
+          organizationId = args['organizationId'] as String?;
+          title = args['title'] as String?;
+          description = args['description'] as String?;
+          latitude = args['latitude'] as double?;
+          longitude = args['longitude'] as double?;
+          locationLabel = args['locationLabel'] as String?;
+        }
+
         return MaterialPageRoute(
           builder: (_) => BlocProvider<OrganizationsCubit>.value(
             value: sl<OrganizationsCubit>(),
-            child: ComplaintFormScreen(organizationId: organizationId),
+            child: ComplaintFormScreen(
+              organizationId: organizationId,
+              title: title,
+              description: description,
+              latitude: latitude,
+              longitude: longitude,
+              locationLabel: locationLabel,
+            ),
           ),
         );
 
@@ -66,6 +93,23 @@ class AppRouter {
           builder: (_) => const ComplaintListScreen(),
         );
 
+      case RouteNames.complaintForm:
+  final args = settings.arguments as Map<String, dynamic>?;
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => BlocProvider<OrganizationsCubit>.value(
+      value: sl<OrganizationsCubit>(),
+      child: ComplaintFormScreen(
+        organizationId: args?['organizationId'],
+        title: args?['title'],
+        description: args?['description'],
+        latitude: args?['latitude'],
+        longitude: args?['longitude'],
+      ),
+    ),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      return FadeTransition(opacity: animation, child: child);
+    },
+  );
       case RouteNames.profile:
         return MaterialPageRoute(
           builder: (_) => const ProfileScreen(),
@@ -93,6 +137,10 @@ class AppRouter {
           builder: (_) => const NotificationsScreen(),
         );
 
+      case RouteNames.qrScanner:
+  return MaterialPageRoute(
+    builder: (_) => const QRScannerModal(),
+  );
       default:
         return MaterialPageRoute(
           builder: (_) => const Scaffold(

@@ -57,6 +57,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   width: logoWidth,
                   height: logoHeight,
                   fit: BoxFit.contain,
+                  color: titleColor ?? Colors.white,
                 )
               : Row(
                   mainAxisSize: MainAxisSize.min,
@@ -67,6 +68,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                         width: logoWidth,
                         height: logoHeight,
                         fit: BoxFit.contain,
+                        color: titleColor ?? Colors.white,
                       ),
                       const SizedBox(width: 8),
                     ],
@@ -80,7 +82,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   ],
                 ))
           : null,
-      centerTitle: logoAssetPath != null || title != null,
+      centerTitle: false,
       elevation: 0,
       bottom: bottom,
       actions: [

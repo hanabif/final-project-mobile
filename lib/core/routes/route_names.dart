@@ -12,4 +12,5 @@ class RouteNames {
   static const String resetPassword = '/reset-password';
   static const String complaintList = '/complaint-list';
   static const String notifications = '/notifications';
+  static const String qrScanner = '/qr-scanner';
 }
