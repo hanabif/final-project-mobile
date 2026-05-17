@@ -855,12 +855,18 @@ class _LocationCard extends StatelessWidget {
                               strokeWidth: 2,
                               color: Color(0xFF005C45))),
                       const SizedBox(width: 10),
-                      Text(l10n.locationServiceRequired,
+                      Expanded(
+                        child: Text(
+                          l10n.locationServiceRequired,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                               fontSize: 13,
                               color: isDark
                                   ? Colors.white54
-                                  : Colors.black45)),
+                                  : Colors.black45),
+                        ),
+                      ),
                     ],
                   )
                 : currentPosition != null

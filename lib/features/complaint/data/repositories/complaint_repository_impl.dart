@@ -49,10 +49,12 @@ class ComplaintRepositoryImpl implements ComplaintRepository {
   }
 
   @override
-  Future<List<Complaint>> getUserComplaints() async {
-    final localComplaints = await localDataSource.getComplaints();
-    if (localComplaints.isNotEmpty && _hasUsableComplaintCache(localComplaints)) {
-      return localComplaints;
+  Future<List<Complaint>> getUserComplaints({bool forceRefresh = false}) async {
+    if (!forceRefresh) {
+      final localComplaints = await localDataSource.getComplaints();
+      if (localComplaints.isNotEmpty && _hasUsableComplaintCache(localComplaints)) {
+        return localComplaints;
+      }
     }
 
     if (await networkInfo.isConnected) {
@@ -63,9 +65,14 @@ class ComplaintRepositoryImpl implements ComplaintRepository {
       } catch (e) {
         rethrow;
       }
-    } else {
+    }
+
+    final localComplaints = await localDataSource.getComplaints();
+    if (localComplaints.isNotEmpty) {
       return localComplaints;
     }
+
+    return localComplaints;
   }
 
   bool _hasUsableComplaintCache(List<Complaint> complaints) {

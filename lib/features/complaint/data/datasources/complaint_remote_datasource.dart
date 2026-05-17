@@ -24,6 +24,26 @@ class ComplaintRemoteDataSourceImpl implements ComplaintRemoteDataSource {
 
   ComplaintRemoteDataSourceImpl({required this.apiClient});
 
+  String _extractErrorMessage(dynamic data, String fallback) {
+    if (data is Map<String, dynamic>) {
+      final message = data['message'];
+      if (message != null) return message.toString();
+      return fallback;
+    }
+
+    if (data is Map) {
+      final message = data['message'];
+      if (message != null) return message.toString();
+      return fallback;
+    }
+
+    if (data is String && data.trim().isNotEmpty) {
+      return data;
+    }
+
+    return fallback;
+  }
+
   @override
   Future<String> submitComplaint(ComplaintModel complaint) async {
     try {
@@ -45,7 +65,7 @@ class ComplaintRemoteDataSourceImpl implements ComplaintRemoteDataSource {
       }
     } on DioException catch (e) {
       if (e.response != null) {
-        final message = e.response?.data['message'] ?? 'Server error';
+        final message = _extractErrorMessage(e.response?.data, 'Server error');
         throw Exception(message);
       } else {
         throw Exception('Network error: ${e.message}');
@@ -96,7 +116,7 @@ class ComplaintRemoteDataSourceImpl implements ComplaintRemoteDataSource {
         throw Exception('Upload failed: ${response.statusCode}');
       }
     } on DioException catch (e) {
-       final message = e.response?.data['message'] ?? e.message ?? 'Upload error';
+       final message = _extractErrorMessage(e.response?.data, e.message ?? 'Upload error');
        throw Exception(message);
     } catch (e) {
       throw Exception('Failed to upload image: $e');
@@ -147,7 +167,7 @@ class ComplaintRemoteDataSourceImpl implements ComplaintRemoteDataSource {
         throw Exception('Upload failed: ${response.statusCode}');
       }
     } on DioException catch (e) {
-       final message = e.response?.data['message'] ?? e.message ?? 'Upload error';
+       final message = _extractErrorMessage(e.response?.data, e.message ?? 'Upload error');
        throw Exception(message);
     } catch (e) {
       throw Exception('Failed to upload images: $e');
@@ -166,7 +186,7 @@ class ComplaintRemoteDataSourceImpl implements ComplaintRemoteDataSource {
       }
     } on DioException catch (e) {
       if (e.response != null) {
-        final message = e.response?.data['message'] ?? 'Server error';
+        final message = _extractErrorMessage(e.response?.data, 'Server error');
         throw Exception(message);
       } else {
         throw Exception('Network error: ${e.message}');
@@ -191,7 +211,7 @@ class ComplaintRemoteDataSourceImpl implements ComplaintRemoteDataSource {
       }
     } on DioException catch (e) {
       if (e.response != null) {
-        final message = e.response?.data['message'] ?? 'Server error';
+        final message = _extractErrorMessage(e.response?.data, 'Server error');
         throw Exception(message);
       } else {
         throw Exception('Network error: ${e.message}');
@@ -213,7 +233,7 @@ class ComplaintRemoteDataSourceImpl implements ComplaintRemoteDataSource {
       }
     } on DioException catch (e) {
       if (e.response != null) {
-        final message = e.response?.data['message'] ?? 'Server error';
+        final message = _extractErrorMessage(e.response?.data, 'Server error');
         throw Exception(message);
       } else {
         throw Exception('Network error: ${e.message}');
@@ -256,7 +276,7 @@ class ComplaintRemoteDataSourceImpl implements ComplaintRemoteDataSource {
         throw Exception('Delete failed: ${response.statusCode}');
       }
     } on DioException catch (e) {
-      final message = e.response?.data['message'] ?? e.message ?? 'Delete error';
+      final message = _extractErrorMessage(e.response?.data, e.message ?? 'Delete error');
       throw Exception(message);
     } catch (e) {
       throw Exception('Failed to delete image: $e');
@@ -275,7 +295,7 @@ class ComplaintRemoteDataSourceImpl implements ComplaintRemoteDataSource {
         throw Exception('AI moderation failed: ${response.statusCode}');
       }
     } on DioException catch (e) {
-      final message = e.response?.data['message'] ?? e.message ?? 'Moderation error';
+      final message = _extractErrorMessage(e.response?.data, e.message ?? 'Moderation error');
       throw Exception(message);
     } catch (e) {
       throw Exception('Failed to moderate complaint: $e');
@@ -294,7 +314,7 @@ class ComplaintRemoteDataSourceImpl implements ComplaintRemoteDataSource {
       }
     } on DioException catch (e) {
       if (e.response != null) {
-        final message = e.response?.data['message'] ?? 'Server error';
+        final message = _extractErrorMessage(e.response?.data, 'Server error');
         throw Exception(message);
       } else {
         throw Exception('Network error: ${e.message}');

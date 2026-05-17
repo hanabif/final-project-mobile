@@ -6,7 +6,7 @@ import '../../data/models/citizen_analytics_model.dart';
 abstract class ComplaintRepository {
   Future<String> submitComplaint(Complaint complaint);
   Future<String> getComplaintStatus(String complaintId);
-  Future<List<Complaint>> getUserComplaints();
+  Future<List<Complaint>> getUserComplaints({bool forceRefresh = false});
   Future<Complaint> getComplaintDetail(String complaintId);
   Future<CitizenAnalyticsModel> getCitizenAnalytics();
   Future<List<String>> uploadImages(List<XFile> files);
