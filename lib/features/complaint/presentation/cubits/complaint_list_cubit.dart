@@ -8,11 +8,11 @@ class ComplaintListCubit extends Cubit<ComplaintListState> {
   ComplaintListCubit({required this.getUserComplaintsUseCase})
       : super(ComplaintListInitial());
 
-  Future<void> fetchComplaints() async {
+  Future<void> fetchComplaints({bool forceRefresh = false}) async {
     emit(ComplaintListLoading());
 
     try {
-      final complaints = await getUserComplaintsUseCase();
+      final complaints = await getUserComplaintsUseCase(forceRefresh: forceRefresh);
       emit(ComplaintListLoaded(complaints: complaints));
     } catch (e) {
       emit(ComplaintListError(message: e.toString()));

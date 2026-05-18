@@ -151,6 +151,7 @@ class ProfileScreen extends StatelessWidget {
                                 context.read<SettingsCubit>().toggleNotifications(value);
                               },
                             ),
+                            const SizedBox(height: 10),
                           ]),
                           const SizedBox(height: 28),
 

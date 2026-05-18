@@ -18,12 +18,40 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     context.read<HomeCubit>().loadHomeData();
     context.read<NotificationCubit>().fetchNotifications();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  // Refresh data when app comes to foreground
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _refreshData();
+    }
+  }
+
+  void _refreshData() {
+    if (mounted) {
+      print('🔄 Refreshing home data on screen resume');
+      // Slight delay to ensure backend has processed all changes
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (mounted) {
+          context.read<HomeCubit>().loadHomeData(forceRefresh: true);
+          context.read<NotificationCubit>().fetchNotifications();
+        }
+      });
+    }
   }
 
 
@@ -37,7 +65,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
 
     if (qrData != null) {
-      navigator.pushNamed(
+      await navigator.pushNamed(
         RouteNames.complaintForm,
         arguments: {
           'organizationId': qrData.organizationId,
@@ -48,6 +76,7 @@ class _HomeScreenState extends State<HomeScreen> {
           'locationLabel': qrData.locationLabel,
         },
       );
+      _refreshData();
     }
   }
 
@@ -171,11 +200,14 @@ class _HomeScreenState extends State<HomeScreen> {
                             name: name,
                             logo: logo,
                             isDark: isDark,
-                            onTap: () => Navigator.pushNamed(
-                              context,
-                              RouteNames.complaintForm,
-                              arguments: org['id'],
-                            ),
+                            onTap: () async {
+                              await Navigator.pushNamed(
+                                context,
+                                RouteNames.complaintForm,
+                                arguments: org['id'],
+                              );
+                              _refreshData();
+                            },
                           );
                         },
                         childCount: state.organizations.length,
@@ -194,8 +226,10 @@ class _HomeScreenState extends State<HomeScreen> {
         child: ModernBottomNavigationBar(
           currentIndex: 0,
           onHomeTap: () {},
-          onReportTap: () =>
-              Navigator.pushNamed(context, RouteNames.complaintForm),
+          onReportTap: () async {
+            await Navigator.pushNamed(context, RouteNames.complaintForm);
+            _refreshData();
+          },
           onProfileTap: () =>
               Navigator.pushNamed(context, RouteNames.profile),
         ),

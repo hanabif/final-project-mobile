@@ -8,9 +8,9 @@ abstract class ComplaintRepository {
   Future<String> getComplaintStatus(String complaintId);
   Future<List<Complaint>> getUserComplaints({bool forceRefresh = false});
   Future<Complaint> getComplaintDetail(String complaintId);
-  Future<CitizenAnalyticsModel> getCitizenAnalytics();
+  Future<CitizenAnalyticsModel> getCitizenAnalytics({bool forceRefresh = false});
   Future<List<String>> uploadImages(List<XFile> files);
   Future<void> deleteUploadedFile(String fileKey);
   Future<void> moderateComplaint(String complaintId);
-  Future<List<Organization>> getOrganizations();
+  Future<List<Organization>> getOrganizations({bool forceRefresh = false});
 }

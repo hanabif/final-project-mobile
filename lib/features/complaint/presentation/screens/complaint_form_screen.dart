@@ -15,6 +15,8 @@ import '../cubits/complaint_cubit.dart';
 import '../cubits/complaint_state.dart';
 import '../cubits/organizations_cubit.dart';
 import '../cubits/organizations_state.dart';
+import '../cubits/home/home_cubit.dart';
+import '../cubits/complaint_list_cubit.dart';
 import '../../../../core/di/injection_container.dart';
 
 class ComplaintFormScreen extends StatefulWidget {
@@ -285,6 +287,50 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
     context.read<ComplaintCubit>().submitComplaint(complaint, _selectedImages);
   }
 
+  // ── Handle Successful Submission ──────────────────────────────────────────
+  
+  Future<void> _handleSuccessfulSubmission(BuildContext context, AppLocalizations l10n) async {
+    try {
+      // Show loading while refreshing data
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.complaintSubmittedSuccessfully)),
+      );
+
+      // Refresh home statistics
+      await _refreshHomeData();
+
+      // Navigate to success screen only after data refresh completes
+      if (context.mounted) {
+        Navigator.of(context).pushReplacementNamed(
+          RouteNames.complaintSuccess,
+          arguments: const Uuid().v4().substring(0, 8).toUpperCase(),
+        );
+      }
+    } catch (e) {
+      print('Error during submission handling: $e');
+      // Even if refresh fails, show success screen
+      if (context.mounted) {
+        Navigator.of(context).pushReplacementNamed(
+          RouteNames.complaintSuccess,
+          arguments: const Uuid().v4().substring(0, 8).toUpperCase(),
+        );
+      }
+    }
+  }
+
+  // ── Refresh Home Data ─────────────────────────────────────────────────────
+  
+  Future<void> _refreshHomeData() async {
+    try {
+      if (mounted) {
+        await context.read<HomeCubit>().loadHomeData(forceRefresh: true);
+        print('✅ Home data refreshed successfully');
+      }
+    } catch (e) {
+      print('❌ Error refreshing home data: $e');
+    }
+  }
+
   // ── Build ─────────────────────────────────────────────────────────────────
 
   @override
@@ -304,15 +350,8 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
       body: BlocConsumer<ComplaintCubit, ComplaintState>(
         listener: (context, state) {
           if (state is ComplaintSuccess) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                  content: Text(l10n.complaintSubmittedSuccessfully)),
-            );
-            Navigator.of(context).pushReplacementNamed(
-              RouteNames.complaintSuccess,
-              arguments:
-                  const Uuid().v4().substring(0, 8).toUpperCase(),
-            );
+            // Refresh home statistics and complaint list after successful submission
+            _handleSuccessfulSubmission(context, l10n);
           } else if (state is ComplaintFailure) {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               content: Text(state.message),

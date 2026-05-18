@@ -21,9 +21,9 @@ class HomeCubit extends Cubit<HomeState> {
     emit(HomeLoading());
 
     try {
-      final stats = await getCitizenAnalyticsUseCase.call();
+      final stats = await getCitizenAnalyticsUseCase.call(forceRefresh: forceRefresh);
       final List<Organization> orgsResponse = await getOrganizationsUseCase
-          .call();
+          .call(forceRefresh: forceRefresh);
 
       final List<Map<String, String>> organizations = orgsResponse.map((org) {
         // Log individual organization to verify fields

@@ -16,7 +16,7 @@ class ComplaintListScreen extends StatefulWidget {
 }
 
 class _ComplaintListScreenState extends State<ComplaintListScreen>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   late TabController _tabController;
   int _selectedIndex = 0;
 
@@ -31,6 +31,7 @@ class _ComplaintListScreenState extends State<ComplaintListScreen>
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _tabController = TabController(length: _tabs.length, vsync: this)
       ..addListener(() {
         if (_tabController.indexIsChanging) return;
@@ -40,8 +41,29 @@ class _ComplaintListScreenState extends State<ComplaintListScreen>
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _tabController.dispose();
     super.dispose();
+  }
+
+  // Refresh data when app comes to foreground
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _refreshComplaints();
+    }
+  }
+
+  void _refreshComplaints() {
+    if (mounted) {
+      print('🔄 Refreshing complaint list on screen resume');
+      // Slight delay to ensure backend has processed
+      Future.delayed(const Duration(milliseconds: 800), () {
+        if (mounted) {
+          sl<ComplaintListCubit>().fetchComplaints(forceRefresh: true);
+        }
+      });
+    }
   }
 
   // ── status helpers ────────────────────────────────────────────────────────
@@ -71,7 +93,7 @@ class _ComplaintListScreenState extends State<ComplaintListScreen>
     final isDark  = theme.brightness == Brightness.dark;
 
     return BlocProvider(
-      create: (context) => sl<ComplaintListCubit>()..fetchComplaints(),
+      create: (context) => sl<ComplaintListCubit>()..fetchComplaints(forceRefresh: true),
       child: Scaffold(
         backgroundColor: isDark ? const Color(0xFF0F1117) : const Color(0xFFF5F6FA),
         appBar: CustomAppBar(

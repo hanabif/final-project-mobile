@@ -93,7 +93,7 @@ class ComplaintRepositoryImpl implements ComplaintRepository {
   }
 
   @override
-  Future<CitizenAnalyticsModel> getCitizenAnalytics() async {
+  Future<CitizenAnalyticsModel> getCitizenAnalytics({bool forceRefresh = false}) async {
     try {
       return await remoteDataSource.getCitizenAnalytics();
     } catch (e) {
@@ -135,10 +135,13 @@ class ComplaintRepositoryImpl implements ComplaintRepository {
   }
 
   @override
-  Future<List<Organization>> getOrganizations() async {
-    final localOrgs = await localDataSource.getOrganizations();
-    if (localOrgs.isNotEmpty) {
-      return localOrgs;
+  Future<List<Organization>> getOrganizations({bool forceRefresh = false}) async {
+    // Skip cache if forceRefresh is true
+    if (!forceRefresh) {
+      final localOrgs = await localDataSource.getOrganizations();
+      if (localOrgs.isNotEmpty) {
+        return localOrgs;
+      }
     }
 
     if (await networkInfo.isConnected) {
@@ -153,6 +156,7 @@ class ComplaintRepositoryImpl implements ComplaintRepository {
         rethrow;
       }
     } else {
+      final localOrgs = await localDataSource.getOrganizations();
       return localOrgs;
     }
   }
