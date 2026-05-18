@@ -38,49 +38,64 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool showLogo = logoAssetPath != null;
+    final bool hasLeading = showBackButton || showLogo;
+
+    // Dynamically calculate leadingWidth to accommodate both widgets safely
+    final double? calculatedLeadingWidth = () {
+      if (!hasLeading) return null;
+      double width = 0.0;
+      
+      if (showBackButton) {
+        width += 42.0; // 14dp left margin + 26dp icon size
+      }
+      if (showLogo) {
+        width += logoWidth;
+        width += showBackButton ? 10.0 : 16.0; // Tighter gap if back button exists
+      }
+      width += 8.0; // Safe cushion margin on the right side
+      return width;
+    }();
+
     return AppBar(
       backgroundColor: backgroundColor ?? const Color(0xFF005C45),
-      leading: showBackButton
-          ? IconButton(
-              iconSize: 26,
-              icon: Icon(
-                Icons.arrow_back,
-                color: titleColor ?? Colors.white,
-              ),
-              onPressed: onBackPressed ?? () => Navigator.pop(context),
+      leadingWidth: calculatedLeadingWidth,
+      leading: hasLeading
+          ? Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (showBackButton)
+                  IconButton(
+                    iconSize: 26,
+                    icon: Icon(
+                      Icons.arrow_back,
+                      color: titleColor ?? Colors.white,
+                    ),
+                    onPressed: onBackPressed ?? () => Navigator.pop(context),
+                  ),
+                if (showLogo)
+                  Padding(
+                    // Give the logo some breathing room if there's no back button
+                    padding: EdgeInsets.only(left: showBackButton ? 0.0 : 0.0),
+                    child: Image.asset(
+                      logoAssetPath!,
+                      width: logoWidth,
+                      height: logoHeight,
+                      fit: BoxFit.contain,
+                      color: titleColor ?? Colors.white,
+                    ),
+                  ),
+              ],
             )
           : null,
-      title: logoAssetPath != null || title != null
-          ? (logoAssetPath != null && title == null
-              ? Image.asset(
-                  logoAssetPath!,
-                  width: logoWidth,
-                  height: logoHeight,
-                  fit: BoxFit.contain,
-                  color: titleColor ?? Colors.white,
-                )
-              : Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (logoAssetPath != null) ...[
-                      Image.asset(
-                        logoAssetPath!,
-                        width: logoWidth,
-                        height: logoHeight,
-                        fit: BoxFit.contain,
-                        color: titleColor ?? Colors.white,
-                      ),
-                      const SizedBox(width: 8),
-                    ],
-                    Text(
-                      title!,
-                      style: TextStyle(
-                        color: titleColor ?? Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ))
+      title: title != null
+          ? Text(
+              title!,
+              style: TextStyle(
+                color: titleColor ?? Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            )
           : null,
       centerTitle: false,
       elevation: 0,
@@ -94,22 +109,35 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   Widget _buildNotificationButton(BuildContext context) {
-    return BlocBuilder<NotificationCubit, NotificationState>(
-      builder: (context, state) {
-        int unreadCount = 0;
-        if (state is NotificationLoaded) {
-          unreadCount = state.notifications.where((n) => !n.isRead).length;
+    return BlocBuilder<SettingsCubit, SettingsState>(
+      builder: (context, settingsState) {
+        bool notificationsEnabled = true;
+        if (settingsState is SettingsLoaded) {
+          notificationsEnabled = settingsState.settings.isNotificationsEnabled;
         }
-        return IconButton(
-          iconSize: 26,
-          icon: unreadCount > 0
-              ? Badge(
-                  label: Text(unreadCount.toString()),
-                  child: Icon(Iconsax.notification, color: titleColor ?? Colors.white, size: 26),
-                )
-              : Icon(Iconsax.notification, color: titleColor ?? Colors.white, size: 26),
-          onPressed: () {
-            Navigator.pushNamed(context, RouteNames.notifications);
+        
+        if (!notificationsEnabled) {
+          return const SizedBox.shrink();
+        }
+        
+        return BlocBuilder<NotificationCubit, NotificationState>(
+          builder: (context, state) {
+            int unreadCount = 0;
+            if (state is NotificationLoaded) {
+              unreadCount = state.notifications.where((n) => !n.isRead).length;
+            }
+            return IconButton(
+              iconSize: 26,
+              icon: unreadCount > 0
+                  ? Badge(
+                      label: Text(unreadCount.toString()),
+                      child: Icon(Iconsax.notification, color: titleColor ?? Colors.white, size: 26),
+                    )
+                  : Icon(Iconsax.notification, color: titleColor ?? Colors.white, size: 26),
+              onPressed: () {
+                Navigator.pushNamed(context, RouteNames.notifications);
+              },
+            );
           },
         );
       },
@@ -141,6 +169,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Size get preferredSize => Size.fromHeight(
-    kToolbarHeight + (bottom?.preferredSize.height ?? 0),
-  );
+        kToolbarHeight + (bottom?.preferredSize.height ?? 0),
+      );
 }

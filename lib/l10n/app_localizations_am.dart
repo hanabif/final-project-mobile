@@ -391,4 +391,29 @@ class AppLocalizationsAm extends AppLocalizations {
 
   @override
   String get returnToDashboard => 'ወደ ዳሽቦርድ ተመለስ';
+
+  @override
+  String get enableNotifications => 'ማሳወቂያዎችን ያንቁ';
+
+  @override
+  String get disableNotifications => 'ማሳወቂያዎችን ያሰናክሉ';
+
+  @override
+  String get notificationsDescription => 'ስለ ቅሬታዎ ሁኔታ ዝመናዎች ተቀበሉ';
+
+  @override
+  String get weakPassword =>
+      'የይለፍ ቃል ቢያንስ 8 ጀምር ያሉ ፊደሎችን ያወቅ ከፍተኛ፣ ሞላላ፣ ቁጥር እና ልዩ ቁምፊ ሊኖር ይገባል';
+
+  @override
+  String get passwordStrengthWeak => 'ደካማ';
+
+  @override
+  String get passwordStrengthFair => 'ተቀባይ';
+
+  @override
+  String get passwordStrengthGood => 'ጥሩ';
+
+  @override
+  String get passwordStrengthStrong => 'ጠንካራ';
 }

@@ -146,5 +146,13 @@
   "reportThroughCallCenterWater": "ወይም ለአዲስ አበባ ውሃና ፍሳሽ ባለስልጣን +251116674036 ይደውሉ",
   "success": "ተሳክቷል",
   "complaintId": "የቅሬታ መለያ:",
-  "returnToDashboard": "ወደ ዳሽቦርድ ተመለስ"
+  "returnToDashboard": "ወደ ዳሽቦርድ ተመለስ",
+  "enableNotifications": "ማሳወቂያዎችን ያንቁ",
+  "disableNotifications": "ማሳወቂያዎችን ያሰናክሉ",
+  "notificationsDescription": "ስለ ቅሬታዎ ሁኔታ ዝመናዎች ተቀበሉ",
+  "weakPassword": "የይለፍ ቃል ቢያንስ 8 ጀምር ያሉ ፊደሎችን ያወቅ ከፍተኛ፣ ሞላላ፣ ቁጥር እና ልዩ ቁምፊ ሊኖር ይገባል",
+  "passwordStrengthWeak": "ደካማ",
+  "passwordStrengthFair": "ተቀባይ",
+  "passwordStrengthGood": "ጥሩ",
+  "passwordStrengthStrong": "ጠንካራ"
 }

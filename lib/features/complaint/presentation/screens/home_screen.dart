@@ -65,9 +65,9 @@ class _HomeScreenState extends State<HomeScreen> {
         showThemeToggle: true,
         showNotification: true,
         backgroundColor: const Color(0xFF005C45),
-        // logoAssetPath: 'assets/icons/logo (2).png',
+        logoAssetPath: 'assets/icons/logo (2).png',
         logoWidth: 110,
-        logoHeight: 32,
+        logoHeight: 48,
       ),
       body: BlocBuilder<HomeCubit, HomeState>(
         builder: (context, state) {

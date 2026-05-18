@@ -397,4 +397,30 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get returnToDashboard => 'Return to Dashboard';
+
+  @override
+  String get enableNotifications => 'Enable Notifications';
+
+  @override
+  String get disableNotifications => 'Disable Notifications';
+
+  @override
+  String get notificationsDescription =>
+      'Receive updates about your complaint status';
+
+  @override
+  String get weakPassword =>
+      'Password must be at least 8 characters with uppercase, lowercase, number and special character';
+
+  @override
+  String get passwordStrengthWeak => 'Weak';
+
+  @override
+  String get passwordStrengthFair => 'Fair';
+
+  @override
+  String get passwordStrengthGood => 'Good';
+
+  @override
+  String get passwordStrengthStrong => 'Strong';
 }

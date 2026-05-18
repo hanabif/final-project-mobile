@@ -135,7 +135,7 @@ Future<void> init() async {
 
   // Notifications
   sl.registerLazySingleton<FirebaseNotificationService>(
-    () => FirebaseNotificationService(sl()),
+    () => FirebaseNotificationService(sl(), sl<SharedPreferences>()),
   );
 
   // Complaint - Use cases
