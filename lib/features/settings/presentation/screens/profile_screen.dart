@@ -1,3 +1,5 @@
+import 'package:complaint_resolution_app/l10n/app_localizations_am.dart';
+import 'package:complaint_resolution_app/l10n/app_localizations_om.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/routes/route_names.dart';
@@ -21,7 +23,22 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n   = AppLocalizations.of(context)!;
+    // Resolve app strings according to settings (supports Oromo via generated class)
+    final settingsState = context.select<SettingsCubit, SettingsState>((c) => c.state);
+    AppLocalizations l10n;
+    if (settingsState is SettingsLoaded) {
+      final lang = settingsState.settings.language.trim().toLowerCase();
+      if (lang.contains('om') || lang.contains('orom') || lang.contains('afaan')) {
+        l10n = AppLocalizationsOm();
+      } else if (lang.contains('am') || lang.contains('amh') || lang.contains('amharic')) {
+        l10n = AppLocalizationsAm();
+      } else {
+        l10n = AppLocalizations.of(context)!;
+      }
+    } else {
+      l10n = AppLocalizations.of(context)!;
+    }
+
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return BlocProvider.value(
@@ -144,6 +161,7 @@ class ProfileScreen extends StatelessWidget {
                               isDark: isDark,
                             ),
                             _Divider(isDark: isDark),
+                            const SizedBox(height: 10),
                             _NotificationToggleTile(
                               isEnabled: settings.isNotificationsEnabled,
                               isDark: isDark,
@@ -151,7 +169,7 @@ class ProfileScreen extends StatelessWidget {
                                 context.read<SettingsCubit>().toggleNotifications(value);
                               },
                             ),
-                            const SizedBox(height: 10),
+                            const SizedBox(height: 20),
                           ]),
                           const SizedBox(height: 28),
 
@@ -373,7 +391,10 @@ class ProfileScreen extends StatelessWidget {
   }
 
   String _normalizeLanguage(String language) {
-    return language.toLowerCase().contains('am') ? 'Amharic' : 'English';
+    final lower = language.toLowerCase();
+    if (lower.contains('am')) return 'Amharic';
+    if (lower.contains('om')) return 'Oromic';
+    return 'English';
   }
 }
 
@@ -584,8 +605,11 @@ class _LanguageExpansion extends StatelessWidget {
 
   String _normalize(String lang) {
     final value = lang.trim().toLowerCase();
-    if (value == 'am' || value == 'amharic') {
+    if (value.contains('am') || value.contains('amh') || value.contains('amharic')) {
       return 'am';
+    }
+    if (value.contains('om') || value.contains('orom') || value.contains('afaan')) {
+      return 'om';
     }
     return 'en';
   }
@@ -637,6 +661,14 @@ class _LanguageExpansion extends StatelessWidget {
             isDark: isDark,
             onTap: () =>
                 context.read<SettingsCubit>().setLanguage(l10n.amharic),
+          ),
+          const SizedBox(height: 6),
+          _LangOption(
+            label: l10n.oromic,
+            selected: _normalize(settings.language) == 'om',
+            isDark: isDark,
+            onTap: () =>
+                context.read<SettingsCubit>().setLanguage(l10n.oromic),
           ),
         ],
       ),

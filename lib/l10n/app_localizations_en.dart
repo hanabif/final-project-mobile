@@ -42,6 +42,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get amharic => 'Amharic';
 
   @override
+  String get oromic => 'Oromiffa';
+
+  @override
   String get settings => 'Settings';
 
   @override

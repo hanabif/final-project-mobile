@@ -7,6 +7,7 @@ import 'package:intl/intl.dart' as intl;
 
 import 'app_localizations_am.dart';
 import 'app_localizations_en.dart';
+import 'app_localizations_om.dart';
 
 // ignore_for_file: type=lint
 
@@ -96,6 +97,7 @@ abstract class AppLocalizations {
   static const List<Locale> supportedLocales = <Locale>[
     Locale('am'),
     Locale('en'),
+    Locale('om'),
   ];
 
   /// No description provided for @appTitle.
@@ -163,6 +165,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Amharic'**
   String get amharic;
+
+  /// No description provided for @oromic.
+  ///
+  /// In en, this message translates to:
+  /// **'Oromiffa'**
+  String get oromic;
 
   /// No description provided for @settings.
   ///
@@ -914,7 +922,7 @@ class _AppLocalizationsDelegate
 
   @override
   bool isSupported(Locale locale) =>
-      <String>['am', 'en'].contains(locale.languageCode);
+      <String>['am', 'en', 'om'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -927,6 +935,8 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
       return AppLocalizationsAm();
     case 'en':
       return AppLocalizationsEn();
+    case 'om':
+      return AppLocalizationsOm();
   }
 
   throw FlutterError(

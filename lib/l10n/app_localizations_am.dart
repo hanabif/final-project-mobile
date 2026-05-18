@@ -42,6 +42,9 @@ class AppLocalizationsAm extends AppLocalizations {
   String get amharic => 'አማርኛ';
 
   @override
+  String get oromic => 'ኦሮሚኛ';
+
+  @override
   String get settings => 'ቅንብሮች';
 
   @override
