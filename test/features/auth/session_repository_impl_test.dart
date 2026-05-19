@@ -7,7 +7,6 @@ import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MockSecureStorageService extends Mock implements SecureStorageService {}
-
 class MockSharedPreferences extends Mock implements SharedPreferences {}
 
 /// Generate a minimal JWT with an `exp` claim a given number of seconds from
@@ -41,12 +40,10 @@ void main() {
 
   test('clearSession removes stored token and clears prefs', () async {
     when(() => mockSecureStorage.clearToken()).thenAnswer((_) async => {});
-    when(
-      () => mockSharedPreferences.remove(any()),
-    ).thenAnswer((_) async => true);
+    when(() => mockSharedPreferences.remove(any())).thenAnswer((_) async => true);
 
     await repo.clearSession();
-
+    
     verify(() => mockSecureStorage.clearToken()).called(1);
     verify(() => mockSharedPreferences.remove(any())).called(3);
   });
@@ -57,9 +54,7 @@ void main() {
   });
 
   test('hasValidSession returns true when token exists', () async {
-    when(
-      () => mockSecureStorage.getToken(),
-    ).thenAnswer((_) async => 'valid-token');
+    when(() => mockSecureStorage.getToken()).thenAnswer((_) async => 'valid-token');
     expect(await repo.hasValidSession(), isTrue);
   });
 }

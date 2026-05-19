@@ -1,24 +1,12 @@
+import 'dart:convert';
+
 import 'package:complaint_resolution_app/core/network/api_client.dart';
 import 'package:complaint_resolution_app/features/auth/domain/repositories/session_repository.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
 
-class DummySession implements SessionRepository {
-  final String? token;
-  DummySession(this.token);
-
-  @override
-  Future<void> clearSession() async {}
-
-  @override
-  Future<String?> getToken() async => token;
-
-  @override
-  Future<bool> hasValidSession() async => token != null;
-
-  @override
-  Future<void> saveToken(String token) async {}
-}
+class MockSessionRepository extends Mock implements SessionRepository {}
 
 class RecordingAdapter implements HttpClientAdapter {
   late RequestOptions recorded;
@@ -39,23 +27,50 @@ class RecordingAdapter implements HttpClientAdapter {
 }
 
 void main() {
-  test('ApiClient attaches token if present', () async {
+  late MockSessionRepository mockSession;
+
+  setUp(() {
+    mockSession = MockSessionRepository();
+    // Default behaviors to avoid Null Pointer exception on un-stubbed methods
+    when(() => mockSession.getRefreshToken()).thenAnswer((_) async => null);
+    when(() => mockSession.clearSession()).thenAnswer((_) async => {});
+  });
+
+  test('ApiClient attaches token if present and not expired', () async {
     final adapter = RecordingAdapter();
-    final client = ApiClient(DummySession('mytoken'));
+    final validJwt = makeJwt(secondsFromNow: 3600);
+    when(() => mockSession.getToken()).thenAnswer((_) async => validJwt);
+
+    final client = ApiClient(mockSession);
     client.dio.httpClientAdapter = adapter;
 
-    await client.dio.get('/foo');
+    await client.dio.get('/foo', options: Options(extra: {'no-auth': false}));
 
-    expect(adapter.recorded.headers['Authorization'], 'Bearer mytoken');
+    expect(adapter.recorded.headers['Authorization'], 'Bearer $validJwt');
   });
 
   test('ApiClient does not attach header if token null', () async {
     final adapter = RecordingAdapter();
-    final client = ApiClient(DummySession(null));
+    when(() => mockSession.getToken()).thenAnswer((_) async => null);
+
+    final client = ApiClient(mockSession);
     client.dio.httpClientAdapter = adapter;
 
-    await client.dio.get('/foo');
+    await client.dio.get('/foo', options: Options(extra: {'no-auth': false}));
 
     expect(adapter.recorded.headers['Authorization'], isNull);
   });
+}
+
+// Helper to generate a dummy JWT for token expiration checks
+String makeJwt({required int secondsFromNow}) {
+  final header = base64Url
+      .encode(utf8.encode('{"alg":"HS256","typ":"JWT"}'))
+      .replaceAll('=', '');
+  final expiry =
+      (DateTime.now().millisecondsSinceEpoch ~/ 1000) + secondsFromNow;
+  final payload = base64Url
+      .encode(utf8.encode('{"exp": $expiry}'))
+      .replaceAll('=', '');
+  return '$header.$payload.signature';
 }

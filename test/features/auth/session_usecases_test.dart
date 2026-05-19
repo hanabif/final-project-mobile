@@ -8,7 +8,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockSessionRepository extends Mock implements SessionRepository {}
-
 class MockAuthRepository extends Mock implements AuthRepository {}
 
 void main() {
@@ -36,15 +35,15 @@ void main() {
     await saveUse('tok');
     expect(await getUse(), 'tok');
     expect(await validUse(), isTrue);
-
+    
     verify(() => session.saveToken('tok')).called(1);
   });
 
   test('logout calls repository logout', () async {
     when(() => authRepo.logout()).thenAnswer((_) async => {});
-
+    
     await logoutUse();
-
+    
     verify(() => authRepo.logout()).called(1);
   });
 }

@@ -49,24 +49,19 @@ void main() {
     whenListen(
       cubit,
       Stream.fromIterable([
-        AuthAuthenticated(
-          User(id: '1', name: 'x', email: 'x', role: 'Citizen'),
-        ),
+        AuthAuthenticated(User(id: '1', name: 'x', email: 'x', role: 'Citizen')),
       ]),
     );
-    when(() => cubit.state).thenReturn(
-      AuthAuthenticated(User(id: '1', name: 'x', email: 'x', role: 'Citizen')),
-    );
+    when(
+      () => cubit.state,
+    ).thenReturn(AuthAuthenticated(User(id: '1', name: 'x', email: 'x', role: 'Citizen')));
 
     await tester.pumpWidget(makeTestable(const LoginPage(), observer));
     await tester.pump(); // process listener
-    await tester.pump(
-      const Duration(seconds: 1),
-    ); // wait for animations/snackbars
+    await tester.pump(const Duration(seconds: 1)); // wait for animations/snackbars
 
     expect(find.text('Login successful'), findsOneWidget);
-    await tester
-        .pumpAndSettle(); // finish all animations including snackbar hide
+    await tester.pumpAndSettle(); // finish all animations including snackbar hide
     verify(
       () => observer.didReplace(
         newRoute: any(named: 'newRoute'),
