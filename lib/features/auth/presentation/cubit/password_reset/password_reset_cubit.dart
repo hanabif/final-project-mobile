@@ -38,6 +38,12 @@ class PasswordResetCubit extends Cubit<PasswordResetState> {
     }
   }
 
+  /// Store the provided email in the cubit state so presentation layers
+  /// can navigate to the reset screen without re-sending the OTP.
+  void setEmailForReset(String email) {
+    emit(PasswordResetOtpSent(email));
+  }
+
   Future<void> verifyCode(String email, String code) async {
     emit(PasswordResetLoading());
     try {
