@@ -15,11 +15,27 @@ import '../cubits/complaint_cubit.dart';
 import '../cubits/complaint_state.dart';
 import '../cubits/organizations_cubit.dart';
 import '../cubits/organizations_state.dart';
+import '../cubits/home/home_cubit.dart';
+import '../cubits/complaint_list_cubit.dart';
 import '../../../../core/di/injection_container.dart';
 
 class ComplaintFormScreen extends StatefulWidget {
   final String? organizationId;
-  const ComplaintFormScreen({super.key, this.organizationId});
+  final String? title;
+  final String? description;
+  final double? latitude;
+  final double? longitude;
+  final String? locationLabel;
+
+  const ComplaintFormScreen({
+    super.key,
+    this.organizationId,
+    this.title,
+    this.description,
+    this.latitude,
+    this.longitude,
+    this.locationLabel,
+  });
 
   @override
   State<ComplaintFormScreen> createState() => _ComplaintFormScreenState();
@@ -41,8 +57,36 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
     if (widget.organizationId != null) {
       _selectedOrganizationId = widget.organizationId;
     }
+    // Pre-fill form fields from QR data
+    if (widget.title != null) {
+      _titleController.text = widget.title!;
+    }
+    if (widget.description != null) {
+      _descCtrl.text = widget.description!;
+    }
+
+     WidgetsBinding.instance.addPostFrameCallback((_) {
+    if (!mounted) return;
+
     context.read<OrganizationsCubit>().fetchOrganizations();
-    _getCurrentLocation();
+    // If QR provided coordinates, use them; otherwise get device location
+    if (widget.latitude != null && widget.longitude != null) {
+      _currentPosition = Position(
+        longitude: widget.longitude!,
+        latitude: widget.latitude!,
+        timestamp: DateTime.now(),
+        accuracy: 0,
+        altitude: 0,
+        altitudeAccuracy: 0,
+        heading: 0,
+        headingAccuracy: 0,
+        speed: 0,
+        speedAccuracy: 0,
+      );
+    } else {
+      _getCurrentLocation();
+    }
+  });
   }
 
   @override
@@ -243,6 +287,50 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
     context.read<ComplaintCubit>().submitComplaint(complaint, _selectedImages);
   }
 
+  // ── Handle Successful Submission ──────────────────────────────────────────
+  
+  Future<void> _handleSuccessfulSubmission(BuildContext context, AppLocalizations l10n) async {
+    try {
+      // Show loading while refreshing data
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.complaintSubmittedSuccessfully)),
+      );
+
+      // Refresh home statistics
+      await _refreshHomeData();
+
+      // Navigate to success screen only after data refresh completes
+      if (context.mounted) {
+        Navigator.of(context).pushReplacementNamed(
+          RouteNames.complaintSuccess,
+          arguments: const Uuid().v4().substring(0, 8).toUpperCase(),
+        );
+      }
+    } catch (e) {
+      print('Error during submission handling: $e');
+      // Even if refresh fails, show success screen
+      if (context.mounted) {
+        Navigator.of(context).pushReplacementNamed(
+          RouteNames.complaintSuccess,
+          arguments: const Uuid().v4().substring(0, 8).toUpperCase(),
+        );
+      }
+    }
+  }
+
+  // ── Refresh Home Data ─────────────────────────────────────────────────────
+  
+  Future<void> _refreshHomeData() async {
+    try {
+      if (mounted) {
+        await context.read<HomeCubit>().loadHomeData(forceRefresh: true);
+        print('✅ Home data refreshed successfully');
+      }
+    } catch (e) {
+      print('❌ Error refreshing home data: $e');
+    }
+  }
+
   // ── Build ─────────────────────────────────────────────────────────────────
 
   @override
@@ -262,15 +350,8 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
       body: BlocConsumer<ComplaintCubit, ComplaintState>(
         listener: (context, state) {
           if (state is ComplaintSuccess) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                  content: Text(l10n.complaintSubmittedSuccessfully)),
-            );
-            Navigator.of(context).pushReplacementNamed(
-              RouteNames.complaintSuccess,
-              arguments:
-                  const Uuid().v4().substring(0, 8).toUpperCase(),
-            );
+            // Refresh home statistics and complaint list after successful submission
+            _handleSuccessfulSubmission(context, l10n);
           } else if (state is ComplaintFailure) {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               content: Text(state.message),

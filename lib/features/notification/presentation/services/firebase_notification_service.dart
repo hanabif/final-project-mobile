@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../domain/repositories/notification_repository.dart';
 import '../../../../core/utils/scaffold_messenger_key.dart';
 import '../../../../core/utils/navigator_key.dart';
@@ -18,12 +19,26 @@ class FirebaseNotificationService {
   }
   
   final NotificationRepository _repository;
+  final SharedPreferences _sharedPreferences;
 
-  FirebaseNotificationService(this._repository);
+  FirebaseNotificationService(this._repository, this._sharedPreferences);
+
+  Future<bool> _areNotificationsEnabled() async {
+    // Check if notifications are enabled in settings
+    // Default to true if not set (for backwards compatibility)
+    return _sharedPreferences.getBool('isNotificationsEnabled') ?? true;
+  }
 
   Future<void> initialize() async {
     if (Firebase.apps.isEmpty) {
       debugPrint('⚠️ [FirebaseNotificationService] Firebase not initialized. Skipping setup.');
+      return;
+    }
+    
+    // Check if notifications are disabled by user
+    final notificationsEnabled = await _areNotificationsEnabled();
+    if (!notificationsEnabled) {
+      debugPrint('⚠️ [FirebaseNotificationService] Notifications are disabled by user. Skipping initialization.');
       return;
     }
     

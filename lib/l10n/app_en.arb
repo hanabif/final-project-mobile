@@ -12,6 +12,7 @@
   "yesAccount": "Already have an account?",
   "english": "English",
   "amharic": "Amharic",
+  "oromic": "Oromiffa",
   "settings": "Settings",
   "save": "Save",
   "update": "Update",
@@ -146,5 +147,13 @@
   "reportThroughCallCenterWater": "or report through their call center +251116674036 for Addis Ababa Water and Sewerage Authority",
   "success": "Success",
   "complaintId": "Complaint ID:",
-  "returnToDashboard": "Return to Dashboard"
+  "returnToDashboard": "Return to Dashboard",
+  "enableNotifications": "Enable Notifications",
+  "disableNotifications": "Disable Notifications",
+  "notificationsDescription": "Receive updates about your complaint status",
+  "weakPassword": "Password must be at least 8 characters with uppercase, lowercase, number and special character",
+  "passwordStrengthWeak": "Weak",
+  "passwordStrengthFair": "Fair",
+  "passwordStrengthGood": "Good",
+  "passwordStrengthStrong": "Strong"
 }

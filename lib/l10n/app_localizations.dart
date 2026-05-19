@@ -7,6 +7,7 @@ import 'package:intl/intl.dart' as intl;
 
 import 'app_localizations_am.dart';
 import 'app_localizations_en.dart';
+import 'app_localizations_om.dart';
 
 // ignore_for_file: type=lint
 
@@ -96,6 +97,7 @@ abstract class AppLocalizations {
   static const List<Locale> supportedLocales = <Locale>[
     Locale('am'),
     Locale('en'),
+    Locale('om'),
   ];
 
   /// No description provided for @appTitle.
@@ -163,6 +165,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Amharic'**
   String get amharic;
+
+  /// No description provided for @oromic.
+  ///
+  /// In en, this message translates to:
+  /// **'Oromiffa'**
+  String get oromic;
 
   /// No description provided for @settings.
   ///
@@ -853,6 +861,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Return to Dashboard'**
   String get returnToDashboard;
+
+  /// No description provided for @enableNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable Notifications'**
+  String get enableNotifications;
+
+  /// No description provided for @disableNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Disable Notifications'**
+  String get disableNotifications;
+
+  /// No description provided for @notificationsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Receive updates about your complaint status'**
+  String get notificationsDescription;
+
+  /// No description provided for @weakPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Password must be at least 8 characters with uppercase, lowercase, number and special character'**
+  String get weakPassword;
+
+  /// No description provided for @passwordStrengthWeak.
+  ///
+  /// In en, this message translates to:
+  /// **'Weak'**
+  String get passwordStrengthWeak;
+
+  /// No description provided for @passwordStrengthFair.
+  ///
+  /// In en, this message translates to:
+  /// **'Fair'**
+  String get passwordStrengthFair;
+
+  /// No description provided for @passwordStrengthGood.
+  ///
+  /// In en, this message translates to:
+  /// **'Good'**
+  String get passwordStrengthGood;
+
+  /// No description provided for @passwordStrengthStrong.
+  ///
+  /// In en, this message translates to:
+  /// **'Strong'**
+  String get passwordStrengthStrong;
 }
 
 class _AppLocalizationsDelegate
@@ -866,7 +922,7 @@ class _AppLocalizationsDelegate
 
   @override
   bool isSupported(Locale locale) =>
-      <String>['am', 'en'].contains(locale.languageCode);
+      <String>['am', 'en', 'om'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -879,6 +935,8 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
       return AppLocalizationsAm();
     case 'en':
       return AppLocalizationsEn();
+    case 'om':
+      return AppLocalizationsOm();
   }
 
   throw FlutterError(
