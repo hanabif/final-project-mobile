@@ -37,125 +37,137 @@ class NotificationsScreen extends StatelessWidget {
         showNotification: false,
         backgroundColor: const Color(0xFF005C45),
         titleColor: Colors.white,
-        actions: [
+      ),
+      body: Column(
+        children: [
+          // Reload button
           BlocBuilder<NotificationCubit, NotificationState>(
             builder: (context, state) {
               final isLoading = state is NotificationLoading;
-              return IconButton(
-                icon: AnimatedRotation(
-                  turns: isLoading ? 1 : 0,
-                  duration: const Duration(milliseconds: 600),
-                  child: const Icon(Icons.refresh_rounded),
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    IconButton(
+                      icon: AnimatedRotation(
+                        turns: isLoading ? 1 : 0,
+                        duration: const Duration(milliseconds: 600),
+                        child: const Icon(Icons.refresh_rounded),
+                      ),
+                      onPressed: isLoading ? null : () {
+                        context.read<NotificationCubit>().fetchNotifications();
+                      },
+                      tooltip: 'Reload',
+                    ),
+                  ],
                 ),
-                onPressed: isLoading
-                    ? null
-                    : () => context
-                        .read<NotificationCubit>()
-                        .fetchNotifications(),
-                tooltip: 'Reload',
               );
             },
           ),
-        ],
-      ),
-      body: BlocListener<NotificationCubit, NotificationState>(
-        listener: (context, state) {
-          if (state is NotificationError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(state.message)));
-          }
-        },
-        child: BlocBuilder<NotificationCubit, NotificationState>(
-          builder: (context, state) {
-            if (state is NotificationLoading ||
-                state is NotificationInitial) {
-              return const Center(
-                child: CircularProgressIndicator(
-                    color: Color(0xFF005C45)),
-              );
-            }
-            if (state is NotificationLoaded) {
-              final notifications = state.notifications;
-              final hasUnread = notifications.any((n) => !n.isRead);
-              if (notifications.isEmpty) {
-                return _EmptyState(l10n: l10n, isDark: isDark);
-              }
-              // Group: unread first
-              final unread =
-                  notifications.where((n) => !n.isRead).toList();
-              final read =
-                  notifications.where((n) => n.isRead).toList();
+          // Notifications list
+          Expanded(
+            child: BlocListener<NotificationCubit, NotificationState>(
+              listener: (context, state) {
+                if (state is NotificationError) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(state.message)));
+                }
+              },
+              child: BlocBuilder<NotificationCubit, NotificationState>(
+                builder: (context, state) {
+                  if (state is NotificationLoading ||
+                      state is NotificationInitial) {
+                    return const Center(
+                      child: CircularProgressIndicator(
+                          color: Color(0xFF005C45)),
+                    );
+                  }
+                  if (state is NotificationLoaded) {
+                    final notifications = state.notifications;
+                    final hasUnread = notifications.any((n) => !n.isRead);
+                    if (notifications.isEmpty) {
+                      return _EmptyState(l10n: l10n, isDark: isDark);
+                    }
+                    // Group: unread first
+                    final unread =
+                        notifications.where((n) => !n.isRead).toList();
+                    final read =
+                        notifications.where((n) => n.isRead).toList();
 
-              return Column(
-                children: [
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
-                      child: TextButton.icon(
-                        onPressed: hasUnread
-                            ? () => context
-                                .read<NotificationCubit>()
-                                .markAllAsRead()
-                            : null,
-                        icon: Icon(
-                          Icons.done_all_rounded,
-                          size: 18,
-                          color: hasUnread
-                              ? const Color(0xFF005C45)
-                              : Colors.grey.shade400,
-                        ),
-                        label: Text(
-                          l10n.markAllAsRead,
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: hasUnread
-                                ? const Color(0xFF005C45)
-                                : Colors.grey.shade400,
+                    return Column(
+                      children: [
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+                            child: TextButton.icon(
+                              onPressed: hasUnread
+                                  ? () => context
+                                      .read<NotificationCubit>()
+                                      .markAllAsRead()
+                                  : null,
+                              icon: Icon(
+                                Icons.done_all_rounded,
+                                size: 18,
+                                color: hasUnread
+                                    ? const Color(0xFF005C45)
+                                    : Colors.grey.shade400,
+                              ),
+                              label: Text(
+                                l10n.markAllAsRead,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: hasUnread
+                                      ? const Color(0xFF005C45)
+                                      : Colors.grey.shade400,
+                                ),
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: ListView(
-                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
-                      children: [
-                        if (unread.isNotEmpty) ...[
-                          _GroupHeader(
-                              label: 'New', count: unread.length, isDark: isDark),
-                          const SizedBox(height: 8),
-                          ...unread.map((n) => _NotificationCard(
-                                notif: n,
-                                isDark: isDark,
-                                timeAgo: _timeAgo(n.date),
-                                l10n: l10n,
-                              )),
-                          const SizedBox(height: 20),
-                        ],
-                        if (read.isNotEmpty) ...[
-                          _GroupHeader(
-                              label: 'Earlier',
-                              count: read.length,
-                              isDark: isDark),
-                          const SizedBox(height: 8),
-                          ...read.map((n) => _NotificationCard(
-                                notif: n,
-                                isDark: isDark,
-                                timeAgo: _timeAgo(n.date),
-                                l10n: l10n,
-                              )),
-                        ],
+                        Expanded(
+                          child: ListView(
+                            padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
+                            children: [
+                              if (unread.isNotEmpty) ...[
+                                _GroupHeader(
+                                    label: 'New', count: unread.length, isDark: isDark),
+                                const SizedBox(height: 8),
+                                ...unread.map((n) => _NotificationCard(
+                                      notif: n,
+                                      isDark: isDark,
+                                      timeAgo: _timeAgo(n.date),
+                                      l10n: l10n,
+                                    )),
+                                const SizedBox(height: 20),
+                              ],
+                              if (read.isNotEmpty) ...[
+                                _GroupHeader(
+                                    label: 'Earlier',
+                                    count: read.length,
+                                    isDark: isDark),
+                                const SizedBox(height: 8),
+                                ...read.map((n) => _NotificationCard(
+                                      notif: n,
+                                      isDark: isDark,
+                                      timeAgo: _timeAgo(n.date),
+                                      l10n: l10n,
+                                    )),
+                              ],
+                            ],
+                          ),
+                        ),
                       ],
-                    ),
-                  ),
-                ],
-              );
-            }
-            return const SizedBox.shrink();
-          },
-        ),
+                    );
+                  }
+                  return const SizedBox.shrink();
+                },
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -190,14 +202,14 @@ class _NotificationCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(18),
           border: isUnread
               ? Border.all(
-                  color: const Color(0xFF005C45).withValues(alpha: 0.25),
+                  color: const Color(0xFF005C45).withOpacity(0.25),
                   width: 1.5)
               : null,
           boxShadow: [
             BoxShadow(
               color: isDark
-                  ? Colors.black.withValues(alpha: 0.22)
-                  : Colors.black.withValues(alpha: 0.05),
+                  ? Colors.black.withOpacity(0.22)
+                  : Colors.black.withOpacity(0.05),
               blurRadius: 14,
               offset: const Offset(0, 4),
             ),
@@ -229,26 +241,16 @@ class _NotificationCard extends StatelessWidget {
                       children: [
                         // Icon bubble
                         Container(
-                          width: 42,
-                          height: 42,
+                          width: 48,
+                          height: 48,
                           decoration: BoxDecoration(
-                            color: isUnread
-                                ? const Color(0xFF005C45).withValues(alpha: 0.12)
-                                : (isDark
-                                    ? Colors.white.withValues(alpha: 0.06)
-                                    : Colors.black.withValues(alpha: 0.05)),
-                            borderRadius: BorderRadius.circular(12),
+                            shape: BoxShape.circle,
+                            color: const Color(0xFF005C45).withOpacity(0.12),
                           ),
                           child: Icon(
-                            isUnread
-                                ? Icons.notifications_active_rounded
-                                : Icons.notifications_none_rounded,
+                            Icons.notifications_rounded,
+                            color: const Color(0xFF005C45),
                             size: 20,
-                            color: isUnread
-                                ? const Color(0xFF005C45)
-                                : (isDark
-                                    ? Colors.white38
-                                    : Colors.black38),
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -257,86 +259,91 @@ class _NotificationCard extends StatelessWidget {
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Expanded(
                                     child: Text(
                                       notif.title,
                                       style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: isUnread
-                                            ? FontWeight.w700
-                                            : FontWeight.w500,
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w700,
                                         color: isDark
                                             ? Colors.white
                                             : const Color(0xFF1A1A2E),
-                                        height: 1.3,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  if (isUnread)
+                                    Padding(
+                                      padding:
+                                          const EdgeInsets.only(left: 8),
+                                      child: Container(
+                                        width: 8,
+                                        height: 8,
+                                        decoration: const BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: Color(0xFF005C45),
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    timeAgo,
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      color: isDark
-                                          ? Colors.white38
-                                          : Colors.black38,
-                                    ),
-                                  ),
                                 ],
                               ),
                               const SizedBox(height: 4),
                               Text(
                                 notif.body,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: isDark
+                                      ? Colors.white70
+                                      : Colors.black54,
+                                ),
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                timeAgo,
                                 style: TextStyle(
-                                  fontSize: 13,
+                                  fontSize: 11,
                                   color: isDark
                                       ? Colors.white54
-                                      : Colors.black54,
-                                  height: 1.4,
+                                      : Colors.black38,
                                 ),
                               ),
-                              if (isUnread) ...[
-                                const SizedBox(height: 10),
-                                GestureDetector(
-                                  onTap: () {
-                                    context
-                                        .read<NotificationCubit>()
-                                        .markAsRead(notif.id);
-                                    ScaffoldMessenger.of(context)
-                                        .showSnackBar(SnackBar(
-                                      content: Text(
-                                          l10n.notificationMarkedAsRead),
-                                      duration:
-                                          const Duration(seconds: 2),
-                                    ));
-                                  },
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 10, vertical: 5),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFF005C45)
-                                          .withValues(alpha: 0.10),
-                                      borderRadius:
-                                          BorderRadius.circular(20),
-                                    ),
-                                    child: Text(
-                                      l10n.markAsRead,
-                                      style: const TextStyle(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w700,
-                                        color: Color(0xFF005C45),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
                             ],
+                          ),
+                        ),
+
+                        // Mark as read button
+                        Padding(
+                          padding: const EdgeInsets.only(left: 8),
+                          child: Center(
+                            child: IconButton(
+                              icon: Icon(
+                                isUnread
+                                    ? Icons.mark_email_unread_rounded
+                                    : Icons.mark_email_read_rounded,
+                                size: 18,
+                                color: isUnread
+                                    ? const Color(0xFF005C45)
+                                    : Colors.grey.shade400,
+                              ),
+                              constraints: const BoxConstraints(
+                                maxHeight: 32,
+                                maxWidth: 32,
+                              ),
+                              padding: const EdgeInsets.all(0),
+                              onPressed: () => context
+                                  .read<NotificationCubit>()
+                                  .markAsRead(notif.id),
+                              tooltip: isUnread
+                                  ? 'Mark as read'
+                                  : 'Already read',
+                            ),
                           ),
                         ),
                       ],
@@ -381,7 +388,7 @@ class _GroupHeader extends StatelessWidget {
           padding:
               const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
           decoration: BoxDecoration(
-            color: const Color(0xFF005C45).withValues(alpha: 0.12),
+            color: const Color(0xFF005C45).withOpacity(0.12),
             borderRadius: BorderRadius.circular(20),
           ),
           child: Text(
@@ -419,7 +426,7 @@ class _EmptyState extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: isDark
-                  ? Colors.white.withValues(alpha: 0.05)
+                  ? Colors.white.withOpacity(0.05)
                   : const Color(0xFFF5F6FA),
             ),
             child: Icon(
