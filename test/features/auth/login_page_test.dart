@@ -26,6 +26,7 @@ void main() {
   setUp(() {
     cubit = MockAuthCubit();
     when(() => cubit.state).thenReturn(AuthInitial());
+    when(() => cubit.close()).thenAnswer((_) async {});
     sl.registerFactory<AuthCubit>(() => cubit);
   });
 
@@ -57,8 +58,10 @@ void main() {
 
     await tester.pumpWidget(makeTestable(const LoginPage(), observer));
     await tester.pump(); // process listener
+    await tester.pump(const Duration(seconds: 1)); // wait for animations/snackbars
 
     expect(find.text('Login successful'), findsOneWidget);
+    await tester.pumpAndSettle(); // finish all animations including snackbar hide
     verify(
       () => observer.didReplace(
         newRoute: any(named: 'newRoute'),
@@ -77,8 +80,10 @@ void main() {
 
     await tester.pumpWidget(makeTestable(const LoginPage(), observer));
     await tester.pump();
+    await tester.pump(const Duration(seconds: 1)); // wait for snackbar
 
     expect(find.text('bad'), findsOneWidget);
+    await tester.pumpAndSettle(); // finish all animations
     verifyNever(
       () => observer.didReplace(
         newRoute: any(named: 'newRoute'),

@@ -19,12 +19,12 @@ class QRComplaintData {
 
   factory QRComplaintData.fromJson(Map<String, dynamic> json) {
     return QRComplaintData(
-      organizationId: json['organizationId']?.toString() ?? '',
-      title: json['title']?.toString() ?? '',
-      description: json['description']?.toString() ?? '',
-      latitude: _toDouble(json['latitude']),
-      longitude: _toDouble(json['longitude']),
-      locationLabel: json['locationLabel']?.toString(),
+      organizationId: (json['organizationId'] ?? json['orgId'])?.toString() ?? '',
+      title: (json['title'] ?? json['ttl'])?.toString() ?? '',
+      description: (json['description'] ?? json['dsc'])?.toString() ?? '',
+      latitude: _toDouble(json['latitude'] ?? json['lat']),
+      longitude: _toDouble(json['longitude'] ?? json['lng']),
+      locationLabel: (json['locationLabel'] ?? json['lbl'])?.toString(),
     );
   }
 
