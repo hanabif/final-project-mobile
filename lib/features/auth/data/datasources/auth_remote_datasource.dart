@@ -18,6 +18,9 @@ abstract class AuthRemoteDataSource {
   Future<void> resetPassword(String email, String token, String newPassword);
   Future<void> resetPasswordOtp(String email, String code, String newPassword);
   Future<UserModel> getProfile();
+  Future<UserModel> updateProfile(String fullName);
+  Future<void> changePassword(String oldPassword, String newPassword);
+  Future<void> logout();
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -27,13 +30,26 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<AuthResponseModel> login(String email, String password) async {
-    final response = await apiClient.dio.post(
-      '/auth/login',
-      data: {"email": email, "password": password},
-      options: Options(extra: {'no-auth': true}),
-    );
+    try {
+      final response = await apiClient.dio.post(
+        '/auth/login',
+        data: {"email": email, "password": password},
+        options: Options(extra: {'no-auth': true}),
+      );
 
-    return AuthResponseModel.fromJson(response.data);
+      if (response.statusCode == 200) {
+        return AuthResponseModel.fromJson(response.data as Map<String, dynamic>);
+      } else {
+        throw Exception('Login failed: ${response.statusCode}');
+      }
+    } on DioException catch (e) {
+      final message = e.response?.data is Map
+          ? e.response?.data['message'] ?? 'Login failed'
+          : e.message ?? 'Login failed';
+      throw Exception(message);
+    } catch (e) {
+      throw Exception('Login error: $e');
+    }
   }
 
   @override
@@ -43,26 +59,57 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     String password,
     String role,
   ) async {
-    final response = await apiClient.dio.post(
-      '/auth/register',
-      data: {"fullName": name, "email": email, "password": password},
-      options: Options(extra: {'no-auth': true}),
-    );
+    try {
+      final response = await apiClient.dio.post(
+        '/auth/register',
+        data: {"fullName": name, "email": email, "password": password},
+        options: Options(extra: {'no-auth': true}),
+      );
 
-    return AuthResponseModel.fromJson(response.data);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return AuthResponseModel.fromJson(response.data as Map<String, dynamic>);
+      } else {
+        throw Exception('Registration failed: ${response.statusCode}');
+      }
+    } on DioException catch (e) {
+      final message = e.response?.data is Map
+          ? e.response?.data['message'] ?? 'Registration failed'
+          : e.message ?? 'Registration failed';
+      throw Exception(message);
+    } catch (e) {
+      throw Exception('Registration error: $e');
+    }
   }
 
   @override
   Future<void> forgotPassword(String email) async {
-    await apiClient.dio.post('/auth/forgot-password', data: {"email": email});
+    try {
+      await apiClient.dio.post('/auth/forgot-password', data: {"email": email});
+    } on DioException catch (e) {
+      final message = e.response?.data is Map
+          ? e.response?.data['message'] ?? 'Failed to send reset email'
+          : e.message ?? 'Failed to send reset email';
+      throw Exception(message);
+    } catch (e) {
+      throw Exception('Error: $e');
+    }
   }
 
   @override
   Future<void> forgotPasswordOtp(String email) async {
-    await apiClient.dio.post(
-      '/auth/forgot-password-otp',
-      data: {"email": email},
-    );
+    try {
+      await apiClient.dio.post(
+        '/auth/forgot-password-otp',
+        data: {"email": email},
+      );
+    } on DioException catch (e) {
+      final message = e.response?.data is Map
+          ? e.response?.data['message'] ?? 'Failed to send OTP'
+          : e.message ?? 'Failed to send OTP';
+      throw Exception(message);
+    } catch (e) {
+      throw Exception('Error: $e');
+    }
   }
 
   @override
@@ -78,10 +125,19 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     String token,
     String newPassword,
   ) async {
-    await apiClient.dio.post(
-      '/auth/reset-password',
-      data: {"email": email, "token": token, "password": newPassword},
-    );
+    try {
+      await apiClient.dio.post(
+        '/auth/reset-password',
+        data: {"email": email, "token": token, "password": newPassword},
+      );
+    } on DioException catch (e) {
+      final message = e.response?.data is Map
+          ? e.response?.data['message'] ?? 'Failed to reset password'
+          : e.message ?? 'Failed to reset password';
+      throw Exception(message);
+    } catch (e) {
+      throw Exception('Error: $e');
+    }
   }
 
   @override
@@ -90,19 +146,88 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     String code,
     String newPassword,
   ) async {
-    await apiClient.dio.post(
-      '/auth/reset-password-otp',
-      data: {"email": email, "otp": code, "password": newPassword},
-    );
+    try {
+      await apiClient.dio.post(
+        '/auth/reset-password-otp',
+        data: {"email": email, "otp": code, "password": newPassword},
+      );
+    } on DioException catch (e) {
+      final message = e.response?.data is Map
+          ? e.response?.data['message'] ?? 'Failed to reset password'
+          : e.message ?? 'Failed to reset password';
+      throw Exception(message);
+    } catch (e) {
+      throw Exception('Error: $e');
+    }
   }
 
   @override
   Future<UserModel> getProfile() async {
-    final response = await apiClient.dio.get('/auth/profile');
-    if (response.statusCode == 200) {
-      return UserModel.fromJson(response.data as Map<String, dynamic>);
-    } else {
-      throw Exception('Failed to fetch profile: ${response.statusCode}');
+    try {
+      final response = await apiClient.dio.get('/auth/profile');
+      if (response.statusCode == 200) {
+        return UserModel.fromJson(response.data as Map<String, dynamic>);
+      } else {
+        throw Exception('Failed to fetch profile: ${response.statusCode}');
+      }
+    } on DioException catch (e) {
+      final message = e.response?.data is Map
+          ? e.response?.data['message'] ?? 'Failed to fetch profile'
+          : e.message ?? 'Failed to fetch profile';
+      throw Exception(message);
+    } catch (e) {
+      throw Exception('Profile fetch error: $e');
+    }
+  }
+
+  @override
+  Future<UserModel> updateProfile(String fullName) async {
+    try {
+      final response = await apiClient.dio.put(
+        '/auth/profile',
+        data: {'fullName': fullName},
+      );
+      if (response.statusCode == 200) {
+        return UserModel.fromJson(response.data as Map<String, dynamic>);
+      } else {
+        throw Exception('Failed to update profile: ${response.statusCode}');
+      }
+    } on DioException catch (e) {
+      final message = e.response?.data is Map
+          ? e.response?.data['message'] ?? 'Failed to update profile'
+          : e.message ?? 'Failed to update profile';
+      throw Exception(message);
+    } catch (e) {
+      throw Exception('Profile update error: $e');
+    }
+  }
+
+  @override
+  Future<void> changePassword(String oldPassword, String newPassword) async {
+    try {
+      final response = await apiClient.dio.post(
+        '/auth/change-password',
+        data: {'oldPassword': oldPassword, 'newPassword': newPassword},
+      );
+      if (response.statusCode != 200 && response.statusCode != 204) {
+        throw Exception('Failed to change password: ${response.statusCode}');
+      }
+    } on DioException catch (e) {
+      final message = e.response?.data is Map
+          ? e.response?.data['message'] ?? 'Failed to change password'
+          : e.message ?? 'Failed to change password';
+      throw Exception(message);
+    } catch (e) {
+      throw Exception('Password change error: $e');
+    }
+  }
+
+  @override
+  Future<void> logout() async {
+    try {
+      await apiClient.dio.post('/auth/logout');
+    } catch (e) {
+      // Ignore errors during logout on the server side
     }
   }
 }

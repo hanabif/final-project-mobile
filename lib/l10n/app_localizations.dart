@@ -7,6 +7,7 @@ import 'package:intl/intl.dart' as intl;
 
 import 'app_localizations_am.dart';
 import 'app_localizations_en.dart';
+import 'app_localizations_om.dart';
 
 // ignore_for_file: type=lint
 
@@ -96,6 +97,7 @@ abstract class AppLocalizations {
   static const List<Locale> supportedLocales = <Locale>[
     Locale('am'),
     Locale('en'),
+    Locale('om'),
   ];
 
   /// No description provided for @appTitle.
@@ -128,6 +130,12 @@ abstract class AppLocalizations {
   /// **'Password'**
   String get password;
 
+  /// No description provided for @fullName.
+  ///
+  /// In en, this message translates to:
+  /// **'Full Name'**
+  String get fullName;
+
   /// No description provided for @forgotPassword.
   ///
   /// In en, this message translates to:
@@ -146,6 +154,60 @@ abstract class AppLocalizations {
   /// **'Already have an account?'**
   String get yesAccount;
 
+  /// No description provided for @english.
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get english;
+
+  /// No description provided for @amharic.
+  ///
+  /// In en, this message translates to:
+  /// **'Amharic'**
+  String get amharic;
+
+  /// No description provided for @oromic.
+  ///
+  /// In en, this message translates to:
+  /// **'Oromiffa'**
+  String get oromic;
+
+  /// No description provided for @settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settings;
+
+  /// No description provided for @save.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get save;
+
+  /// No description provided for @update.
+  ///
+  /// In en, this message translates to:
+  /// **'Update'**
+  String get update;
+
+  /// No description provided for @currentPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Password'**
+  String get currentPassword;
+
+  /// No description provided for @newPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'New Password'**
+  String get newPassword;
+
+  /// No description provided for @confirmPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Password'**
+  String get confirmPassword;
+
   /// No description provided for @home.
   ///
   /// In en, this message translates to:
@@ -163,6 +225,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Profile'**
   String get profile;
+
+  /// No description provided for @yourVoiceMatters.
+  ///
+  /// In en, this message translates to:
+  /// **'Your voice matters'**
+  String get yourVoiceMatters;
+
+  /// No description provided for @reportIssuesInYourCommunity.
+  ///
+  /// In en, this message translates to:
+  /// **'Report issues in your community and help us improve services.'**
+  String get reportIssuesInYourCommunity;
+
+  /// No description provided for @fileReport.
+  ///
+  /// In en, this message translates to:
+  /// **'File Report'**
+  String get fileReport;
 
   /// No description provided for @complaintStatistics.
   ///
@@ -248,6 +328,12 @@ abstract class AppLocalizations {
   /// **'Lng'**
   String get longitude;
 
+  /// No description provided for @location.
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get location;
+
   /// No description provided for @submit.
   ///
   /// In en, this message translates to:
@@ -265,6 +351,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Notifications'**
   String get notifications;
+
+  /// No description provided for @markAllAsRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark all as read'**
+  String get markAllAsRead;
 
   /// No description provided for @complaintStatusUpdated.
   ///
@@ -296,11 +388,77 @@ abstract class AppLocalizations {
   /// **'We are working on it'**
   String get weAreWorkingOnIt;
 
+  /// No description provided for @noNotificationsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No notifications yet.'**
+  String get noNotificationsYet;
+
+  /// No description provided for @notificationMarkedAsRead.
+  ///
+  /// In en, this message translates to:
+  /// **'This notification is marked as read'**
+  String get notificationMarkedAsRead;
+
+  /// No description provided for @markAsRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as read'**
+  String get markAsRead;
+
   /// No description provided for @myReports.
   ///
   /// In en, this message translates to:
   /// **'My Reports'**
   String get myReports;
+
+  /// No description provided for @complaintDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Complaint Details'**
+  String get complaintDetails;
+
+  /// No description provided for @complaintProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Complaint Progress'**
+  String get complaintProgress;
+
+  /// No description provided for @issueDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Issue Description'**
+  String get issueDescription;
+
+  /// No description provided for @photos.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos'**
+  String get photos;
+
+  /// No description provided for @locationDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Location Details'**
+  String get locationDetails;
+
+  /// No description provided for @submittedOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Submitted on'**
+  String get submittedOn;
+
+  /// No description provided for @resolvedOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Resolved on'**
+  String get resolvedOn;
+
+  /// No description provided for @failedToLoadImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load'**
+  String get failedToLoadImage;
 
   /// No description provided for @all.
   ///
@@ -319,6 +477,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Submitted'**
   String get submitted;
+
+  /// No description provided for @noMoreIssuesToShow.
+  ///
+  /// In en, this message translates to:
+  /// **'No more issues to show.'**
+  String get noMoreIssuesToShow;
+
+  /// No description provided for @tapPlusToFileNewReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the \'+\' to file a new report.'**
+  String get tapPlusToFileNewReport;
 
   /// No description provided for @myComplaints.
   ///
@@ -416,6 +586,60 @@ abstract class AppLocalizations {
   /// **'Logout'**
   String get logout;
 
+  /// No description provided for @profileUpdatedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile updated successfully'**
+  String get profileUpdatedSuccessfully;
+
+  /// No description provided for @passwordChangedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Password changed successfully'**
+  String get passwordChangedSuccessfully;
+
+  /// No description provided for @nameIsRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Name is required'**
+  String get nameIsRequired;
+
+  /// No description provided for @currentPasswordIsRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Current password is required'**
+  String get currentPasswordIsRequired;
+
+  /// No description provided for @newPasswordIsRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'New password is required'**
+  String get newPasswordIsRequired;
+
+  /// No description provided for @passwordMustBeAtLeast6Characters.
+  ///
+  /// In en, this message translates to:
+  /// **'Password must be at least 6 characters'**
+  String get passwordMustBeAtLeast6Characters;
+
+  /// No description provided for @pleaseConfirmPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Please confirm password'**
+  String get pleaseConfirmPassword;
+
+  /// No description provided for @passwordsDoNotMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match'**
+  String get passwordsDoNotMatch;
+
+  /// No description provided for @areYouSureLogout.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to logout?'**
+  String get areYouSureLogout;
+
   /// No description provided for @statusSubmitted.
   ///
   /// In en, this message translates to:
@@ -469,6 +693,222 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No data available'**
   String get noData;
+
+  /// No description provided for @failedToLoadOrganizationsPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load organizations: '**
+  String get failedToLoadOrganizationsPrefix;
+
+  /// No description provided for @locationServiceRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'You should turn on your location to submit complaints.'**
+  String get locationServiceRequired;
+
+  /// No description provided for @locationSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get locationSettings;
+
+  /// No description provided for @locationPermissionsPermanentlyDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Location permissions are permanently denied.'**
+  String get locationPermissionsPermanentlyDenied;
+
+  /// No description provided for @locationPermissionsDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Location permissions are denied'**
+  String get locationPermissionsDenied;
+
+  /// No description provided for @locationPermissionsPermanentlyDeniedNoRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Location permissions are permanently denied, we cannot request permissions.'**
+  String get locationPermissionsPermanentlyDeniedNoRequest;
+
+  /// No description provided for @locationErrorPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Error getting location: '**
+  String get locationErrorPrefix;
+
+  /// No description provided for @cameraPermissionRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera permission is required'**
+  String get cameraPermissionRequired;
+
+  /// No description provided for @galleryPermissionRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Gallery permission is required'**
+  String get galleryPermissionRequired;
+
+  /// No description provided for @maximum5ImagesAllowed.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum 5 images allowed'**
+  String get maximum5ImagesAllowed;
+
+  /// No description provided for @imageExceeds5MbLimitSuffix.
+  ///
+  /// In en, this message translates to:
+  /// **'exceeds 5MB limit'**
+  String get imageExceeds5MbLimitSuffix;
+
+  /// No description provided for @imagePickingErrorPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Error picking image: '**
+  String get imagePickingErrorPrefix;
+
+  /// No description provided for @locationIsRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Location is required'**
+  String get locationIsRequired;
+
+  /// No description provided for @complaintSubmittedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Complaint submitted successfully!'**
+  String get complaintSubmittedSuccessfully;
+
+  /// No description provided for @titleIsRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Title is required'**
+  String get titleIsRequired;
+
+  /// No description provided for @titleMustBeAtLeast5Characters.
+  ///
+  /// In en, this message translates to:
+  /// **'Title must be at least 5 characters'**
+  String get titleMustBeAtLeast5Characters;
+
+  /// No description provided for @descriptionIsRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Description is required'**
+  String get descriptionIsRequired;
+
+  /// No description provided for @descriptionMustBeAtLeast20Characters.
+  ///
+  /// In en, this message translates to:
+  /// **'Description must be at least 20 characters'**
+  String get descriptionMustBeAtLeast20Characters;
+
+  /// No description provided for @selectOrganization.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Organization'**
+  String get selectOrganization;
+
+  /// No description provided for @pleaseSelectOrganization.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select an organization'**
+  String get pleaseSelectOrganization;
+
+  /// No description provided for @selectedImages.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected Images:'**
+  String get selectedImages;
+
+  /// No description provided for @locationNotAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Location not available'**
+  String get locationNotAvailable;
+
+  /// No description provided for @refreshLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh Location'**
+  String get refreshLocation;
+
+  /// No description provided for @reportThroughCallCenterElectric.
+  ///
+  /// In en, this message translates to:
+  /// **'or report through their call center 905 for Ethiopian Electric Utility'**
+  String get reportThroughCallCenterElectric;
+
+  /// No description provided for @reportThroughCallCenterWater.
+  ///
+  /// In en, this message translates to:
+  /// **'or report through their call center +251116674036 for Addis Ababa Water and Sewerage Authority'**
+  String get reportThroughCallCenterWater;
+
+  /// No description provided for @success.
+  ///
+  /// In en, this message translates to:
+  /// **'Success'**
+  String get success;
+
+  /// No description provided for @complaintId.
+  ///
+  /// In en, this message translates to:
+  /// **'Complaint ID:'**
+  String get complaintId;
+
+  /// No description provided for @returnToDashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Return to Dashboard'**
+  String get returnToDashboard;
+
+  /// No description provided for @enableNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable Notifications'**
+  String get enableNotifications;
+
+  /// No description provided for @disableNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Disable Notifications'**
+  String get disableNotifications;
+
+  /// No description provided for @notificationsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Receive updates about your complaint status'**
+  String get notificationsDescription;
+
+  /// No description provided for @weakPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Password must be at least 8 characters with uppercase, lowercase, number and special character'**
+  String get weakPassword;
+
+  /// No description provided for @passwordStrengthWeak.
+  ///
+  /// In en, this message translates to:
+  /// **'Weak'**
+  String get passwordStrengthWeak;
+
+  /// No description provided for @passwordStrengthFair.
+  ///
+  /// In en, this message translates to:
+  /// **'Fair'**
+  String get passwordStrengthFair;
+
+  /// No description provided for @passwordStrengthGood.
+  ///
+  /// In en, this message translates to:
+  /// **'Good'**
+  String get passwordStrengthGood;
+
+  /// No description provided for @passwordStrengthStrong.
+  ///
+  /// In en, this message translates to:
+  /// **'Strong'**
+  String get passwordStrengthStrong;
 }
 
 class _AppLocalizationsDelegate
@@ -482,7 +922,7 @@ class _AppLocalizationsDelegate
 
   @override
   bool isSupported(Locale locale) =>
-      <String>['am', 'en'].contains(locale.languageCode);
+      <String>['am', 'en', 'om'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -495,6 +935,8 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
       return AppLocalizationsAm();
     case 'en':
       return AppLocalizationsEn();
+    case 'om':
+      return AppLocalizationsOm();
   }
 
   throw FlutterError(

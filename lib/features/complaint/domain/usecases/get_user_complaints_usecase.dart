@@ -6,7 +6,7 @@ class GetUserComplaintsUseCase {
 
   GetUserComplaintsUseCase(this.repository);
 
-  Future<List<Complaint>> call() {
-    return repository.getUserComplaints();
+  Future<List<Complaint>> call({bool forceRefresh = false}) {
+    return repository.getUserComplaints(forceRefresh: forceRefresh);
   }
 }

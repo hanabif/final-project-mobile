@@ -40,7 +40,13 @@ class _SplashPageState extends State<SplashPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset('assets/images/logo (1).png', height: 120),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Image.asset(
+                'assets/images/logo (1).png',
+                height: 120,
+              ),
+            ),
             const SizedBox(height: 24),
             const CircularProgressIndicator(
               valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF005C45)),

@@ -63,4 +63,18 @@ class SettingsCubit extends Cubit<SettingsState> {
       }
     }
   }
+
+  Future<void> setLanguage(String language) async {
+    if (state is SettingsLoaded) {
+      final currentSettings = (state as SettingsLoaded).settings;
+      final newSettings = currentSettings.copyWith(language: language);
+      emit(SettingsLoaded(settings: newSettings));
+      try {
+        await updateSettingsUseCase(newSettings);
+      } catch (e) {
+        emit(SettingsLoaded(settings: currentSettings));
+        emit(SettingsError(message: 'Failed to update settings'));
+      }
+    }
+  }
 }

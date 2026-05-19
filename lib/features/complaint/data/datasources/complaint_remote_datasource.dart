@@ -1,8 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../../core/network/api_client.dart';
 import '../models/complaint_model.dart';
 import '../models/citizen_analytics_model.dart';
+
 
 abstract class ComplaintRemoteDataSource {
   Future<String> submitComplaint(ComplaintModel complaint);
@@ -22,12 +24,36 @@ class ComplaintRemoteDataSourceImpl implements ComplaintRemoteDataSource {
 
   ComplaintRemoteDataSourceImpl({required this.apiClient});
 
+  String _extractErrorMessage(dynamic data, String fallback) {
+    if (data is Map<String, dynamic>) {
+      final message = data['message'];
+      if (message != null) return message.toString();
+      return fallback;
+    }
+
+    if (data is Map) {
+      final message = data['message'];
+      if (message != null) return message.toString();
+      return fallback;
+    }
+
+    if (data is String && data.trim().isNotEmpty) {
+      return data;
+    }
+
+    return fallback;
+  }
+
   @override
   Future<String> submitComplaint(ComplaintModel complaint) async {
     try {
+      final payload = complaint.toJson();
+      debugPrint('--- Submitting to /complaints ---');
+      debugPrint('Payload: $payload');
+      
       final response = await apiClient.dio.post(
         '/complaints',
-        data: complaint.toJson(),
+        data: payload,
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
@@ -39,7 +65,7 @@ class ComplaintRemoteDataSourceImpl implements ComplaintRemoteDataSource {
       }
     } on DioException catch (e) {
       if (e.response != null) {
-        final message = e.response?.data['message'] ?? 'Server error';
+        final message = _extractErrorMessage(e.response?.data, 'Server error');
         throw Exception(message);
       } else {
         throw Exception('Network error: ${e.message}');
@@ -52,13 +78,24 @@ class ComplaintRemoteDataSourceImpl implements ComplaintRemoteDataSource {
   @override
   Future<String> uploadSingleFile(XFile file) async {
     try {
+      debugPrint('--- Uploading Single File to /uploads ---');
+      debugPrint('File name: ${file.name}, path: ${file.path}');
+      
+      String filename = file.name;
+      if (filename.toLowerCase().endsWith('.webp')) {
+        filename = filename.replaceAll(RegExp(r'\.webp$', caseSensitive: false), '.jpg');
+      }
+
       final formData = FormData.fromMap({
-        'file': MultipartFile.fromBytes(
+        'files': MultipartFile.fromBytes(
           await file.readAsBytes(),
-          filename: file.name,
+          filename: filename,
         ),
         'folder': 'complaints',
       });
+
+      debugPrint('FormData fields: ${formData.fields}');
+      debugPrint('FormData files: ${formData.files.map((f) => f.key).toList()}');
 
       final response = await apiClient.dio.post(
         '/uploads',
@@ -79,7 +116,7 @@ class ComplaintRemoteDataSourceImpl implements ComplaintRemoteDataSource {
         throw Exception('Upload failed: ${response.statusCode}');
       }
     } on DioException catch (e) {
-       final message = e.response?.data['message'] ?? e.message ?? 'Upload error';
+       final message = _extractErrorMessage(e.response?.data, e.message ?? 'Upload error');
        throw Exception(message);
     } catch (e) {
       throw Exception('Failed to upload image: $e');
@@ -89,12 +126,18 @@ class ComplaintRemoteDataSourceImpl implements ComplaintRemoteDataSource {
   @override
   Future<List<String>> uploadMultipleFiles(List<XFile> files) async {
     try {
+      debugPrint('--- Uploading Multiple Files to /uploads ---');
+      debugPrint('Files count: ${files.length}');
       final List<MultipartFile> multipartFiles = [];
       for (final file in files) {
+        String filename = file.name;
+        if (filename.toLowerCase().endsWith('.webp')) {
+          filename = filename.replaceAll(RegExp(r'\.webp$', caseSensitive: false), '.jpg');
+        }
         multipartFiles.add(
           MultipartFile.fromBytes(
             await file.readAsBytes(),
-            filename: file.name,
+            filename: filename,
           ),
         );
       }
@@ -103,6 +146,9 @@ class ComplaintRemoteDataSourceImpl implements ComplaintRemoteDataSource {
         'files': multipartFiles,
         'folder': 'complaints',
       });
+      
+      debugPrint('FormData fields: ${formData.fields}');
+      debugPrint('FormData files: ${formData.files.map((f) => f.key).toList()}');
 
       final response = await apiClient.dio.post(
         '/uploads',
@@ -121,7 +167,7 @@ class ComplaintRemoteDataSourceImpl implements ComplaintRemoteDataSource {
         throw Exception('Upload failed: ${response.statusCode}');
       }
     } on DioException catch (e) {
-       final message = e.response?.data['message'] ?? e.message ?? 'Upload error';
+       final message = _extractErrorMessage(e.response?.data, e.message ?? 'Upload error');
        throw Exception(message);
     } catch (e) {
       throw Exception('Failed to upload images: $e');
@@ -140,7 +186,7 @@ class ComplaintRemoteDataSourceImpl implements ComplaintRemoteDataSource {
       }
     } on DioException catch (e) {
       if (e.response != null) {
-        final message = e.response?.data['message'] ?? 'Server error';
+        final message = _extractErrorMessage(e.response?.data, 'Server error');
         throw Exception(message);
       } else {
         throw Exception('Network error: ${e.message}');
@@ -165,7 +211,7 @@ class ComplaintRemoteDataSourceImpl implements ComplaintRemoteDataSource {
       }
     } on DioException catch (e) {
       if (e.response != null) {
-        final message = e.response?.data['message'] ?? 'Server error';
+        final message = _extractErrorMessage(e.response?.data, 'Server error');
         throw Exception(message);
       } else {
         throw Exception('Network error: ${e.message}');
@@ -187,7 +233,7 @@ class ComplaintRemoteDataSourceImpl implements ComplaintRemoteDataSource {
       }
     } on DioException catch (e) {
       if (e.response != null) {
-        final message = e.response?.data['message'] ?? 'Server error';
+        final message = _extractErrorMessage(e.response?.data, 'Server error');
         throw Exception(message);
       } else {
         throw Exception('Network error: ${e.message}');
@@ -230,7 +276,7 @@ class ComplaintRemoteDataSourceImpl implements ComplaintRemoteDataSource {
         throw Exception('Delete failed: ${response.statusCode}');
       }
     } on DioException catch (e) {
-      final message = e.response?.data['message'] ?? e.message ?? 'Delete error';
+      final message = _extractErrorMessage(e.response?.data, e.message ?? 'Delete error');
       throw Exception(message);
     } catch (e) {
       throw Exception('Failed to delete image: $e');
@@ -249,7 +295,7 @@ class ComplaintRemoteDataSourceImpl implements ComplaintRemoteDataSource {
         throw Exception('AI moderation failed: ${response.statusCode}');
       }
     } on DioException catch (e) {
-      final message = e.response?.data['message'] ?? e.message ?? 'Moderation error';
+      final message = _extractErrorMessage(e.response?.data, e.message ?? 'Moderation error');
       throw Exception(message);
     } catch (e) {
       throw Exception('Failed to moderate complaint: $e');
@@ -268,7 +314,7 @@ class ComplaintRemoteDataSourceImpl implements ComplaintRemoteDataSource {
       }
     } on DioException catch (e) {
       if (e.response != null) {
-        final message = e.response?.data['message'] ?? 'Server error';
+        final message = _extractErrorMessage(e.response?.data, 'Server error');
         throw Exception(message);
       } else {
         throw Exception('Network error: ${e.message}');

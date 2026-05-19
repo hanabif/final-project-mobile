@@ -1,4 +1,6 @@
 import 'package:complaint_resolution_app/core/routes/route_names.dart';
+import 'package:complaint_resolution_app/core/utils/password_validator.dart';
+import 'package:complaint_resolution_app/core/widgets/password_strength_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/di/injection_container.dart';
@@ -35,7 +37,6 @@ class _RegisterPageState extends State<RegisterPage> {
     return BlocProvider(
       create: (_) => sl<AuthCubit>(),
       child: Scaffold(
-        backgroundColor: Colors.white,
         body: SafeArea(
           child: BlocListener<AuthCubit, AuthState>(
             listener: (context, state) {
@@ -56,6 +57,8 @@ class _RegisterPageState extends State<RegisterPage> {
             },
             child: BlocBuilder<AuthCubit, AuthState>(
               builder: (context, state) {
+                final isDark = Theme.of(context).brightness == Brightness.dark;
+                
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Form(
@@ -142,18 +145,17 @@ class _RegisterPageState extends State<RegisterPage> {
                           const SizedBox(height: 8),
                           AuthTextField(
                             controller: _passwordController,
-                            hint: "********",
+                            hint: "Minimum 8 characters with uppercase, lowercase, number and special character",
                             icon: Icons.lock_outline,
                             obscure: true,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return "Password is required";
-                              }
-                              if (value.length < 6) {
-                                return "Minimum 6 characters";
-                              }
-                              return null;
-                            },
+                            validator: (value) => PasswordValidator.validatePassword(value ?? ''),
+                            onChanged: (_) => setState(() {}),
+                          ),
+                          
+                          /// Password Strength Indicator
+                          PasswordStrengthIndicator(
+                            password: _passwordController.text,
+                            isDark: isDark,
                           ),
 
                           const SizedBox(height: 40),
@@ -164,6 +166,16 @@ class _RegisterPageState extends State<RegisterPage> {
                             isLoading: state is AuthLoading,
                             onPressed: () {
                               if (_formKey.currentState!.validate()) {
+                                // Additional check for strong password
+                                if (!PasswordValidator.isStrongPassword(_passwordController.text.trim())) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('Password must be strong (8+ characters, uppercase, lowercase, number, special character)'),
+                                    ),
+                                  );
+                                  return;
+                                }
+                                
                                 context.read<AuthCubit>().register(
                                   _nameController.text.trim(),
                                   _emailController.text.trim(),

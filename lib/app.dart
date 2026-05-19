@@ -14,6 +14,7 @@ import 'features/settings/presentation/cubits/settings_cubit.dart';
 import 'features/settings/presentation/cubits/settings_state.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import '../l10n/app_localizations.dart';
+import '../l10n/settings_aware_app_localizations_delegate.dart';
 
 class ComplaintResolutionApp extends StatelessWidget {
   const ComplaintResolutionApp({super.key});
@@ -31,7 +32,13 @@ class ComplaintResolutionApp extends StatelessWidget {
       child: BlocBuilder<SettingsCubit, SettingsState>(
         builder: (context, state) {
           ThemeMode mode = ThemeMode.system;
-          if (state is SettingsLoaded) {
+          // `frameworkLocale` is used for framework delegates (Material/Cupertino).
+          // `appLocaleOverride` is used to override only `AppLocalizations` so
+          // we can load app strings in Oromo while keeping framework delegates
+          // on a supported locale (English/Amharic).
+          Locale frameworkLocale = const Locale('en');
+          Locale appLocaleOverride = const Locale('en');
+            if (state is SettingsLoaded) {
             switch (state.settings.themeMode.toLowerCase()) {
               case 'light':
                 mode = ThemeMode.light;
@@ -42,6 +49,19 @@ class ComplaintResolutionApp extends StatelessWidget {
               default:
                 mode = ThemeMode.system;
             }
+            final langVal = state.settings.language.toLowerCase();
+            if (langVal.contains('am') || langVal.contains('amh') || langVal.contains('amharic')) {
+              frameworkLocale = const Locale('am');
+              appLocaleOverride = const Locale('am');
+            } else if (langVal.contains('om') || langVal.contains('orom') || langVal.contains('afaan')) {
+              // Framework delegates don't support 'om'. Use English for framework,
+              // but override AppLocalizations to load Oromo translations.
+              frameworkLocale = const Locale('en');
+              appLocaleOverride = const Locale('om');
+            } else {
+              frameworkLocale = const Locale('en');
+              appLocaleOverride = const Locale('en');
+            }
           }
 
           return MaterialApp(
@@ -50,24 +70,30 @@ class ComplaintResolutionApp extends StatelessWidget {
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
             themeMode: mode,
+            locale: frameworkLocale,
             scaffoldMessengerKey: scaffoldMessengerKey,
             navigatorKey: navigatorKey,
             initialRoute: RouteNames.splash,
             onGenerateRoute: AppRouter.generateRoute,
 
-             // localization delegates
+            // localization delegates
             localizationsDelegates: const [
               GlobalMaterialLocalizations.delegate,
               GlobalWidgetsLocalizations.delegate,
               GlobalCupertinoLocalizations.delegate,
-              AppLocalizations.delegate,
+              // Use settings-aware delegate so AppLocalizations loads the
+              // correct language based on persisted settings without
+              // overriding framework delegates.
+              SettingsAwareAppLocalizationsDelegate(),
             ],
             
-            // supported locale
+            // supported locale (framework/localization delegates may not support 'om' yet)
             supportedLocales: const [
               Locale('en'),
               Locale('am'),
             ],
+            // No special builder: the SettingsAware delegate returns the
+            // appropriate `AppLocalizations` instance based on stored settings.
           );
         },
       ),

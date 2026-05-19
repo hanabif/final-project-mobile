@@ -6,7 +6,7 @@ class GetCitizenAnalyticsUseCase {
 
   GetCitizenAnalyticsUseCase(this.repository);
 
-  Future<CitizenAnalyticsModel> call() async {
-    return await repository.getCitizenAnalytics();
+  Future<CitizenAnalyticsModel> call({bool forceRefresh = false}) async {
+    return await repository.getCitizenAnalytics(forceRefresh: forceRefresh);
   }
 }

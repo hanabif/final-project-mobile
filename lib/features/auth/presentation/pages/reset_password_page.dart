@@ -14,6 +14,7 @@ class ResetPasswordPage extends StatefulWidget {
 }
 
 class _ResetPasswordPageState extends State<ResetPasswordPage> {
+  final _tokenController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
@@ -33,11 +34,17 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       email = args['email'];
       token = args['token'];
       isOtp = false;
+      if (token != null && _tokenController.text.isEmpty) {
+        _tokenController.text = token;
+      }
     } else if (cubit.state is PasswordResetCodeVerified) {
       final state = cubit.state as PasswordResetCodeVerified;
       email = state.email;
       token = state.token;
       isOtp = true;
+      if (_tokenController.text.isEmpty) {
+        _tokenController.text = token;
+      }
     }
 
     return Scaffold(
@@ -71,8 +78,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           },
           child: BlocBuilder<PasswordResetCubit, PasswordResetState>(
             builder: (context, state) {
-              if (email == null || token == null) {
-                return const Center(child: Text("Invalid session. Please try again."));
+              if (email == null) {
+                return const Center(child: Text("Invalid session. Email is required."));
               }
 
               return SingleChildScrollView(
@@ -102,6 +109,27 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                         ),
                       ),
                       const SizedBox(height: 40),
+                      const Text(
+                        "Reset Token",
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      AuthTextField(
+                        controller: _tokenController,
+                        hint: "Enter token from email",
+                        icon: Icons.key_outlined,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Token is required";
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 24),
                       const Text(
                         "New Password",
                         style: TextStyle(
@@ -156,7 +184,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                           if (_formKey.currentState!.validate()) {
                             context.read<PasswordResetCubit>().resetPassword(
                                   email: email!,
-                                  token: token!,
+                                  token: _tokenController.text.trim(),
                                   newPassword: _passwordController.text.trim(),
                                   isOtp: isOtp,
                                 );

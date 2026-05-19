@@ -12,11 +12,18 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<User> login(String email, String password) async {
     final authResponse = await remoteDataSource.login(email, password);
-    // store token as soon as we get it
-    await sessionRepository.saveToken(authResponse.token);
-    if (authResponse.refreshToken != null) {
-      await sessionRepository.saveRefreshToken(authResponse.refreshToken!);
+    
+    // Validate user role - only Citizens are allowed to login
+    if (authResponse.user.role.toLowerCase() != 'citizen') {
+      throw Exception(
+        'Unauthorized: Only citizens are authorized to access this application. '
+        'Your role is ${authResponse.user.role}.',
+      );
     }
+    
+    // Store tokens immediately after successful login
+    await sessionRepository.saveToken(authResponse.accessToken);
+    await sessionRepository.saveRefreshToken(authResponse.refreshToken);
     return authResponse.user;
   }
 
@@ -33,10 +40,17 @@ class AuthRepositoryImpl implements AuthRepository {
       password,
       role,
     );
-    await sessionRepository.saveToken(authResponse.token);
-    if (authResponse.refreshToken != null) {
-      await sessionRepository.saveRefreshToken(authResponse.refreshToken!);
+    
+    // Validate user role - only Citizens are allowed to register and use the app
+    if (authResponse.user.role.toLowerCase() != 'citizen') {
+      throw Exception(
+        'Registration failed: Only citizens can register for this application.',
+      );
     }
+    
+    // Store tokens immediately after successful registration
+    await sessionRepository.saveToken(authResponse.accessToken);
+    await sessionRepository.saveRefreshToken(authResponse.refreshToken);
     return authResponse.user;
   }
 
@@ -76,5 +90,21 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<User> getProfile() async {
     return await remoteDataSource.getProfile();
+  }
+
+  @override
+  Future<User> updateProfile(String fullName) async {
+    return await remoteDataSource.updateProfile(fullName);
+  }
+
+  @override
+  Future<void> changePassword(String oldPassword, String newPassword) async {
+    return await remoteDataSource.changePassword(oldPassword, newPassword);
+  }
+
+  @override
+  Future<void> logout() async {
+    await remoteDataSource.logout();
+    await sessionRepository.clearSession();
   }
 }

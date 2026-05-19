@@ -16,22 +16,33 @@ class SettingsDataSourceImpl implements SettingsDataSource {
   @override
   Future<UserSettingsModel> getSettings() async {
     final jsonString = sharedPreferences.getString(key);
+    late UserSettingsModel settings;
+    
     if (jsonString != null) {
-      return UserSettingsModel.fromJson(json.decode(jsonString));
+      settings = UserSettingsModel.fromJson(json.decode(jsonString));
     } else {
       // Default settings
-      return const UserSettingsModel(
+      settings = const UserSettingsModel(
         isAnonymousMode: false,
         isNotificationsEnabled: true,
         themeMode: 'Light',
         language: 'English',
       );
     }
+    
+    // Ensure the notification setting is stored in SharedPreferences for FirebaseNotificationService
+    if (!sharedPreferences.containsKey('isNotificationsEnabled')) {
+      await sharedPreferences.setBool('isNotificationsEnabled', settings.isNotificationsEnabled);
+    }
+    
+    return settings;
   }
 
   @override
   Future<void> updateSettings(UserSettingsModel settings) async {
     final jsonString = json.encode(settings.toJson());
     await sharedPreferences.setString(key, jsonString);
+    // Also store the notification setting separately for easy access by FirebaseNotificationService
+    await sharedPreferences.setBool('isNotificationsEnabled', settings.isNotificationsEnabled);
   }
 }

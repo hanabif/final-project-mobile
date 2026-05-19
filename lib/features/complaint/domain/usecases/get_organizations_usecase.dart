@@ -6,7 +6,7 @@ class GetOrganizationsUseCase {
 
   GetOrganizationsUseCase(this.repository);
 
-  Future<List<Organization>> call() async {
-    return await repository.getOrganizations();
+  Future<List<Organization>> call({bool forceRefresh = false}) async {
+    return await repository.getOrganizations(forceRefresh: forceRefresh);
   }
 }

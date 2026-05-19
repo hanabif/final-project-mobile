@@ -13,13 +13,17 @@ class HomeCubit extends Cubit<HomeState> {
     required this.getOrganizationsUseCase,
   }) : super(HomeInitial());
 
-  Future<void> loadHomeData() async {
+  Future<void> loadHomeData({bool forceRefresh = false}) async {
+    if (!forceRefresh && state is HomeLoaded) {
+      return;
+    }
+
     emit(HomeLoading());
 
     try {
-      final stats = await getCitizenAnalyticsUseCase.call();
+      final stats = await getCitizenAnalyticsUseCase.call(forceRefresh: forceRefresh);
       final List<Organization> orgsResponse = await getOrganizationsUseCase
-          .call();
+          .call(forceRefresh: forceRefresh);
 
       final List<Map<String, String>> organizations = orgsResponse.map((org) {
         // Log individual organization to verify fields
@@ -41,5 +45,9 @@ class HomeCubit extends Cubit<HomeState> {
       print('Stacktrace: $stackTrace');
       emit(HomeError(message: 'Failed to load home data: ${e.toString()}'));
     }
+  }
+
+  void clearCache() {
+    emit(HomeInitial());
   }
 }
