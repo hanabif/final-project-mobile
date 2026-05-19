@@ -36,7 +36,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           child: BlocListener<PasswordResetCubit, PasswordResetState>(
             listener: (context, state) {
               if (state is PasswordResetEmailSent || state is PasswordResetOtpSent) {
-                Navigator.pushNamed(
+                Navigator.pushReplacementNamed(
                   context,
                   RouteNames.resetPassword,
                   arguments: {'email': _emailController.text.trim()},
@@ -69,7 +69,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          "Don't worry! It happens. Please select the method you'd like to use to reset your password.",
+                          "Don't worry! It happens. Please enter your email address to reset your password.",
                           style: TextStyle(
                             fontFamily: 'Poppins',
                             color: Colors.grey[600],
@@ -107,11 +107,52 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                           onPressed: () {
                             if (_formKey.currentState!.validate()) {
                               final email = _emailController.text.trim();
-                              context.read<PasswordResetCubit>().sendResetEmail(email);
+                              context.read<PasswordResetCubit>().sendResetOtp(email);
                             }
                           },
                         ),
                         const SizedBox(height: 24),
+                        Center(
+                          child: TextButton(
+                            onPressed: () {
+                              // If the user already has an OTP, allow them to go
+                              // straight to the reset page without re-entering email.
+                              String email = _emailController.text.trim();
+
+                              if (email.isEmpty) {
+                                final cubit = context.read<PasswordResetCubit>();
+                                if (cubit.state is PasswordResetOtpSent) {
+                                  email = (cubit.state as PasswordResetOtpSent).email;
+                                } else if (cubit.state is PasswordResetEmailSent) {
+                                  email = (cubit.state as PasswordResetEmailSent).email;
+                                }
+                              }
+
+                              if (email.isEmpty) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('Please enter your email or request an OTP first')),
+                                );
+                                return;
+                              }
+
+                              final cubit = context.read<PasswordResetCubit>();
+                              cubit.setEmailForReset(email);
+                              Navigator.pushReplacementNamed(
+                                context,
+                                RouteNames.resetPassword,
+                                arguments: {'email': email},
+                              );
+                            },
+                            child: const Text(
+                              "Already got OTP?",
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                color: primaryColor,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),

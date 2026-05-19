@@ -21,11 +21,11 @@ class _ComplaintListScreenState extends State<ComplaintListScreen>
   int _selectedIndex = 0;
 
   static const _tabs = [
-    _TabItem(label: 'All',        icon: Icons.grid_view_rounded),
-    _TabItem(label: 'Submitted',  icon: Icons.upload_file_rounded),
-    _TabItem(label: 'In Progress',icon: Icons.autorenew_rounded),
-    _TabItem(label: 'Resolved',   icon: Icons.check_circle_outline_rounded),
-    _TabItem(label: 'Rejected',   icon: Icons.cancel_outlined),
+    _TabItem(label: 'All',         icon: Icons.grid_view_rounded),
+    _TabItem(label: 'Submitted',   icon: Icons.upload_file_rounded),
+    _TabItem(label: 'In Progress', icon: Icons.autorenew_rounded),
+    _TabItem(label: 'Resolved',    icon: Icons.check_circle_outline_rounded),
+    _TabItem(label: 'Rejected',    icon: Icons.cancel_outlined),
   ];
 
   @override
@@ -46,7 +46,6 @@ class _ComplaintListScreenState extends State<ComplaintListScreen>
     super.dispose();
   }
 
-  // Refresh data when app comes to foreground
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
@@ -56,8 +55,7 @@ class _ComplaintListScreenState extends State<ComplaintListScreen>
 
   void _refreshComplaints() {
     if (mounted) {
-      print('🔄 Refreshing complaint list on screen resume');
-      // Slight delay to ensure backend has processed
+      debugPrint('🔄 Refreshing complaint list on screen resume');
       Future.delayed(const Duration(milliseconds: 800), () {
         if (mounted) {
           sl<ComplaintListCubit>().fetchComplaints(forceRefresh: true);
@@ -73,9 +71,12 @@ class _ComplaintListScreenState extends State<ComplaintListScreen>
     final matchers = [
       null, // All — handled above
       (String s) => s == 'submitted',
-      (String s) => s == 'in progress' || s == 'in_progress'
-                 || s == 'manual review' || s == 'manual_review'
-                 || s == 'under review',
+      (String s) =>
+          s == 'in progress' ||
+          s == 'in_progress' ||
+          s == 'manual review' ||
+          s == 'manual_review' ||
+          s == 'under review',
       (String s) => s == 'resolved',
       (String s) => s == 'rejected',
     ];
@@ -88,14 +89,16 @@ class _ComplaintListScreenState extends State<ComplaintListScreen>
 
   @override
   Widget build(BuildContext context) {
-    final l10n    = AppLocalizations.of(context)!;
-    final theme   = Theme.of(context);
-    final isDark  = theme.brightness == Brightness.dark;
+    final l10n   = AppLocalizations.of(context)!;
+    final theme  = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return BlocProvider(
-      create: (context) => sl<ComplaintListCubit>()..fetchComplaints(forceRefresh: true),
+      create: (context) =>
+          sl<ComplaintListCubit>()..fetchComplaints(forceRefresh: true),
       child: Scaffold(
-        backgroundColor: isDark ? const Color(0xFF0F1117) : const Color(0xFFF5F6FA),
+        backgroundColor:
+            isDark ? const Color(0xFF0F1117) : const Color(0xFFF5F6FA),
         appBar: CustomAppBar(
           title: l10n.myReports,
           showBackButton: true,
@@ -110,17 +113,44 @@ class _ComplaintListScreenState extends State<ComplaintListScreen>
           },
         ),
 
-        // ── Floating tab row + content ──────────────────────────────────────
+        // ── Tab bar + content ───────────────────────────────────────────────
         body: Column(
           children: [
-            _FloatingTabBar(
-              tabs: _tabs,
-              controller: _tabController,
-              selectedIndex: _selectedIndex,
-              isDark: isDark,
+            // Floating tab bar row (with refresh button on the right)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 8, 8),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: _FloatingTabBar(
+                      tabs: _tabs,
+                      controller: _tabController,
+                      selectedIndex: _selectedIndex,
+                      isDark: isDark,
+                    ),
+                  ),
+                  BlocBuilder<ComplaintListCubit, ComplaintListState>(
+                    builder: (context, state) {
+                      final isLoading = state is ComplaintListLoading;
+                      return IconButton(
+                        icon: AnimatedRotation(
+                          turns: isLoading ? 1 : 0,
+                          duration: const Duration(milliseconds: 600),
+                          child: const Icon(Icons.refresh_rounded),
+                        ),
+                        onPressed: isLoading
+                            ? null
+                            : () => sl<ComplaintListCubit>()
+                                .fetchComplaints(forceRefresh: true),
+                        tooltip: 'Reload',
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
 
-            // ── Tab content ────────────────────────────────────────────────
+            // ── Tab content ─────────────────────────────────────────────────
             Expanded(
               child: BlocBuilder<ComplaintListCubit, ComplaintListState>(
                 builder: (context, state) {
@@ -189,43 +219,40 @@ class _FloatingTabBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-      child: Container(
-        height: 52,
-        decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF1C1F2E) : Colors.white,
-          borderRadius: BorderRadius.circular(26),
-          boxShadow: [
-            BoxShadow(
-              color: isDark
-                  ? Colors.black.withOpacity(0.35)
-                  : const Color(0xFFF26A3D).withOpacity(0.12),
-              blurRadius: 20,
-              spreadRadius: 0,
-              offset: const Offset(0, 6),
-            ),
-          ],
-        ),
-        child: TabBar(
-          controller: controller,
-          isScrollable: true,
-          tabAlignment: TabAlignment.start,
-          dividerColor: Colors.transparent,
-          indicatorColor: Colors.transparent,
-          splashFactory: NoSplash.splashFactory,
-          overlayColor: WidgetStateProperty.all(Colors.transparent),
-          labelPadding: EdgeInsets.zero,
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
-          tabs: List.generate(tabs.length, (i) {
-            final selected = selectedIndex == i;
-            return _AnimatedTab(
-              item: tabs[i],
-              selected: selected,
-              isDark: isDark,
-            );
-          }),
-        ),
+    return Container(
+      height: 52,
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1C1F2E) : Colors.white,
+        borderRadius: BorderRadius.circular(26),
+        boxShadow: [
+          BoxShadow(
+            color: isDark
+                ? Colors.black.withValues(alpha: 0.35)
+                : const Color(0xFFF26A3D).withValues(alpha: 0.12),
+            blurRadius: 20,
+            spreadRadius: 0,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: TabBar(
+        controller: controller,
+        isScrollable: true,
+        tabAlignment: TabAlignment.start,
+        dividerColor: Colors.transparent,
+        indicatorColor: Colors.transparent,
+        splashFactory: NoSplash.splashFactory,
+        overlayColor: WidgetStateProperty.all(Colors.transparent),
+        labelPadding: EdgeInsets.zero,
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+        tabs: List.generate(tabs.length, (i) {
+          final selected = selectedIndex == i;
+          return _AnimatedTab(
+            item: tabs[i],
+            selected: selected,
+            isDark: isDark,
+          );
+        }),
       ),
     );
   }
@@ -262,7 +289,7 @@ class _AnimatedTab extends StatelessWidget {
         boxShadow: selected
             ? [
                 BoxShadow(
-                  color: const Color(0xFFF26A3D).withOpacity(0.35),
+                  color: const Color(0xFFF26A3D).withValues(alpha: 0.35),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
@@ -360,7 +387,7 @@ class _EmptyState extends StatelessWidget {
             height: 100,
             decoration: BoxDecoration(
               color: isDark
-                  ? Colors.white.withOpacity(0.05)
+                  ? Colors.white.withValues(alpha: 0.05)
                   : const Color(0xFFF5F6FA),
               shape: BoxShape.circle,
             ),

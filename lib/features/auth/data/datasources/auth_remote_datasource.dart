@@ -12,9 +12,7 @@ abstract class AuthRemoteDataSource {
     String password,
     String role,
   );
-  Future<void> forgotPassword(String email);
   Future<void> forgotPasswordOtp(String email);
-  Future<void> verifyCode(String email, String code);
   Future<void> resetPassword(String email, String token, String newPassword);
   Future<void> resetPasswordOtp(String email, String code, String newPassword);
   Future<UserModel> getProfile();
@@ -82,18 +80,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<void> forgotPassword(String email) async {
-    try {
-      await apiClient.dio.post('/auth/forgot-password', data: {"email": email});
-    } on DioException catch (e) {
-      final message = e.response?.data is Map
-          ? e.response?.data['message'] ?? 'Failed to send reset email'
-          : e.message ?? 'Failed to send reset email';
-      throw Exception(message);
-    } catch (e) {
-      throw Exception('Error: $e');
-    }
-  }
+  // Note: `forgotPassword` has been removed in favor of `forgotPasswordOtp`.
 
   @override
   Future<void> forgotPasswordOtp(String email) async {
@@ -112,12 +99,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     }
   }
 
-  @override
-  Future<void> verifyCode(String email, String code) async {
-    // There is no verify-code endpoint in the screenshots provided.
-    // We will treat this as a mock local step as planned.
-    await Future.delayed(const Duration(milliseconds: 500));
-  }
+  // `verifyCode` endpoint is not available on the remote API; verification
+  // is handled locally in the repository layer.
 
   @override
   Future<void> resetPassword(
