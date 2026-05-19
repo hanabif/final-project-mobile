@@ -5,7 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:complaint_resolution_app/features/auth/presentation/pages/register_page.dart';
 import 'package:complaint_resolution_app/features/auth/presentation/cubit/auth/auth_cubit.dart';
 import 'package:complaint_resolution_app/features/auth/presentation/cubit/auth/auth_state.dart';
-import 'package:complaint_resolution_app/core/di/injection_container.dart' as di;
+import 'package:complaint_resolution_app/core/di/injection_container.dart'
+    as di;
 import 'package:complaint_resolution_app/l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get_it/get_it.dart';
@@ -36,9 +37,7 @@ void main() {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: [
-        Locale('en', ''),
-      ],
+      supportedLocales: [Locale('en', '')],
       home: RegisterPage(),
     );
   }
@@ -69,16 +68,17 @@ void main() {
 
   testWidgets('calls register on AuthCubit when form is valid', (tester) async {
     when(() => mockAuthCubit.state).thenReturn(AuthInitial());
-    when(() => mockAuthCubit.register(
-          any(),
-          any(),
-          any(),
-        )).thenAnswer((_) async {});
+    when(
+      () => mockAuthCubit.register(any(), any(), any()),
+    ).thenAnswer((_) async {});
 
     await tester.pumpWidget(createTestableWidget());
 
     // Enter text in TextForms
-    await tester.enterText(find.byType(TextFormField).at(0), 'test@example.com');
+    await tester.enterText(
+      find.byType(TextFormField).at(0),
+      'test@example.com',
+    );
     await tester.enterText(find.byType(TextFormField).at(1), 'John Doe');
     await tester.enterText(find.byType(TextFormField).at(2), 'Password123!');
 
@@ -87,11 +87,13 @@ void main() {
     await tester.tap(find.text('Register').last);
     await tester.pumpAndSettle();
 
-    verify(() => mockAuthCubit.register(
-      'John Doe',
-      'test@example.com',
-      'Password123!',
-    )).called(1);
+    verify(
+      () => mockAuthCubit.register(
+        'John Doe',
+        'test@example.com',
+        'Password123!',
+      ),
+    ).called(1);
   });
 
   testWidgets('shows loading state when AuthLoading', (tester) async {

@@ -9,7 +9,9 @@ import 'package:complaint_resolution_app/features/complaint/domain/entities/comp
 import 'package:complaint_resolution_app/features/complaint/data/models/citizen_analytics_model.dart';
 
 class MockRemoteDataSource extends Mock implements ComplaintRemoteDataSource {}
+
 class MockLocalDataSource extends Mock implements ComplaintLocalDataSource {}
+
 class MockNetworkInfo extends Mock implements NetworkInfo {}
 
 void main() {
@@ -47,7 +49,9 @@ void main() {
   group('submitComplaint', () {
     test('should submit to remote when online', () async {
       when(() => mockNetworkInfo.isConnected).thenAnswer((_) async => true);
-      when(() => mockRemoteDataSource.submitComplaint(any())).thenAnswer((_) async => 'Success');
+      when(
+        () => mockRemoteDataSource.submitComplaint(any()),
+      ).thenAnswer((_) async => 'Success');
 
       final result = await repository.submitComplaint(tComplaint);
 
@@ -57,7 +61,9 @@ void main() {
 
     test('should cache locally when offline', () async {
       when(() => mockNetworkInfo.isConnected).thenAnswer((_) async => false);
-      when(() => mockLocalDataSource.cacheComplaint(any())).thenAnswer((_) async => {});
+      when(
+        () => mockLocalDataSource.cacheComplaint(any()),
+      ).thenAnswer((_) async => {});
 
       final result = await repository.submitComplaint(tComplaint);
 
@@ -69,22 +75,28 @@ void main() {
 
   group('getComplaintStatus', () {
     test('should return status from remote', () async {
-      when(() => mockRemoteDataSource.getComplaintStatus(any()))
-          .thenAnswer((_) async => tComplaintModel);
+      when(
+        () => mockRemoteDataSource.getComplaintStatus(any()),
+      ).thenAnswer((_) async => tComplaintModel);
 
       final result = await repository.getComplaintStatus(tComplaintId);
 
       expect(result, 'pending');
-      verify(() => mockRemoteDataSource.getComplaintStatus(tComplaintId)).called(1);
+      verify(
+        () => mockRemoteDataSource.getComplaintStatus(tComplaintId),
+      ).called(1);
     });
   });
 
   group('getUserComplaints', () {
     test('should return remote data when forced and online', () async {
       when(() => mockNetworkInfo.isConnected).thenAnswer((_) async => true);
-      when(() => mockRemoteDataSource.getUserComplaints())
-          .thenAnswer((_) async => [tComplaintModel]);
-      when(() => mockLocalDataSource.cacheComplaints(any())).thenAnswer((_) async => {});
+      when(
+        () => mockRemoteDataSource.getUserComplaints(),
+      ).thenAnswer((_) async => [tComplaintModel]);
+      when(
+        () => mockLocalDataSource.cacheComplaints(any()),
+      ).thenAnswer((_) async => {});
 
       final result = await repository.getUserComplaints(forceRefresh: true);
 
@@ -106,9 +118,11 @@ void main() {
           longitude: 0.0,
           createdAt: DateTime.now(),
           updatedAt: DateTime.now(),
-        )
+        ),
       ];
-      when(() => mockLocalDataSource.getComplaints()).thenAnswer((_) async => tComplaints);
+      when(
+        () => mockLocalDataSource.getComplaints(),
+      ).thenAnswer((_) async => tComplaints);
 
       final result = await repository.getUserComplaints(forceRefresh: false);
 
@@ -126,7 +140,9 @@ void main() {
         resolved: 5,
         resolvedPercentage: 50.0,
       );
-      when(() => mockRemoteDataSource.getCitizenAnalytics()).thenAnswer((_) async => tAnalytics);
+      when(
+        () => mockRemoteDataSource.getCitizenAnalytics(),
+      ).thenAnswer((_) async => tAnalytics);
 
       final result = await repository.getCitizenAnalytics();
 

@@ -16,20 +16,17 @@ void main() {
   );
 
   Widget createTestableWidget(Widget child) {
-    return MaterialApp(
-      home: Scaffold(body: child),
-    );
+    return MaterialApp(home: Scaffold(body: child));
   }
 
   group('ComplaintCard Widget Tests', () {
     testWidgets('renders complaint details correctly', (tester) async {
       bool tapped = false;
-      await tester.pumpWidget(createTestableWidget(
-        ComplaintCard(
-          complaint: testComplaint,
-          onTap: () => tapped = true,
+      await tester.pumpWidget(
+        createTestableWidget(
+          ComplaintCard(complaint: testComplaint, onTap: () => tapped = true),
         ),
-      ));
+      );
 
       expect(find.text('Water Leakage'), findsOneWidget);
       expect(find.text('Water Board'), findsOneWidget);

@@ -12,6 +12,7 @@ import 'package:complaint_resolution_app/l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 class MockNotificationCubit extends Mock implements NotificationCubit {}
+
 class MockSettingsCubit extends Mock implements SettingsCubit {}
 
 void main() {
@@ -27,8 +28,12 @@ void main() {
     when(() => mockSettingsCubit.close()).thenAnswer((_) async {});
 
     // Stub stream to avoid Null subtype errors
-    when(() => mockNotificationCubit.stream).thenAnswer((_) => const Stream.empty());
-    when(() => mockSettingsCubit.stream).thenAnswer((_) => const Stream.empty());
+    when(
+      () => mockNotificationCubit.stream,
+    ).thenAnswer((_) => const Stream.empty());
+    when(
+      () => mockSettingsCubit.stream,
+    ).thenAnswer((_) => const Stream.empty());
 
     // Stub default settings state
     when(() => mockSettingsCubit.state).thenReturn(
@@ -51,9 +56,7 @@ void main() {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: const [
-        Locale('en', ''),
-      ],
+      supportedLocales: const [Locale('en', '')],
       home: MultiBlocProvider(
         providers: [
           BlocProvider<NotificationCubit>.value(value: mockNotificationCubit),
@@ -73,7 +76,9 @@ void main() {
   });
 
   testWidgets('renders empty state when no notifications', (tester) async {
-    when(() => mockNotificationCubit.state).thenReturn(NotificationLoaded(const []));
+    when(
+      () => mockNotificationCubit.state,
+    ).thenReturn(NotificationLoaded(const []));
 
     await tester.pumpWidget(createTestableWidget(const NotificationsScreen()));
     await tester.pumpAndSettle();
@@ -99,7 +104,9 @@ void main() {
       ),
     ];
 
-    when(() => mockNotificationCubit.state).thenReturn(NotificationLoaded(notifications));
+    when(
+      () => mockNotificationCubit.state,
+    ).thenReturn(NotificationLoaded(notifications));
 
     await tester.pumpWidget(createTestableWidget(const NotificationsScreen()));
     await tester.pumpAndSettle();
@@ -110,7 +117,9 @@ void main() {
     expect(find.text('Body 2'), findsOneWidget);
   });
 
-  testWidgets('calls markAllAsRead when "Mark all as read" is pressed', (tester) async {
+  testWidgets('calls markAllAsRead when "Mark all as read" is pressed', (
+    tester,
+  ) async {
     final notifications = [
       NotificationItem(
         id: '1',
@@ -121,7 +130,9 @@ void main() {
       ),
     ];
 
-    when(() => mockNotificationCubit.state).thenReturn(NotificationLoaded(notifications));
+    when(
+      () => mockNotificationCubit.state,
+    ).thenReturn(NotificationLoaded(notifications));
     when(() => mockNotificationCubit.markAllAsRead()).thenAnswer((_) async {});
 
     await tester.pumpWidget(createTestableWidget(const NotificationsScreen()));
@@ -134,7 +145,9 @@ void main() {
     verify(() => mockNotificationCubit.markAllAsRead()).called(1);
   });
 
-  testWidgets('shows error snackbar when state is NotificationError', (tester) async {
+  testWidgets('shows error snackbar when state is NotificationError', (
+    tester,
+  ) async {
     // We need to emit the error state via a stream if the listener is to pick it up properly,
     // but BlocProvider.value and state stubbing works too if we pump correctly.
     whenListen(

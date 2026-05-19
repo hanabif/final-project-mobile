@@ -4,7 +4,8 @@ import 'package:complaint_resolution_app/core/utils/qr_complaint_parser.dart';
 void main() {
   group('QRComplaintParser', () {
     test('should parse valid JSON QR content', () {
-      const qrContent = '{"organizationId": "ORG123", "title": "Test Title", "description": "Test Desc"}';
+      const qrContent =
+          '{"organizationId": "ORG123", "title": "Test Title", "description": "Test Desc"}';
       final result = QRComplaintParser.parse(qrContent);
 
       expect(result, isNotNull);
@@ -14,7 +15,8 @@ void main() {
     });
 
     test('should parse valid JSON with flexible keys (orgId, ttl, dsc)', () {
-      const qrContent = '{"orgId": "ORG123", "ttl": "Test Title", "dsc": "Test Desc"}';
+      const qrContent =
+          '{"orgId": "ORG123", "ttl": "Test Title", "dsc": "Test Desc"}';
       final result = QRComplaintParser.parse(qrContent);
 
       expect(result, isNotNull);

@@ -6,7 +6,8 @@ import 'package:complaint_resolution_app/features/complaint/presentation/cubits/
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
-class MockGetUserComplaintsUseCase extends Mock implements GetUserComplaintsUseCase {}
+class MockGetUserComplaintsUseCase extends Mock
+    implements GetUserComplaintsUseCase {}
 
 void main() {
   late MockGetUserComplaintsUseCase mockGetComplaintsUseCase;
@@ -14,7 +15,9 @@ void main() {
 
   setUp(() {
     mockGetComplaintsUseCase = MockGetUserComplaintsUseCase();
-    cubit = ComplaintListCubit(getUserComplaintsUseCase: mockGetComplaintsUseCase);
+    cubit = ComplaintListCubit(
+      getUserComplaintsUseCase: mockGetComplaintsUseCase,
+    );
   });
 
   tearDown(() {
@@ -38,7 +41,9 @@ void main() {
     blocTest<ComplaintListCubit, ComplaintListState>(
       'emits [ComplaintListLoading, ComplaintListLoaded] when fetching succeeds',
       build: () {
-        when(() => mockGetComplaintsUseCase()).thenAnswer((_) async => tComplaints);
+        when(
+          () => mockGetComplaintsUseCase(),
+        ).thenAnswer((_) async => tComplaints);
         return cubit;
       },
       act: (cubit) => cubit.fetchComplaints(),
@@ -55,10 +60,7 @@ void main() {
         return cubit;
       },
       act: (cubit) => cubit.fetchComplaints(),
-      expect: () => [
-        ComplaintListLoading(),
-        isA<ComplaintListError>(),
-      ],
+      expect: () => [ComplaintListLoading(), isA<ComplaintListError>()],
     );
   });
 }

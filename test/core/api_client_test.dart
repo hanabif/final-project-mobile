@@ -40,7 +40,7 @@ void main() {
     final adapter = RecordingAdapter();
     final validJwt = makeJwt(secondsFromNow: 3600);
     when(() => mockSession.getToken()).thenAnswer((_) async => validJwt);
-    
+
     final client = ApiClient(mockSession);
     client.dio.httpClientAdapter = adapter;
 
@@ -52,7 +52,7 @@ void main() {
   test('ApiClient does not attach header if token null', () async {
     final adapter = RecordingAdapter();
     when(() => mockSession.getToken()).thenAnswer((_) async => null);
-    
+
     final client = ApiClient(mockSession);
     client.dio.httpClientAdapter = adapter;
 
@@ -64,8 +64,13 @@ void main() {
 
 // Helper to generate a dummy JWT for token expiration checks
 String makeJwt({required int secondsFromNow}) {
-  final header = base64Url.encode(utf8.encode('{"alg":"HS256","typ":"JWT"}')).replaceAll('=', '');
-  final expiry = (DateTime.now().millisecondsSinceEpoch ~/ 1000) + secondsFromNow;
-  final payload = base64Url.encode(utf8.encode('{"exp": $expiry}')).replaceAll('=', '');
+  final header = base64Url
+      .encode(utf8.encode('{"alg":"HS256","typ":"JWT"}'))
+      .replaceAll('=', '');
+  final expiry =
+      (DateTime.now().millisecondsSinceEpoch ~/ 1000) + secondsFromNow;
+  final payload = base64Url
+      .encode(utf8.encode('{"exp": $expiry}'))
+      .replaceAll('=', '');
   return '$header.$payload.signature';
 }

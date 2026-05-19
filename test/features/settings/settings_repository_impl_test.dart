@@ -22,7 +22,7 @@ void main() {
     themeMode: 'Light',
     language: 'en',
   );
-  
+
   final tSettingsModel = UserSettingsModel(
     isAnonymousMode: false,
     isNotificationsEnabled: true,
@@ -32,7 +32,9 @@ void main() {
 
   group('SettingsRepository', () {
     test('should get settings from local data source', () async {
-      when(() => mockLocalDataSource.getSettings()).thenAnswer((_) async => tSettingsModel);
+      when(
+        () => mockLocalDataSource.getSettings(),
+      ).thenAnswer((_) async => tSettingsModel);
 
       final result = await repository.getSettings();
 
@@ -41,7 +43,9 @@ void main() {
     });
 
     test('should update settings in local data source', () async {
-      when(() => mockLocalDataSource.updateSettings(any())).thenAnswer((_) async => {});
+      when(
+        () => mockLocalDataSource.updateSettings(any()),
+      ).thenAnswer((_) async => {});
 
       await repository.updateSettings(tSettings);
 

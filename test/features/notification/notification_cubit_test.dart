@@ -7,9 +7,14 @@ import 'package:complaint_resolution_app/features/notification/presentation/cubi
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
-class MockGetNotificationsUseCase extends Mock implements GetNotificationsUseCase {}
-class MockMarkAllNotificationsAsReadUseCase extends Mock implements MarkAllNotificationsAsReadUseCase {}
-class MockMarkNotificationAsReadUseCase extends Mock implements MarkNotificationAsReadUseCase {}
+class MockGetNotificationsUseCase extends Mock
+    implements GetNotificationsUseCase {}
+
+class MockMarkAllNotificationsAsReadUseCase extends Mock
+    implements MarkAllNotificationsAsReadUseCase {}
+
+class MockMarkNotificationAsReadUseCase extends Mock
+    implements MarkNotificationAsReadUseCase {}
 
 void main() {
   late MockGetNotificationsUseCase mockGetNotifications;
@@ -46,14 +51,13 @@ void main() {
     blocTest<NotificationCubit, NotificationState>(
       'emits [NotificationLoading, NotificationLoaded] when fetching succeeds',
       build: () {
-        when(() => mockGetNotifications()).thenAnswer((_) async => tNotifications);
+        when(
+          () => mockGetNotifications(),
+        ).thenAnswer((_) async => tNotifications);
         return cubit;
       },
       act: (cubit) => cubit.fetchNotifications(),
-      expect: () => [
-        NotificationLoading(),
-        NotificationLoaded(tNotifications),
-      ],
+      expect: () => [NotificationLoading(), NotificationLoaded(tNotifications)],
     );
 
     blocTest<NotificationCubit, NotificationState>(

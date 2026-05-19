@@ -13,7 +13,9 @@ import 'package:complaint_resolution_app/l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 class MockHomeCubit extends Mock implements HomeCubit {}
+
 class MockNotificationCubit extends Mock implements NotificationCubit {}
+
 class MockSettingsCubit extends Mock implements SettingsCubit {}
 
 void main() {
@@ -31,11 +33,20 @@ void main() {
     when(() => mockSettingsCubit.close()).thenAnswer((_) async {});
 
     when(() => mockHomeCubit.stream).thenAnswer((_) => const Stream.empty());
-    when(() => mockNotificationCubit.stream).thenAnswer((_) => const Stream.empty());
-    when(() => mockSettingsCubit.stream).thenAnswer((_) => const Stream.empty());
+    when(
+      () => mockNotificationCubit.stream,
+    ).thenAnswer((_) => const Stream.empty());
+    when(
+      () => mockSettingsCubit.stream,
+    ).thenAnswer((_) => const Stream.empty());
 
-    when(() => mockHomeCubit.loadHomeData(forceRefresh: any(named: 'forceRefresh'))).thenAnswer((_) async {});
-    when(() => mockNotificationCubit.fetchNotifications()).thenAnswer((_) async {});
+    when(
+      () =>
+          mockHomeCubit.loadHomeData(forceRefresh: any(named: 'forceRefresh')),
+    ).thenAnswer((_) async {});
+    when(
+      () => mockNotificationCubit.fetchNotifications(),
+    ).thenAnswer((_) async {});
 
     when(() => mockSettingsCubit.state).thenReturn(
       const SettingsLoaded(
@@ -57,9 +68,7 @@ void main() {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: const [
-        Locale('en', ''),
-      ],
+      supportedLocales: const [Locale('en', '')],
       home: MultiBlocProvider(
         providers: [
           BlocProvider<HomeCubit>.value(value: mockHomeCubit),
@@ -72,12 +81,14 @@ void main() {
   }
 
   testWidgets('renders Home Screen correctly with loaded data', (tester) async {
-    when(() => mockHomeCubit.state).thenReturn(const HomeLoaded(
-      totalComplaints: 10,
-      resolvedComplaints: 7,
-      pendingComplaints: 3,
-      organizations: [],
-    ));
+    when(() => mockHomeCubit.state).thenReturn(
+      const HomeLoaded(
+        totalComplaints: 10,
+        resolvedComplaints: 7,
+        pendingComplaints: 3,
+        organizations: [],
+      ),
+    );
     when(() => mockNotificationCubit.state).thenReturn(NotificationInitial());
 
     await tester.pumpWidget(createTestableWidget(const HomeScreen()));
@@ -85,8 +96,8 @@ void main() {
 
     expect(find.byType(HomeScreen), findsOneWidget);
     expect(find.text('10'), findsOneWidget); // Total complaints
-    expect(find.text('7'), findsOneWidget);  // Resolved
-    expect(find.text('3'), findsOneWidget);  // Pending
+    expect(find.text('7'), findsOneWidget); // Resolved
+    expect(find.text('3'), findsOneWidget); // Pending
   });
 
   testWidgets('shows loading indicator when HomeLoading', (tester) async {
@@ -94,13 +105,15 @@ void main() {
     when(() => mockNotificationCubit.state).thenReturn(NotificationInitial());
 
     await tester.pumpWidget(createTestableWidget(const HomeScreen()));
-    
+
     // We expect a CircularProgressIndicator somewhere in the body
     expect(find.byType(CircularProgressIndicator), findsWidgets);
   });
 
   testWidgets('shows error message when HomeError', (tester) async {
-    when(() => mockHomeCubit.state).thenReturn(const HomeError(message: 'Failed to load'));
+    when(
+      () => mockHomeCubit.state,
+    ).thenReturn(const HomeError(message: 'Failed to load'));
     when(() => mockNotificationCubit.state).thenReturn(NotificationInitial());
 
     await tester.pumpWidget(createTestableWidget(const HomeScreen()));

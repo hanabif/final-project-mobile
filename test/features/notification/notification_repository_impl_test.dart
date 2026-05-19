@@ -5,7 +5,8 @@ import 'package:complaint_resolution_app/features/notification/data/repositories
 import 'package:complaint_resolution_app/features/notification/domain/entities/notification_item.dart';
 import 'package:complaint_resolution_app/features/notification/data/models/notification_model.dart';
 
-class MockRemoteDataSource extends Mock implements NotificationRemoteDataSource {}
+class MockRemoteDataSource extends Mock
+    implements NotificationRemoteDataSource {}
 
 void main() {
   late NotificationRepositoryImpl repository;
@@ -18,12 +19,15 @@ void main() {
 
   group('NotificationRepository', () {
     test('should register device token', () async {
-      when(() => mockRemoteDataSource.registerDeviceToken(any()))
-          .thenAnswer((_) async => {});
+      when(
+        () => mockRemoteDataSource.registerDeviceToken(any()),
+      ).thenAnswer((_) async => {});
 
       await repository.registerDeviceToken('token123');
 
-      verify(() => mockRemoteDataSource.registerDeviceToken('token123')).called(1);
+      verify(
+        () => mockRemoteDataSource.registerDeviceToken('token123'),
+      ).called(1);
     });
 
     test('should get notifications', () async {
@@ -34,10 +38,11 @@ void main() {
           body: 'Body',
           date: DateTime.now(),
           isRead: false,
-        )
+        ),
       ];
-      when(() => mockRemoteDataSource.getNotifications())
-          .thenAnswer((_) async => tNotifications);
+      when(
+        () => mockRemoteDataSource.getNotifications(),
+      ).thenAnswer((_) async => tNotifications);
 
       final result = await repository.getNotifications();
 
@@ -46,7 +51,9 @@ void main() {
     });
 
     test('should mark all as read', () async {
-      when(() => mockRemoteDataSource.markAllAsRead()).thenAnswer((_) async => {});
+      when(
+        () => mockRemoteDataSource.markAllAsRead(),
+      ).thenAnswer((_) async => {});
 
       await repository.markAllAsRead();
 
@@ -54,7 +61,9 @@ void main() {
     });
 
     test('should mark as read by id', () async {
-      when(() => mockRemoteDataSource.markAsRead(any())).thenAnswer((_) async => {});
+      when(
+        () => mockRemoteDataSource.markAsRead(any()),
+      ).thenAnswer((_) async => {});
 
       await repository.markAsRead('1');
 

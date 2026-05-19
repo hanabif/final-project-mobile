@@ -39,26 +39,41 @@ void main() {
       });
 
       test('should return error for short password', () {
-        expect(PasswordValidator.validatePassword('Short1!'), contains('at least 8 characters'));
+        expect(
+          PasswordValidator.validatePassword('Short1!'),
+          contains('at least 8 characters'),
+        );
       });
 
       test('should return error if no uppercase', () {
-        expect(PasswordValidator.validatePassword('nouppercase1!'), contains('uppercase'));
+        expect(
+          PasswordValidator.validatePassword('nouppercase1!'),
+          contains('uppercase'),
+        );
       });
     });
 
     group('getPasswordStrength', () {
       test('should return weak for empty', () {
-        expect(PasswordValidator.getPasswordStrength(''), PasswordStrength.weak);
+        expect(
+          PasswordValidator.getPasswordStrength(''),
+          PasswordStrength.weak,
+        );
       });
 
       test('should return strong for complex password', () {
-        expect(PasswordValidator.getPasswordStrength('VeryStrongPassword123!@#'), PasswordStrength.strong);
+        expect(
+          PasswordValidator.getPasswordStrength('VeryStrongPassword123!@#'),
+          PasswordStrength.strong,
+        );
       });
 
       test('should return fair for simple but long password', () {
         // Length(2) + Lower(1) = 3 -> fair
-        expect(PasswordValidator.getPasswordStrength('justlowercase'), PasswordStrength.fair);
+        expect(
+          PasswordValidator.getPasswordStrength('justlowercase'),
+          PasswordStrength.fair,
+        );
       });
     });
   });

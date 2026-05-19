@@ -7,8 +7,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mocktail/mocktail.dart';
 
-class MockSubmitComplaintUseCase extends Mock implements SubmitComplaintUseCase {}
+class MockSubmitComplaintUseCase extends Mock
+    implements SubmitComplaintUseCase {}
+
 class MockXFile extends Mock implements XFile {}
+
 class FakeComplaint extends Fake implements Complaint {}
 
 void main() {
@@ -45,14 +48,13 @@ void main() {
     blocTest<ComplaintCubit, ComplaintState>(
       'emits [ComplaintSubmitting, ComplaintSuccess] when submission succeeds',
       build: () {
-        when(() => mockSubmitUseCase(any(), any())).thenAnswer((_) async => 'success');
+        when(
+          () => mockSubmitUseCase(any(), any()),
+        ).thenAnswer((_) async => 'success');
         return cubit;
       },
       act: (cubit) => cubit.submitComplaint(tComplaint, tImageFiles),
-      expect: () => [
-        ComplaintSubmitting(),
-        ComplaintSuccess(),
-      ],
+      expect: () => [ComplaintSubmitting(), ComplaintSuccess()],
       verify: (_) {
         verify(() => mockSubmitUseCase(tComplaint, tImageFiles)).called(1);
       },
@@ -61,14 +63,13 @@ void main() {
     blocTest<ComplaintCubit, ComplaintState>(
       'emits [ComplaintSubmitting, ComplaintFailure] when submission fails',
       build: () {
-        when(() => mockSubmitUseCase(any(), any())).thenThrow(Exception('Failed to submit'));
+        when(
+          () => mockSubmitUseCase(any(), any()),
+        ).thenThrow(Exception('Failed to submit'));
         return cubit;
       },
       act: (cubit) => cubit.submitComplaint(tComplaint, tImageFiles),
-      expect: () => [
-        ComplaintSubmitting(),
-        isA<ComplaintFailure>(),
-      ],
+      expect: () => [ComplaintSubmitting(), isA<ComplaintFailure>()],
     );
   });
 }

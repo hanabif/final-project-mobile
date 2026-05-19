@@ -8,7 +8,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockGetSettingsUseCase extends Mock implements GetSettingsUseCase {}
+
 class MockUpdateSettingsUseCase extends Mock implements UpdateSettingsUseCase {}
+
 class FakeUserSettings extends Fake implements UserSettings {}
 
 void main() {
@@ -61,10 +63,7 @@ void main() {
         return cubit;
       },
       act: (cubit) => cubit.loadSettings(),
-      expect: () => [
-        SettingsLoading(),
-        isA<SettingsError>(),
-      ],
+      expect: () => [SettingsLoading(), isA<SettingsError>()],
     );
   });
 
@@ -78,12 +77,14 @@ void main() {
       },
       act: (cubit) => cubit.toggleAnonymousMode(true),
       expect: () => [
-        const SettingsLoaded(settings: UserSettings(
-          isAnonymousMode: true,
-          isNotificationsEnabled: true,
-          themeMode: 'Light',
-          language: 'English',
-        )),
+        const SettingsLoaded(
+          settings: UserSettings(
+            isAnonymousMode: true,
+            isNotificationsEnabled: true,
+            themeMode: 'Light',
+            language: 'English',
+          ),
+        ),
       ],
     );
   });

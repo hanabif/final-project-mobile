@@ -13,58 +13,84 @@ void main() {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: const [
-        Locale('en', ''),
-      ],
+      supportedLocales: const [Locale('en', '')],
       home: Scaffold(body: child),
     );
   }
 
   group('PasswordStrengthIndicator Widget Tests', () {
     testWidgets('should show nothing when password is empty', (tester) async {
-      await tester.pumpWidget(createTestableWidget(
-        const PasswordStrengthIndicator(password: '', isDark: false),
-      ));
+      await tester.pumpWidget(
+        createTestableWidget(
+          const PasswordStrengthIndicator(password: '', isDark: false),
+        ),
+      );
 
       expect(find.byType(LinearProgressIndicator), findsNothing);
     });
 
     testWidgets('should show weak strength for short password', (tester) async {
-      await tester.pumpWidget(createTestableWidget(
-        const PasswordStrengthIndicator(password: '123', isDark: false),
-      ));
+      await tester.pumpWidget(
+        createTestableWidget(
+          const PasswordStrengthIndicator(password: '123', isDark: false),
+        ),
+      );
 
       await tester.pumpAndSettle();
 
       expect(find.textContaining('Weak'), findsOneWidget);
-      
-      final indicator = tester.widget<LinearProgressIndicator>(find.byType(LinearProgressIndicator));
+
+      final indicator = tester.widget<LinearProgressIndicator>(
+        find.byType(LinearProgressIndicator),
+      );
       expect(indicator.valueColor is AlwaysStoppedAnimation<Color>, isTrue);
-      expect((indicator.valueColor as AlwaysStoppedAnimation<Color>).value, Colors.red);
+      expect(
+        (indicator.valueColor as AlwaysStoppedAnimation<Color>).value,
+        Colors.red,
+      );
     });
 
-    testWidgets('should show strong strength for strong password', (tester) async {
-      await tester.pumpWidget(createTestableWidget(
-        const PasswordStrengthIndicator(password: 'Strong123!', isDark: false),
-      ));
+    testWidgets('should show strong strength for strong password', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        createTestableWidget(
+          const PasswordStrengthIndicator(
+            password: 'Strong123!',
+            isDark: false,
+          ),
+        ),
+      );
 
       await tester.pumpAndSettle();
 
       expect(find.textContaining('Strong'), findsOneWidget);
-      
-      final indicator = tester.widget<LinearProgressIndicator>(find.byType(LinearProgressIndicator));
-      expect((indicator.valueColor as AlwaysStoppedAnimation<Color>).value, Colors.green);
+
+      final indicator = tester.widget<LinearProgressIndicator>(
+        find.byType(LinearProgressIndicator),
+      );
+      expect(
+        (indicator.valueColor as AlwaysStoppedAnimation<Color>).value,
+        Colors.green,
+      );
     });
 
-    testWidgets('should display requirement text in correct color for dark mode', (tester) async {
-      await tester.pumpWidget(createTestableWidget(
-        const PasswordStrengthIndicator(password: 'pw', isDark: true),
-      ));
+    testWidgets(
+      'should display requirement text in correct color for dark mode',
+      (tester) async {
+        await tester.pumpWidget(
+          createTestableWidget(
+            const PasswordStrengthIndicator(password: 'pw', isDark: true),
+          ),
+        );
 
-      await tester.pumpAndSettle();
+        await tester.pumpAndSettle();
 
-      final requirementText = tester.widget<Text>(find.textContaining('Required:'));
-      expect(requirementText.style?.color, Colors.white38);
-    });
+        final requirementText = tester.widget<Text>(
+          find.textContaining('Required:'),
+        );
+        expect(requirementText.style?.color, Colors.white38);
+      },
+    );
   });
 }
