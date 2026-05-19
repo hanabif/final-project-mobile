@@ -43,7 +43,7 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
         child: BlocListener<PasswordResetCubit, PasswordResetState>(
           listener: (context, state) {
             if (state is PasswordResetCodeVerified) {
-              Navigator.pushNamed(context, RouteNames.resetPassword);
+              Navigator.pushReplacementNamed(context, RouteNames.resetPassword);
             }
 
             if (state is PasswordResetError) {
@@ -139,4 +139,4 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
       ),
     );
   }
-}
+}

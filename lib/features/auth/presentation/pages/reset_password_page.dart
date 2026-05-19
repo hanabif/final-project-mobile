@@ -14,7 +14,7 @@ class ResetPasswordPage extends StatefulWidget {
 }
 
 class _ResetPasswordPageState extends State<ResetPasswordPage> {
-  final _tokenController = TextEditingController();
+  final _otpController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
@@ -24,26 +24,30 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   Widget build(BuildContext context) {
     final cubit = context.read<PasswordResetCubit>();
     String? email;
-    String? token;
-
-    // Check for arguments from DeepLink (passed via Navigator)
+    // Check for arguments (passed via Navigator) - we expect email for OTP flow
     final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-    bool isOtp = false;
-    
+    bool isOtp = true;
+
     if (args != null) {
       email = args['email'];
-      token = args['token'];
-      isOtp = false;
-      if (token != null && _tokenController.text.isEmpty) {
-        _tokenController.text = token;
+      if (args['otp'] != null && _otpController.text.isEmpty) {
+        _otpController.text = args['otp'];
       }
-    } else if (cubit.state is PasswordResetCodeVerified) {
-      final state = cubit.state as PasswordResetCodeVerified;
-      email = state.email;
-      token = state.token;
-      isOtp = true;
-      if (_tokenController.text.isEmpty) {
-        _tokenController.text = token;
+    }
+
+    // Fallbacks: if no route args were provided, try to read the email from
+    // the cubit's state (covers navigation paths that don't pass arguments).
+    if (email == null) {
+      if (cubit.state is PasswordResetOtpSent) {
+        email = (cubit.state as PasswordResetOtpSent).email;
+      } else if (cubit.state is PasswordResetEmailSent) {
+        email = (cubit.state as PasswordResetEmailSent).email;
+      } else if (cubit.state is PasswordResetCodeVerified) {
+        final state = cubit.state as PasswordResetCodeVerified;
+        email = state.email;
+        if (_otpController.text.isEmpty) {
+          _otpController.text = state.token;
+        }
       }
     }
 
@@ -110,7 +114,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                       ),
                       const SizedBox(height: 40),
                       const Text(
-                        "Reset Token",
+                        "OTP Code",
                         style: TextStyle(
                           fontFamily: 'Poppins',
                           fontWeight: FontWeight.w600,
@@ -119,12 +123,13 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                       ),
                       const SizedBox(height: 12),
                       AuthTextField(
-                        controller: _tokenController,
-                        hint: "Enter token from email",
-                        icon: Icons.key_outlined,
+                        controller: _otpController,
+                        hint: "Enter OTP from email",
+                        icon: Icons.lock_clock_outlined,
+                        keyboardType: TextInputType.number,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return "Token is required";
+                            return "Code is required";
                           }
                           return null;
                         },
@@ -184,9 +189,9 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                           if (_formKey.currentState!.validate()) {
                             context.read<PasswordResetCubit>().resetPassword(
                                   email: email!,
-                                  token: _tokenController.text.trim(),
+                                  token: _otpController.text.trim(),
                                   newPassword: _passwordController.text.trim(),
-                                  isOtp: isOtp,
+                                  isOtp: true,
                                 );
                           }
                         },
@@ -202,4 +207,4 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       ),
     );
   }
-}
+}
