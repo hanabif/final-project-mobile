@@ -49,6 +49,11 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> logout() async {
     emit(AuthLoading());
     try {
+      try {
+        await notificationService.unregisterDevice();
+      } catch (e) {
+        // Notification cleanup must not block logout.
+      }
       await logoutUseCase();
       emit(AuthInitial()); // Or AuthUnauthenticated if you have that state
     } catch (e) {

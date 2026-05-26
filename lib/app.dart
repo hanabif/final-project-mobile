@@ -25,7 +25,7 @@ class ComplaintResolutionApp extends StatelessWidget {
       providers: [
         BlocProvider(create: (_) => sl<HomeCubit>()),
         BlocProvider(create: (_) => sl<ComplaintCubit>()),
-        BlocProvider(create: (_) => sl<NotificationCubit>()),
+        BlocProvider.value(value: sl<NotificationCubit>()),
         BlocProvider(create: (_) => sl<PasswordResetCubit>()),
         BlocProvider(create: (_) => sl<SettingsCubit>()..loadSettings()),
       ],
@@ -38,7 +38,7 @@ class ComplaintResolutionApp extends StatelessWidget {
           // on a supported locale (English/Amharic).
           Locale frameworkLocale = const Locale('en');
           Locale appLocaleOverride = const Locale('en');
-            if (state is SettingsLoaded) {
+          if (state is SettingsLoaded) {
             switch (state.settings.themeMode.toLowerCase()) {
               case 'light':
                 mode = ThemeMode.light;
@@ -50,10 +50,14 @@ class ComplaintResolutionApp extends StatelessWidget {
                 mode = ThemeMode.system;
             }
             final langVal = state.settings.language.toLowerCase();
-            if (langVal.contains('am') || langVal.contains('amh') || langVal.contains('amharic')) {
+            if (langVal.contains('am') ||
+                langVal.contains('amh') ||
+                langVal.contains('amharic')) {
               frameworkLocale = const Locale('am');
               appLocaleOverride = const Locale('am');
-            } else if (langVal.contains('om') || langVal.contains('orom') || langVal.contains('afaan')) {
+            } else if (langVal.contains('om') ||
+                langVal.contains('orom') ||
+                langVal.contains('afaan')) {
               // Framework delegates don't support 'om'. Use English for framework,
               // but override AppLocalizations to load Oromo translations.
               frameworkLocale = const Locale('en');
@@ -86,12 +90,9 @@ class ComplaintResolutionApp extends StatelessWidget {
               // overriding framework delegates.
               SettingsAwareAppLocalizationsDelegate(),
             ],
-            
+
             // supported locale (framework/localization delegates may not support 'om' yet)
-            supportedLocales: const [
-              Locale('en'),
-              Locale('am'),
-            ],
+            supportedLocales: const [Locale('en'), Locale('am')],
             // No special builder: the SettingsAware delegate returns the
             // appropriate `AppLocalizations` instance based on stored settings.
           );

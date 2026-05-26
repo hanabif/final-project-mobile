@@ -33,6 +33,7 @@ void main() {
       notificationService: notificationService,
     );
     when(() => notificationService.getDeviceToken()).thenAnswer((_) async => 'mocked-token');
+    when(() => notificationService.unregisterDevice()).thenAnswer((_) async {});
   });
 
   group('login', () {
@@ -92,6 +93,24 @@ void main() {
       },
       act: (c) => c.logout(),
       expect: () => [AuthLoading(), AuthInitial()],
+      verify: (_) {
+        verify(() => notificationService.unregisterDevice()).called(1);
+      },
+    );
+
+    blocTest<AuthCubit, AuthState>(
+      'still logs out when unregister fails',
+      build: () {
+        when(() => notificationService.unregisterDevice()).thenThrow(Exception('cleanup failed'));
+        when(() => logoutUseCase()).thenAnswer((_) async => {});
+        return cubit;
+      },
+      act: (c) => c.logout(),
+      expect: () => [AuthLoading(), AuthInitial()],
+      verify: (_) {
+        verify(() => notificationService.unregisterDevice()).called(1);
+        verify(() => logoutUseCase()).called(1);
+      },
     );
   });
 }

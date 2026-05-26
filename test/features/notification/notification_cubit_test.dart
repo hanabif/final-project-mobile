@@ -92,4 +92,43 @@ void main() {
       ],
     );
   });
+
+  group('addNotification', () {
+    blocTest<NotificationCubit, NotificationState>(
+      'prepends a notification and removes duplicates by id when loaded',
+      seed: () => NotificationLoaded(tNotifications),
+      build: () => cubit,
+      act: (cubit) => cubit.addNotification(
+        const NotificationItem(
+          id: '2',
+          title: 'New Title',
+          body: 'New Body',
+          date: DateTime(2026, 5, 25),
+          isRead: false,
+        ),
+      ),
+      expect: () => [
+        isA<NotificationLoaded>().having(
+          (s) => s.notifications.first.id,
+          'first notification id',
+          '2',
+        ),
+      ],
+    );
+
+    blocTest<NotificationCubit, NotificationState>(
+      'creates a loaded state when adding a notification from initial state',
+      build: () => cubit,
+      act: (cubit) => cubit.addNotification(
+        const NotificationItem(
+          id: '1',
+          title: 'New Title',
+          body: 'New Body',
+          date: DateTime(2026, 5, 25),
+          isRead: false,
+        ),
+      ),
+      expect: () => [isA<NotificationLoaded>()],
+    );
+  });
 }

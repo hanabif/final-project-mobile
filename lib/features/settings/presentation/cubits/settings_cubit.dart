@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../notification/presentation/services/firebase_notification_service.dart';
 import '../../domain/usecases/get_settings_usecase.dart';
 import '../../domain/usecases/update_settings_usecase.dart';
 import 'settings_state.dart';
@@ -6,10 +7,12 @@ import 'settings_state.dart';
 class SettingsCubit extends Cubit<SettingsState> {
   final GetSettingsUseCase getSettingsUseCase;
   final UpdateSettingsUseCase updateSettingsUseCase;
+  final FirebaseNotificationService notificationService;
 
   SettingsCubit({
     required this.getSettingsUseCase,
     required this.updateSettingsUseCase,
+    required this.notificationService,
   }) : super(SettingsInitial());
 
   Future<void> loadSettings() async {
@@ -43,6 +46,11 @@ class SettingsCubit extends Cubit<SettingsState> {
       emit(SettingsLoaded(settings: newSettings));
       try {
         await updateSettingsUseCase(newSettings);
+        if (value) {
+          await notificationService.getDeviceToken();
+        } else {
+          await notificationService.unregisterDevice();
+        }
       } catch (e) {
         emit(SettingsLoaded(settings: currentSettings));
         emit(SettingsError(message: 'Failed to update settings'));

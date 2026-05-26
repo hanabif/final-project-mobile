@@ -2,7 +2,15 @@ import '../../../../core/network/api_client.dart';
 import '../models/notification_model.dart';
 
 abstract class NotificationRemoteDataSource {
-  Future<void> registerDeviceToken(String token);
+  Future<void> registerDevice({
+    required String fcmToken,
+    required String deviceId,
+    required String deviceName,
+    required String devicePlatform,
+    required String appVersion,
+  });
+
+  Future<void> unregisterDevice(String deviceId);
   Future<List<NotificationModel>> getNotifications();
   Future<void> markAllAsRead();
   Future<void> markAsRead(String id);
@@ -14,10 +22,30 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
   NotificationRemoteDataSourceImpl(this.apiClient);
 
   @override
-  Future<void> registerDeviceToken(String token) async {
+  Future<void> registerDevice({
+    required String fcmToken,
+    required String deviceId,
+    required String deviceName,
+    required String devicePlatform,
+    required String appVersion,
+  }) async {
     await apiClient.dio.post(
-      '/notifications/register-token',
-      data: {"token": token},
+      '/notifications/register-device',
+      data: {
+        'fcmToken': fcmToken,
+        'deviceId': deviceId,
+        'deviceName': deviceName,
+        'devicePlatform': devicePlatform,
+        'appVersion': appVersion,
+      },
+    );
+  }
+
+  @override
+  Future<void> unregisterDevice(String deviceId) async {
+    await apiClient.dio.delete(
+      '/notifications/unregister-device',
+      data: {'deviceId': deviceId},
     );
   }
 

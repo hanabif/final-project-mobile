@@ -18,16 +18,44 @@ void main() {
   });
 
   group('NotificationRepository', () {
-    test('should register device token', () async {
+    test('should register device', () async {
       when(
-        () => mockRemoteDataSource.registerDeviceToken(any()),
+        () => mockRemoteDataSource.registerDevice(
+          fcmToken: any(named: 'fcmToken'),
+          deviceId: any(named: 'deviceId'),
+          deviceName: any(named: 'deviceName'),
+          devicePlatform: any(named: 'devicePlatform'),
+          appVersion: any(named: 'appVersion'),
+        ),
       ).thenAnswer((_) async => {});
 
-      await repository.registerDeviceToken('token123');
+      await repository.registerDevice(
+        fcmToken: 'token123',
+        deviceId: 'device-1',
+        deviceName: 'Android device',
+        devicePlatform: 'android',
+        appVersion: '1.0.0+1',
+      );
 
       verify(
-        () => mockRemoteDataSource.registerDeviceToken('token123'),
+        () => mockRemoteDataSource.registerDevice(
+          fcmToken: 'token123',
+          deviceId: 'device-1',
+          deviceName: 'Android device',
+          devicePlatform: 'android',
+          appVersion: '1.0.0+1',
+        ),
       ).called(1);
+    });
+
+    test('should unregister device', () async {
+      when(() => mockRemoteDataSource.unregisterDevice(any()))
+          .thenAnswer((_) async => {});
+
+      await repository.unregisterDevice('device-1');
+
+      verify(() => mockRemoteDataSource.unregisterDevice('device-1'))
+          .called(1);
     });
 
     test('should get notifications', () async {

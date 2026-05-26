@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'app.dart';
 import 'core/di/injection_container.dart';
 import 'core/network/deep_link_service.dart';
@@ -24,6 +25,9 @@ void main() async {
   sl<DeepLinkService>().initialize();
 
   // 3. Start UI immediately (Crucial for avoiding blank screen)
+  // Register background message handler before runApp so background isolates are set up
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+
   runApp(const ComplaintResolutionApp());
   debugPrint('runApp executed.');
 
@@ -34,7 +38,7 @@ void main() async {
 Future<void> _initializeFirebaseAndNotifications() async {
   try {
     debugPrint('Initializing Firebase (Background)...');
-    await Firebase.initializeApp().timeout(const Duration(seconds: 3));
+    await Firebase.initializeApp().timeout(const Duration(seconds: 10));
     
     if (Firebase.apps.isNotEmpty) {
       debugPrint('Firebase Initialized. Setting up notifications...');

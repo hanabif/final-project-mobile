@@ -188,7 +188,7 @@ Future<void> init() async {
       getUserComplaintsUseCase: sl(),
     ),
   );
-  sl.registerFactory(
+  sl.registerLazySingleton(
     () => NotificationCubit(
       sl<GetNotificationsUseCase>(),
       sl<MarkAllNotificationsAsReadUseCase>(),
@@ -206,7 +206,11 @@ Future<void> init() async {
 
   // Settings
   sl.registerFactory(
-    () => SettingsCubit(getSettingsUseCase: sl(), updateSettingsUseCase: sl()),
+    () => SettingsCubit(
+      getSettingsUseCase: sl(),
+      updateSettingsUseCase: sl(),
+      notificationService: sl(),
+    ),
   );
   sl.registerLazySingleton(() => GetSettingsUseCase(sl()));
   sl.registerLazySingleton(() => UpdateSettingsUseCase(sl()));
