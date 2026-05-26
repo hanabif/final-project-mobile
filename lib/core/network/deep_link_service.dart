@@ -23,12 +23,10 @@ class DeepLinkService {
   }
 
   Future<void> _handleDeepLink(Uri uri) async {
-    debugPrint('Incoming Deep Link: $uri');
     
     // 1. Wait for navigator to be ready
     int attempts = 0;
     while (navigatorKey.currentState == null && attempts < 20) {
-      debugPrint('Waiting for Navigator... (Attempt ${attempts + 1})');
       await Future.delayed(const Duration(milliseconds: 500));
       attempts++;
     }

@@ -168,9 +168,7 @@
         return;
       }
 
-      debugPrint(
-        '🔔 [FirebaseNotificationService] Initializing notifications...',
-      );
+     
       // Request permission
       NotificationSettings? settings = await _fcm?.requestPermission(
         alert: true,
@@ -182,15 +180,7 @@
         sound: true,
       );
 
-      if (settings?.authorizationStatus == AuthorizationStatus.authorized) {
-        debugPrint('User granted permission');
-      } else if (settings?.authorizationStatus ==
-          AuthorizationStatus.provisional) {
-        debugPrint('User granted provisional permission');
-      } else {
-        debugPrint('User declined or has not accepted permission');
-      }
-
+    
       // Handle foreground messages
       // Guard static properties for Web safety
       try {
@@ -208,8 +198,6 @@
         });
 
         FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-          debugPrint('Got a message whilst in the foreground!');
-          debugPrint('Message data: ${message.data}');
 
           if (message.notification != null) {
             debugPrint(
@@ -239,18 +227,9 @@
     Future<String?> getDeviceToken() async {
       try {
         String? token = await _fcm?.getToken();
-        debugPrint(
-          "------------------------------------------------------------------",
-        );
-        debugPrint("🚀 [FirebaseNotificationService] FCM DEVICE TOKEN:");
-        debugPrint("$token");
-        debugPrint(
-          "------------------------------------------------------------------",
-        );
 
         if (token != null) {
           await registerDevice(token);
-          debugPrint("FCM Token registered with backend successfully");
         }
 
         return token;
@@ -261,14 +240,13 @@
     }
 
     void _handleMessage(RemoteMessage message) {
-      debugPrint("Handling notification message: ${message.messageId}");
+      
 
       _syncNotificationState(message);
 
       final String? complaintId = message.data['complaintId'];
 
       if (complaintId != null && navigatorKey.currentState != null) {
-        debugPrint("Navigating to complaint status with ID: $complaintId");
         navigatorKey.currentState!.pushNamed(
           RouteNames.complaintStatus,
           arguments: complaintId,
@@ -455,5 +433,4 @@
   @pragma('vm:entry-point')
   Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     await Firebase.initializeApp();
-    debugPrint("Handling a background message: ${message.messageId}");
   }
