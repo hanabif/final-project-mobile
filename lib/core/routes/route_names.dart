@@ -7,6 +7,7 @@ class RouteNames {
   static const String complaintSuccess = '/complaintSuccess';
   static const String complaintStatus = '/complaintStatus';
   static const String profile = '/profile';
+  static const String about = '/about';
   static const String forgotPassword = '/forgot-password';
   static const String verifyCode = '/verify-code';
   static const String resetPassword = '/reset-password';

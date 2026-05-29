@@ -220,6 +220,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String get changePassword => 'Change Password';
 
   @override
+  String get about => 'About';
+
+  @override
+  String get aboutServiceTitle => 'About CityVoice';
+
+  @override
+  String get aboutServiceShort => 'In short';
+
+  @override
+  String get aboutServiceShortDescription =>
+      'A simple way to submit issues, monitor progress, and stay informed.';
+
+  @override
+  String get aboutServiceOverview =>
+      'CityVoice helps people report community service issues, follow complaint progress, and get updates from the right organization in one place.';
+
+  @override
+  String get aboutServiceFocus =>
+      'Report issues, track progress, and stay connected with the responsible organization.';
+
+  @override
   String get emailVerification => 'Email Verification';
 
   @override

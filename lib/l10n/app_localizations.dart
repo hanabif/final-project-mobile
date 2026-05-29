@@ -520,6 +520,42 @@ abstract class AppLocalizations {
   /// **'Change Password'**
   String get changePassword;
 
+  /// No description provided for @about.
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get about;
+
+  /// No description provided for @aboutServiceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'About CityVoice'**
+  String get aboutServiceTitle;
+
+  /// No description provided for @aboutServiceShort.
+  ///
+  /// In en, this message translates to:
+  /// **'In short'**
+  String get aboutServiceShort;
+
+  /// No description provided for @aboutServiceShortDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'A simple way to submit issues, monitor progress, and stay informed.'**
+  String get aboutServiceShortDescription;
+
+  /// No description provided for @aboutServiceOverview.
+  ///
+  /// In en, this message translates to:
+  /// **'CityVoice helps people report community service issues, follow complaint progress, and get updates from the right organization in one place.'**
+  String get aboutServiceOverview;
+
+  /// No description provided for @aboutServiceFocus.
+  ///
+  /// In en, this message translates to:
+  /// **'Report issues, track progress, and stay connected with the responsible organization.'**
+  String get aboutServiceFocus;
+
   /// No description provided for @emailVerification.
   ///
   /// In en, this message translates to:
