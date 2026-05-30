@@ -5,6 +5,7 @@ import 'package:complaint_resolution_app/features/auth/data/repositories/auth_re
 import 'package:complaint_resolution_app/features/auth/domain/repositories/session_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MockRemote extends Mock implements AuthRemoteDataSource {}
 class MockSession extends Mock implements SessionRepository {}
@@ -14,10 +15,12 @@ void main() {
   late MockSession session;
   late AuthRepositoryImpl repo;
 
-  setUp(() {
+  setUp(() async {
+    SharedPreferences.setMockInitialValues({});
     remote = MockRemote();
     session = MockSession();
-    repo = AuthRepositoryImpl(remote, session);
+    final sharedPreferences = await SharedPreferences.getInstance();
+    repo = AuthRepositoryImpl(remote, session, sharedPreferences);
   });
 
   const tUser = UserModel(id: '42', name: 'Alice', email: 'alice@mail.com', role: 'Citizen');

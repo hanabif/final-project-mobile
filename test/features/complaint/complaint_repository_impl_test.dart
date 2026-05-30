@@ -6,6 +6,7 @@ import 'package:complaint_resolution_app/features/complaint/data/datasources/com
 import 'package:complaint_resolution_app/features/complaint/data/models/complaint_model.dart';
 import 'package:complaint_resolution_app/features/complaint/data/repositories/complaint_repository_impl.dart';
 import 'package:complaint_resolution_app/features/complaint/domain/entities/complaint.dart';
+import 'package:complaint_resolution_app/features/complaint/domain/entities/complaint_submission_result.dart';
 import 'package:complaint_resolution_app/features/complaint/data/models/citizen_analytics_model.dart';
 
 class MockRemoteDataSource extends Mock implements ComplaintRemoteDataSource {}
@@ -52,11 +53,21 @@ void main() {
       when(
         () => mockRemoteDataSource.submitComplaint(any()),
       ).thenAnswer((_) async => 'Success');
+      when(() => mockRemoteDataSource.moderateComplaint(any()))
+          .thenAnswer((_) async {});
 
       final result = await repository.submitComplaint(tComplaint);
 
-      expect(result, 'Success');
+      expect(
+        result,
+        const ComplaintSubmissionResult(
+          complaintId: 'Success',
+          isQueued: false,
+          message: 'Complaint submitted successfully!',
+        ),
+      );
       verify(() => mockRemoteDataSource.submitComplaint(any())).called(1);
+      verify(() => mockRemoteDataSource.moderateComplaint('Success')).called(1);
     });
 
     test('should cache locally when offline', () async {
@@ -67,9 +78,29 @@ void main() {
 
       final result = await repository.submitComplaint(tComplaint);
 
-      expect(result, contains('cached'));
+      expect(result.isQueued, isTrue);
       verify(() => mockLocalDataSource.cacheComplaint(any())).called(1);
       verifyNever(() => mockRemoteDataSource.submitComplaint(any()));
+    });
+  });
+
+  group('syncPendingComplaints', () {
+    test('should replay queued complaints when online', () async {
+      when(() => mockNetworkInfo.isConnected).thenAnswer((_) async => true);
+      when(() => mockLocalDataSource.getQueuedComplaints())
+          .thenAnswer((_) async => [tComplaintModel]);
+      when(() => mockRemoteDataSource.submitComplaint(any()))
+          .thenAnswer((_) async => 'Success');
+      when(() => mockRemoteDataSource.moderateComplaint(any()))
+          .thenAnswer((_) async {});
+      when(() => mockLocalDataSource.removeQueuedComplaint(any()))
+          .thenAnswer((_) async {});
+
+      await repository.syncPendingComplaints();
+
+      verify(() => mockRemoteDataSource.submitComplaint(any())).called(1);
+      verify(() => mockRemoteDataSource.moderateComplaint('Success')).called(1);
+      verify(() => mockLocalDataSource.removeQueuedComplaint(tComplaintId)).called(1);
     });
   });
 

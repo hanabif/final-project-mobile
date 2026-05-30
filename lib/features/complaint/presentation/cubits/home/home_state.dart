@@ -11,6 +11,15 @@ class HomeInitial extends HomeState {}
 
 class HomeLoading extends HomeState {}
 
+class HomeOffline extends HomeState {
+  final String message;
+
+  const HomeOffline({required this.message});
+
+  @override
+  List<Object?> get props => [message];
+}
+
 class HomeLoaded extends HomeState {
   final int totalComplaints;
   final int resolvedComplaints;

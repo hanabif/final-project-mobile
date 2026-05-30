@@ -57,4 +57,15 @@ class NotificationModel extends NotificationItem {
       complaintId: complaintId,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'body': body,
+      'date': date.toIso8601String(),
+      'isRead': isRead,
+      'complaintId': complaintId,
+    };
+  }
 }

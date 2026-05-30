@@ -1,10 +1,11 @@
 import 'package:image_picker/image_picker.dart';
 import '../entities/complaint.dart';
+import '../entities/complaint_submission_result.dart';
 import '../entities/organization.dart';
 import '../../data/models/citizen_analytics_model.dart';
 
 abstract class ComplaintRepository {
-  Future<String> submitComplaint(Complaint complaint);
+  Future<ComplaintSubmissionResult> submitComplaint(Complaint complaint);
   Future<String> getComplaintStatus(String complaintId);
   Future<List<Complaint>> getUserComplaints({bool forceRefresh = false});
   Future<Complaint> getComplaintDetail(String complaintId);
@@ -13,4 +14,5 @@ abstract class ComplaintRepository {
   Future<void> deleteUploadedFile(String fileKey);
   Future<void> moderateComplaint(String complaintId);
   Future<List<Organization>> getOrganizations({bool forceRefresh = false});
+  Future<void> syncPendingComplaints();
 }

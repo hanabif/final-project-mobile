@@ -289,21 +289,26 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
 
   // ── Handle Successful Submission ──────────────────────────────────────────
   
-  Future<void> _handleSuccessfulSubmission(BuildContext context, AppLocalizations l10n) async {
+  Future<void> _handleSuccessfulSubmission(
+    BuildContext context,
+    AppLocalizations l10n,
+    ComplaintSuccess state,
+  ) async {
     try {
-      // Show loading while refreshing data
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.complaintSubmittedSuccessfully)),
-      );
-
-      // Refresh home statistics
+      // Refresh home statistics only for real online submissions.
       await _refreshHomeData();
 
-      // Navigate to success screen only after data refresh completes
       if (context.mounted) {
         Navigator.of(context).pushReplacementNamed(
           RouteNames.complaintSuccess,
-          arguments: const Uuid().v4().substring(0, 8).toUpperCase(),
+          arguments: {
+            'complaintId': state.complaintId ??
+                const Uuid().v4().substring(0, 8).toUpperCase(),
+            'message': state.message.isNotEmpty
+                ? state.message
+                : l10n.complaintSubmittedSuccessfully,
+            'isQueued': false,
+          },
         );
       }
     } catch (e) {
@@ -312,7 +317,14 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
       if (context.mounted) {
         Navigator.of(context).pushReplacementNamed(
           RouteNames.complaintSuccess,
-          arguments: const Uuid().v4().substring(0, 8).toUpperCase(),
+          arguments: {
+            'complaintId': state.complaintId ??
+                const Uuid().v4().substring(0, 8).toUpperCase(),
+            'message': state.message.isNotEmpty
+                ? state.message
+                : l10n.complaintSubmittedSuccessfully,
+            'isQueued': false,
+          },
         );
       }
     }
@@ -350,8 +362,20 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
       body: BlocConsumer<ComplaintCubit, ComplaintState>(
         listener: (context, state) {
           if (state is ComplaintSuccess) {
+            if (state.isQueued) {
+              Navigator.of(context).pushReplacementNamed(
+                RouteNames.complaintSuccess,
+                arguments: {
+                  'complaintId': state.complaintId,
+                  'message': state.message,
+                  'isQueued': true,
+                },
+              );
+              return;
+            }
+
             // Refresh home statistics and complaint list after successful submission
-            _handleSuccessfulSubmission(context, l10n);
+            _handleSuccessfulSubmission(context, l10n, state);
           } else if (state is ComplaintFailure) {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               content: Text(state.message),

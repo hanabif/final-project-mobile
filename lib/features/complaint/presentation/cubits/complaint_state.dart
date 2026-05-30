@@ -11,7 +11,20 @@ class ComplaintInitial extends ComplaintState {}
 
 class ComplaintSubmitting extends ComplaintState {}
 
-class ComplaintSuccess extends ComplaintState {}
+class ComplaintSuccess extends ComplaintState {
+  final String message;
+  final bool isQueued;
+  final String? complaintId;
+
+  const ComplaintSuccess({
+    required this.message,
+    required this.isQueued,
+    this.complaintId,
+  });
+
+  @override
+  List<Object> get props => [message, isQueued, complaintId ?? ''];
+}
 
 class ComplaintFailure extends ComplaintState {
   final String message;

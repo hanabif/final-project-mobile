@@ -79,8 +79,25 @@ class AppRouter {
         );
 
       case RouteNames.complaintSuccess:
+        final args = settings.arguments;
+        String? complaintId;
+        String? message;
+        bool isQueued = false;
+
+        if (args is String) {
+          complaintId = args;
+        } else if (args is Map<String, dynamic>) {
+          complaintId = args['complaintId'] as String?;
+          message = args['message'] as String?;
+          isQueued = args['isQueued'] == true;
+        }
+
         return MaterialPageRoute(
-          builder: (_) => const ComplaintSuccessScreen(),
+          builder: (_) => ComplaintSuccessScreen(
+            complaintId: complaintId,
+            message: message,
+            isQueued: isQueued,
+          ),
         );
 
       case RouteNames.complaintStatus:

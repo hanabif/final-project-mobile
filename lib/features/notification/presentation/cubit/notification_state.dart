@@ -24,3 +24,12 @@ class NotificationError extends NotificationState {
   @override
   List<Object?> get props => [message];
 }
+
+class NotificationOffline extends NotificationState {
+  final String message;
+
+  NotificationOffline(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}

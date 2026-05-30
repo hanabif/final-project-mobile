@@ -29,6 +29,7 @@ class SessionRepositoryImpl implements SessionRepository {
       await _sharedPreferences.remove(CACHED_ORGANIZATIONS);
       await _sharedPreferences.remove(CACHED_COMPLAINTS);
       await _sharedPreferences.remove(CACHED_UNSUBMITTED_COMPLAINTS);
+      await _sharedPreferences.remove('CACHED_PROFILE');
     } catch (_) {
       // ignore errors when clearing optional cached keys
     }

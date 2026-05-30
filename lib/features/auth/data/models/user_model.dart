@@ -21,4 +21,13 @@ class UserModel extends User {
       rethrow;
     }
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'fullName': name,
+      'email': email,
+      'role': role,
+    };
+  }
 }

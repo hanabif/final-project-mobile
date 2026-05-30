@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../../core/network/network_info.dart';
 import '../../../domain/entities/organization.dart';
 import '../../../domain/usecases/get_citizen_analytics_usecase.dart';
 import '../../../domain/usecases/get_organizations_usecase.dart';
@@ -7,10 +8,12 @@ import 'home_state.dart';
 class HomeCubit extends Cubit<HomeState> {
   final GetCitizenAnalyticsUseCase getCitizenAnalyticsUseCase;
   final GetOrganizationsUseCase getOrganizationsUseCase;
+  final NetworkInfo networkInfo;
 
   HomeCubit({
     required this.getCitizenAnalyticsUseCase,
     required this.getOrganizationsUseCase,
+    required this.networkInfo,
   }) : super(HomeInitial());
 
   Future<void> loadHomeData({bool forceRefresh = false}) async {
@@ -41,9 +44,17 @@ class HomeCubit extends Cubit<HomeState> {
         ),
       );
     } catch (e, stackTrace) {
+      final isConnected = await networkInfo.isConnected;
+      if (!isConnected) {
+        emit(const HomeOffline(
+          message: 'No internet connection. Showing saved home data when available.',
+        ));
+        return;
+      }
+
       print('HomeCubit Error: $e');
       print('Stacktrace: $stackTrace');
-      emit(HomeError(message: 'Failed to load home data: ${e.toString()}'));
+      emit(const HomeError(message: 'Unable to load home data right now.'));
     }
   }
 

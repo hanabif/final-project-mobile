@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/routes/route_names.dart';
 import '../../../../core/utils/organization_logo_mapper.dart';
 import '../../../../core/widgets/custom_app_bar.dart';
+import '../../../../core/widgets/connection_lost_state_view.dart';
 import '../../../../core/widgets/modern_bottom_navigation_bar.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../notification/presentation/cubit/notification_cubit.dart';
@@ -105,8 +106,17 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               child: CircularProgressIndicator(color: Color(0xFF005C45)),
             );
           }
+          if (state is HomeOffline) {
+            return _OfflineHomeView(
+              message: state.message,
+              onRetry: () => context.read<HomeCubit>().loadHomeData(forceRefresh: true),
+            );
+          }
           if (state is HomeError) {
-            return Center(child: Text(state.message));
+            return _OfflineHomeView(
+              message: state.message,
+              onRetry: () => context.read<HomeCubit>().loadHomeData(forceRefresh: true),
+            );
           }
           if (state is HomeLoaded) {
             return RefreshIndicator(
@@ -241,6 +251,35 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         elevation: 6,
         shape: const CircleBorder(),
         child: const Icon(Icons.qr_code_scanner_rounded, size: 28),
+      ),
+    );
+  }
+}
+
+class _OfflineHomeView extends StatelessWidget {
+  final String message;
+  final VoidCallback onRetry;
+
+  const _OfflineHomeView({required this.message, required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return RefreshIndicator(
+      color: const Color(0xFF005C45),
+      onRefresh: () async => onRetry(),
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: [
+          const SizedBox(height: 60),
+          ConnectionLostStateView(
+            title: 'Connection Lost!',
+            subtitle: message,
+            buttonLabel: l10n.retry,
+            onRetry: onRetry,
+          ),
+        ],
       ),
     );
   }

@@ -1,4 +1,5 @@
 import 'package:bloc_test/bloc_test.dart';
+import 'package:complaint_resolution_app/core/network/network_info.dart';
 import 'package:complaint_resolution_app/features/notification/domain/entities/notification_item.dart';
 import 'package:complaint_resolution_app/features/notification/domain/usecases/get_notifications_usecase.dart';
 import 'package:complaint_resolution_app/features/notification/domain/usecases/mark_all_notifications_as_read_usecase.dart';
@@ -16,20 +17,26 @@ class MockMarkAllNotificationsAsReadUseCase extends Mock
 class MockMarkNotificationAsReadUseCase extends Mock
     implements MarkNotificationAsReadUseCase {}
 
+class MockNetworkInfo extends Mock implements NetworkInfo {}
+
 void main() {
   late MockGetNotificationsUseCase mockGetNotifications;
   late MockMarkAllNotificationsAsReadUseCase mockMarkAllAsRead;
   late MockMarkNotificationAsReadUseCase mockMarkAsRead;
+  late MockNetworkInfo mockNetworkInfo;
   late NotificationCubit cubit;
 
   setUp(() {
     mockGetNotifications = MockGetNotificationsUseCase();
     mockMarkAllAsRead = MockMarkAllNotificationsAsReadUseCase();
     mockMarkAsRead = MockMarkNotificationAsReadUseCase();
+    mockNetworkInfo = MockNetworkInfo();
+    when(() => mockNetworkInfo.isConnected).thenAnswer((_) async => true);
     cubit = NotificationCubit(
       mockGetNotifications,
       mockMarkAllAsRead,
       mockMarkAsRead,
+      mockNetworkInfo,
     );
   });
 
@@ -61,7 +68,7 @@ void main() {
     );
 
     blocTest<NotificationCubit, NotificationState>(
-      'emits [NotificationLoading, NotificationError] when fetching fails',
+      'emits [NotificationLoading, NotificationError] when fetching fails online',
       build: () {
         when(() => mockGetNotifications()).thenThrow(Exception('Error'));
         return cubit;
@@ -69,7 +76,7 @@ void main() {
       act: (cubit) => cubit.fetchNotifications(),
       expect: () => [
         NotificationLoading(),
-        NotificationError('Failed to load notifications'),
+        NotificationError('Unable to load notifications right now.'),
       ],
     );
   });

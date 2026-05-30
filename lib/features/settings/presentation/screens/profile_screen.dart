@@ -7,6 +7,7 @@ import '../../../../core/di/injection_container.dart';
 import '../../../../core/widgets/custom_app_bar.dart';
 import '../../../../core/widgets/modern_bottom_navigation_bar.dart';
 import '../../../../core/widgets/password_strength_indicator.dart';
+import '../../../../core/widgets/connection_lost_state_view.dart';
 import '../../../../core/utils/qr_complaint_parser.dart';
 import '../../../../core/utils/password_validator.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -77,8 +78,17 @@ class ProfileScreen extends StatelessWidget {
                           color: Color(0xFF005C45)),
                     );
                   }
+                  if (profileState is ProfileOffline) {
+                    return _OfflineProfileView(
+                      message: profileState.message,
+                      onRetry: () => context.read<ProfileCubit>().loadProfileData(forceRefresh: true),
+                    );
+                  }
                   if (profileState is ProfileError) {
-                    return Center(child: Text(profileState.message));
+                    return _OfflineProfileView(
+                      message: profileState.message,
+                      onRetry: () => context.read<ProfileCubit>().loadProfileData(forceRefresh: true),
+                    );
                   }
                   if (settingsState is SettingsError) {
                     return Center(child: Text(settingsState.message));
@@ -940,6 +950,35 @@ class _FloatingQRButton extends StatelessWidget {
       },
       backgroundColor: const Color(0xFF005C45),
       child: const Icon(Icons.qr_code_scanner_rounded, color: Colors.white, size: 28),
+    );
+  }
+}
+
+class _OfflineProfileView extends StatelessWidget {
+  final String message;
+  final VoidCallback onRetry;
+
+  const _OfflineProfileView({required this.message, required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return RefreshIndicator(
+      color: const Color(0xFF005C45),
+      onRefresh: () async => onRetry(),
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.fromLTRB(0, 40, 0, 0),
+        children: [
+          ConnectionLostStateView(
+            title: 'Connection Lost!',
+            subtitle: message,
+            buttonLabel: l10n.retry,
+            onRetry: onRetry,
+          ),
+        ],
+      ),
     );
   }
 }

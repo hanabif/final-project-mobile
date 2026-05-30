@@ -110,7 +110,7 @@ void main() {
     expect(find.byType(CircularProgressIndicator), findsWidgets);
   });
 
-  testWidgets('shows error message when HomeError', (tester) async {
+  testWidgets('shows offline view when HomeError', (tester) async {
     when(
       () => mockHomeCubit.state,
     ).thenReturn(const HomeError(message: 'Failed to load'));
@@ -119,6 +119,6 @@ void main() {
     await tester.pumpWidget(createTestableWidget(const HomeScreen()));
     await tester.pumpAndSettle();
 
-    expect(find.text('Failed to load'), findsOneWidget);
+    expect(find.text('Connection Lost!'), findsOneWidget);
   });
 }

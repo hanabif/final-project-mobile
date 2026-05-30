@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../../../core/network/network_info.dart';
 import '../../../../auth/domain/entities/user.dart';
 import '../../../../auth/domain/usecases/get_profile_usecase.dart';
 import '../../../../auth/domain/usecases/update_profile_usecase.dart';
@@ -35,6 +36,15 @@ class ProfileError extends ProfileState {
   List<Object?> get props => [message];
 }
 
+class ProfileOffline extends ProfileState {
+  final String message;
+
+  ProfileOffline(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}
+
 class ProfileUpdateSuccess extends ProfileState {
   final User user;
 
@@ -54,12 +64,14 @@ class ProfileCubit extends Cubit<ProfileState> {
   final GetCitizenAnalyticsUseCase getCitizenAnalyticsUseCase;
   final UpdateProfileUseCase updateProfileUseCase;
   final ChangePasswordUseCase changePasswordUseCase;
+  final NetworkInfo networkInfo;
 
   ProfileCubit({
     required this.getProfileUseCase,
     required this.getCitizenAnalyticsUseCase,
     required this.updateProfileUseCase,
     required this.changePasswordUseCase,
+    required this.networkInfo,
   }) : super(ProfileInitial());
 
   Future<void> loadProfileData({bool forceRefresh = false}) async {
@@ -80,7 +92,13 @@ class ProfileCubit extends Cubit<ProfileState> {
 
       emit(ProfileLoaded(user: user, stats: stats));
     } catch (e) {
-      emit(ProfileError(e.toString()));
+      final isConnected = await networkInfo.isConnected;
+      if (!isConnected) {
+        emit(ProfileOffline('No internet connection. Showing saved profile data when available.'));
+        return;
+      }
+
+      emit(ProfileError('Unable to load profile right now.'));
     }
   }
 
@@ -101,7 +119,13 @@ class ProfileCubit extends Cubit<ProfileState> {
       // Re-emit ProfileLoaded to restore UI content with fresh data
       emit(ProfileLoaded(user: user, stats: stats));
     } catch (e) {
-      emit(ProfileError(e.toString()));
+      final isConnected = await networkInfo.isConnected;
+      if (!isConnected) {
+        emit(ProfileOffline('No internet connection. Showing saved profile data when available.'));
+        return;
+      }
+
+      emit(ProfileError('Unable to update your profile right now.'));
     }
   }
 
@@ -122,7 +146,13 @@ class ProfileCubit extends Cubit<ProfileState> {
       // Re-emit ProfileLoaded to restore UI content
       emit(ProfileLoaded(user: user, stats: stats));
     } catch (e) {
-      emit(ProfileError(e.toString()));
+      final isConnected = await networkInfo.isConnected;
+      if (!isConnected) {
+        emit(ProfileOffline('No internet connection. Showing saved profile data when available.'));
+        return;
+      }
+
+      emit(ProfileError('Unable to change password right now.'));
     }
   }
 
