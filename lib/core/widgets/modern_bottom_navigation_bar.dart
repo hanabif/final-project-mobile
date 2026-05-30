@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../../l10n/app_localizations.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 
@@ -7,6 +8,7 @@ class ModernBottomNavigationBar extends StatefulWidget {
   final int currentIndex;
   final FutureOr<void> Function() onHomeTap;
   final FutureOr<void> Function() onReportTap;
+  final FutureOr<void> Function() onComplaintsTap;
   final FutureOr<void> Function() onProfileTap;
 
   const ModernBottomNavigationBar({
@@ -14,6 +16,7 @@ class ModernBottomNavigationBar extends StatefulWidget {
     required this.currentIndex,
     required this.onHomeTap,
     required this.onReportTap,
+    required this.onComplaintsTap,
     required this.onProfileTap,
   });
 
@@ -47,6 +50,8 @@ class _ModernBottomNavigationBarState extends State<ModernBottomNavigationBar> {
     // Making it responsive based on screen height
     final double navBarHeight = screenHeight > 800 ? 75.0 : 60.0;
 
+    final l10n = AppLocalizations.of(context)!;
+
     return CurvedNavigationBar(
       key: _navKey,
       index: widget.currentIndex,
@@ -56,20 +61,29 @@ class _ModernBottomNavigationBarState extends State<ModernBottomNavigationBar> {
       backgroundColor: Colors.transparent, // transparent to blend with the scaffold background
       animationDuration: const Duration(milliseconds: 300), // Smooth transition
       items: [
-        Icon(
-          Iconsax.home,
-          size: 30,
-          color: _internalIndex == 0 ? Colors.white : (isDark ? Colors.white70 : Colors.black87),
+        _NavItem(
+          icon: Iconsax.home,
+          label: l10n.home,
+          isSelected: _internalIndex == 0,
+          isDark: isDark,
         ),
-        Icon(
-          Iconsax.document_text,
-          size: 30,
-          color: _internalIndex == 1 ? Colors.white : (isDark ? Colors.white70 : Colors.black87),
+        _NavItem(
+          icon: Iconsax.document_text,
+          label: l10n.report,
+          isSelected: _internalIndex == 1,
+          isDark: isDark,
         ),
-        Icon(
-          Iconsax.user,
-          size: 30,
-          color: _internalIndex == 2 ? Colors.white : (isDark ? Colors.white70 : Colors.black87),
+        _NavItem(
+          icon: Icons.receipt_long_rounded,
+          label: l10n.bottomNavComplaints,
+          isSelected: _internalIndex == 2,
+          isDark: isDark,
+        ),
+        _NavItem(
+          icon: Iconsax.user,
+          label: l10n.profile,
+          isSelected: _internalIndex == 3,
+          isDark: isDark,
         ),
       ],
       onTap: (index) async {
@@ -96,6 +110,12 @@ class _ModernBottomNavigationBarState extends State<ModernBottomNavigationBar> {
             _navKey.currentState?.setPage(widget.currentIndex);
           }
         } else if (index == 2) {
+          await widget.onComplaintsTap();
+          if (mounted && _internalIndex != widget.currentIndex) {
+            setState(() => _internalIndex = widget.currentIndex);
+            _navKey.currentState?.setPage(widget.currentIndex);
+          }
+        } else if (index == 3) {
           await widget.onProfileTap();
           // Reset index after returning from Profile screen
           if (mounted && _internalIndex != widget.currentIndex) {
@@ -104,6 +124,44 @@ class _ModernBottomNavigationBarState extends State<ModernBottomNavigationBar> {
           }
         }
       },
+    );
+  }
+}
+
+class _NavItem extends StatelessWidget {
+  const _NavItem({
+    required this.icon,
+    required this.label,
+    required this.isSelected,
+    required this.isDark,
+  });
+
+  final IconData icon;
+  final String label;
+  final bool isSelected;
+  final bool isDark;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = isSelected ? Colors.white : (isDark ? Colors.white70 : Colors.black87);
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(icon, size: 24, color: color),
+        const SizedBox(height: 2),
+        Text(
+          label,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            fontSize: 9,
+            fontWeight: FontWeight.w600,
+            color: color,
+          ),
+        ),
+      ],
     );
   }
 }

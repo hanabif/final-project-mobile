@@ -226,6 +226,24 @@ abstract class AppLocalizations {
   /// **'Profile'**
   String get profile;
 
+  /// No description provided for @bottomNavComplaints.
+  ///
+  /// In en, this message translates to:
+  /// **'Complaints'**
+  String get bottomNavComplaints;
+
+  /// No description provided for @callCenter.
+  ///
+  /// In en, this message translates to:
+  /// **'Call Center'**
+  String get callCenter;
+
+  /// No description provided for @callCenterContacts.
+  ///
+  /// In en, this message translates to:
+  /// **'Call Center Contacts'**
+  String get callCenterContacts;
+
   /// No description provided for @yourVoiceMatters.
   ///
   /// In en, this message translates to:
@@ -409,7 +427,7 @@ abstract class AppLocalizations {
   /// No description provided for @myReports.
   ///
   /// In en, this message translates to:
-  /// **'My Reports'**
+  /// **'My Complaints'**
   String get myReports;
 
   /// No description provided for @complaintDetails.

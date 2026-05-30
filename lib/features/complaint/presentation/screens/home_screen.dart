@@ -240,6 +240,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             await Navigator.pushNamed(context, RouteNames.complaintForm);
             _refreshData();
           },
+          onComplaintsTap: () async {
+            await Navigator.pushNamed(context, RouteNames.complaintList);
+            _refreshData();
+          },
           onProfileTap: () =>
               Navigator.pushNamed(context, RouteNames.profile),
         ),

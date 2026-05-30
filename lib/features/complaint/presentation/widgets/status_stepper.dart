@@ -123,7 +123,11 @@ class StatusStepper extends StatelessWidget {
               color: circleColor,
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, size: 20, color: iconColor),
+            child: Icon(
+              isCompleted ? Icons.check_rounded : icon,
+              size: 20,
+              color: iconColor,
+            ),
           ),
           const SizedBox(height: 8),
           Text(

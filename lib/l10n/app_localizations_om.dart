@@ -63,13 +63,22 @@ class AppLocalizationsOm extends AppLocalizations {
   String get confirmPassword => 'Jecha Iccitii Mirkaneessi';
 
   @override
-  String get home => 'Mana';
+  String get home => 'Home';
 
   @override
   String get report => 'Gabaasi';
 
   @override
   String get profile => 'Profaayilii';
+
+  @override
+  String get bottomNavComplaints => 'Complaints';
+
+  @override
+  String get callCenter => 'Call Center';
+
+  @override
+  String get callCenterContacts => 'Call Center Contacts';
 
   @override
   String get yourVoiceMatters => 'Sagaleen kee ni dhaga\'ama';

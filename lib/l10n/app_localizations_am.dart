@@ -72,6 +72,15 @@ class AppLocalizationsAm extends AppLocalizations {
   String get profile => 'መገለጫ';
 
   @override
+  String get bottomNavComplaints => 'ቅሬታዎች';
+
+  @override
+  String get callCenter => 'የጥሪ ማዕከል';
+
+  @override
+  String get callCenterContacts => 'የጥሪ ማዕከል አገናኝ';
+
+  @override
   String get yourVoiceMatters => 'ድምጽዎ ዋጋ አለው';
 
   @override
@@ -220,7 +229,7 @@ class AppLocalizationsAm extends AppLocalizations {
   String get changePassword => 'የይለፍ ቃል ቀይር';
 
   @override
-  String get about => 'ስለ';
+  String get about => 'ስለ እኛ';
 
   @override
   String get aboutServiceTitle => 'ስለ ሲቲቮይስ';

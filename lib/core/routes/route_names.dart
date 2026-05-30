@@ -12,6 +12,7 @@ class RouteNames {
   static const String verifyCode = '/verify-code';
   static const String resetPassword = '/reset-password';
   static const String complaintList = '/complaint-list';
+  static const String callCenter = '/call-center';
   static const String notifications = '/notifications';
   static const String qrScanner = '/qr-scanner';
 }

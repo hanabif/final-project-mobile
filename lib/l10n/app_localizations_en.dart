@@ -72,6 +72,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profile => 'Profile';
 
   @override
+  String get bottomNavComplaints => 'Complaints';
+
+  @override
+  String get callCenter => 'Call Center';
+
+  @override
+  String get callCenterContacts => 'Call Center Contacts';
+
+  @override
   String get yourVoiceMatters => 'Your voice matters';
 
   @override
@@ -163,7 +172,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get markAsRead => 'Mark as read';
 
   @override
-  String get myReports => 'My Reports';
+  String get myReports => 'My Complaints';
 
   @override
   String get complaintDetails => 'Complaint Details';

@@ -107,22 +107,21 @@ class ProfileScreen extends StatelessWidget {
                           _ProfileHeaderCard(user: user, isDark: isDark),
                           const SizedBox(height: 20),
 
-                          // ── My Complaints ──────────────────────────────
-                          _SectionLabel(
-                              label: l10n.myComplaints, isDark: isDark),
-                          const SizedBox(height: 10),
-                          _ActionTile(
-                            icon: Icons.list_alt_rounded,
+                            // ── Call Center ────────────────────────────────
+                            _SectionLabel(label: l10n.callCenter, isDark: isDark),
+                            const SizedBox(height: 10),
+                            _ActionTile(
+                            icon: Icons.phone_in_talk_rounded,
                             iconColor: const Color(0xFF3B82F6),
-                            label: l10n.viewAllComplaints,
+                            label: l10n.callCenterContacts,
                             trailing: const Icon(
-                                Icons.arrow_forward_ios_rounded,
-                                size: 14),
+                              Icons.arrow_forward_ios_rounded,
+                              size: 14),
                             isDark: isDark,
                             onTap: () => Navigator.pushNamed(
-                                context, RouteNames.complaintList),
-                          ),
-                          const SizedBox(height: 20),
+                              context, RouteNames.callCenter),
+                            ),
+                            const SizedBox(height: 20),
 
                           // ── Account Settings ───────────────────────────
                           _SectionLabel(
@@ -911,11 +910,13 @@ class _BottomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ModernBottomNavigationBar(
-      currentIndex: 2,
+      currentIndex: 3,
       onHomeTap: () => Navigator.pushNamedAndRemoveUntil(
           context, RouteNames.home, (route) => false),
       onReportTap: () =>
           Navigator.pushNamed(context, RouteNames.complaintForm),
+      onComplaintsTap: () =>
+          Navigator.pushNamed(context, RouteNames.complaintList),
       onProfileTap: () {},
     );
   }
