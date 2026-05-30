@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:complaint_resolution_app/features/notification/data/datasources/notification_remote_datasource.dart';
 import 'package:complaint_resolution_app/features/notification/data/repositories/notification_repository_impl.dart';
 import 'package:complaint_resolution_app/features/notification/domain/entities/notification_item.dart';
@@ -11,10 +12,13 @@ class MockRemoteDataSource extends Mock
 void main() {
   late NotificationRepositoryImpl repository;
   late MockRemoteDataSource mockRemoteDataSource;
+  late SharedPreferences sharedPreferences;
 
-  setUp(() {
+  setUp(() async {
+    SharedPreferences.setMockInitialValues({});
     mockRemoteDataSource = MockRemoteDataSource();
-    repository = NotificationRepositoryImpl(mockRemoteDataSource);
+    sharedPreferences = await SharedPreferences.getInstance();
+    repository = NotificationRepositoryImpl(mockRemoteDataSource, sharedPreferences);
   });
 
   group('NotificationRepository', () {

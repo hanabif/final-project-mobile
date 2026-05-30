@@ -1,5 +1,6 @@
 import 'package:image_picker/image_picker.dart';
 import '../entities/complaint.dart';
+import '../entities/complaint_submission_result.dart';
 import '../repositories/complaint_repository.dart';
 
 class SubmitComplaintUseCase {
@@ -7,18 +8,20 @@ class SubmitComplaintUseCase {
 
   SubmitComplaintUseCase(this.repository);
   
-  Future<void> call(Complaint complaint, List<XFile> imageFiles) async {
-    List<String> imageUrls = [];
-    if (imageFiles.isNotEmpty) {
-      imageUrls = await repository.uploadImages(imageFiles);
-    }
-    
-    final updatedComplaint = Complaint(
+  Future<ComplaintSubmissionResult> call(
+    Complaint complaint,
+    List<XFile> imageFiles,
+  ) async {
+    final preparedComplaint = Complaint(
       id: complaint.id,
       title: complaint.title,
       description: complaint.description,
-      imageUrl: imageUrls.isNotEmpty ? imageUrls.first : null,
-      images: imageUrls,
+      imageUrl: complaint.imageUrl ??
+          (complaint.images.isNotEmpty ? complaint.images.first : null) ??
+          (imageFiles.isNotEmpty ? imageFiles.first.path : null),
+      images: complaint.images.isNotEmpty
+          ? complaint.images
+          : imageFiles.map((file) => file.path).toList(),
       latitude: complaint.latitude,
       longitude: complaint.longitude,
       organizationId: complaint.organizationId,
@@ -30,9 +33,6 @@ class SubmitComplaintUseCase {
       history: complaint.history,
     );
 
-    final serverComplaintId = await repository.submitComplaint(updatedComplaint);
-    
-    // Trigger moderation right after submission using the real server ID
-    await repository.moderateComplaint(serverComplaintId);
+    return repository.submitComplaint(preparedComplaint);
   }
 }

@@ -1,13 +1,25 @@
+import 'dart:convert';
+
+import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../domain/entities/user.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../datasources/auth_remote_datasource.dart';
 import '../../domain/repositories/session_repository.dart';
+import '../models/user_model.dart';
+
+const CACHED_PROFILE = 'CACHED_PROFILE';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource remoteDataSource;
   final SessionRepository sessionRepository;
+  final SharedPreferences sharedPreferences;
 
-  AuthRepositoryImpl(this.remoteDataSource, this.sessionRepository);
+  AuthRepositoryImpl(
+    this.remoteDataSource,
+    this.sessionRepository,
+    this.sharedPreferences,
+  );
 
   @override
   Future<User> login(String email, String password) async {
@@ -95,12 +107,30 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<User> getProfile() async {
-    return await remoteDataSource.getProfile();
+    try {
+      final profile = await remoteDataSource.getProfile();
+      await sharedPreferences.setString(
+        CACHED_PROFILE,
+        json.encode((profile as UserModel).toJson()),
+      );
+      return profile;
+    } catch (e) {
+      final cachedProfile = await _getCachedProfile();
+      if (cachedProfile != null) {
+        return cachedProfile;
+      }
+      rethrow;
+    }
   }
 
   @override
   Future<User> updateProfile(String fullName) async {
-    return await remoteDataSource.updateProfile(fullName);
+    final profile = await remoteDataSource.updateProfile(fullName);
+    await sharedPreferences.setString(
+      CACHED_PROFILE,
+      json.encode((profile as UserModel).toJson()),
+    );
+    return profile;
   }
 
   @override
@@ -112,5 +142,15 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<void> logout() async {
     await remoteDataSource.logout();
     await sessionRepository.clearSession();
+  }
+
+  Future<User?> _getCachedProfile() async {
+    final jsonString = sharedPreferences.getString(CACHED_PROFILE);
+    if (jsonString == null || jsonString.isEmpty) {
+      return null;
+    }
+
+    final jsonMap = json.decode(jsonString) as Map<String, dynamic>;
+    return UserModel.fromJson(jsonMap);
   }
 }

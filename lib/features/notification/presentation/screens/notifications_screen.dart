@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/widgets/custom_app_bar.dart';
+import '../../../../core/widgets/connection_lost_state_view.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../cubit/notification_cubit.dart';
 import '../../domain/entities/notification_item.dart';
@@ -58,68 +59,75 @@ class NotificationsScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: BlocListener<NotificationCubit, NotificationState>(
-        listener: (context, state) {
-          if (state is NotificationError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(state.message)));
+      body: BlocBuilder<NotificationCubit, NotificationState>(
+        builder: (context, state) {
+          if (state is NotificationLoading || state is NotificationInitial) {
+            return const Center(
+              child: CircularProgressIndicator(
+                  color: Color(0xFF005C45)),
+            );
           }
-        },
-        child: BlocBuilder<NotificationCubit, NotificationState>(
-          builder: (context, state) {
-            if (state is NotificationLoading ||
-                state is NotificationInitial) {
-              return const Center(
-                child: CircularProgressIndicator(
-                    color: Color(0xFF005C45)),
-              );
+          if (state is NotificationOffline) {
+            return _OfflineNotificationsView(
+              message: state.message,
+              onRetry: () => context.read<NotificationCubit>().fetchNotifications(),
+            );
+          }
+          if (state is NotificationError) {
+            return _OfflineNotificationsView(
+              message: state.message,
+              onRetry: () => context.read<NotificationCubit>().fetchNotifications(),
+            );
+          }
+          if (state is NotificationLoaded) {
+            final notifications = state.notifications;
+            final hasUnread = notifications.any((n) => !n.isRead);
+            if (notifications.isEmpty) {
+              return _EmptyState(l10n: l10n, isDark: isDark);
             }
-            if (state is NotificationLoaded) {
-              final notifications = state.notifications;
-              final hasUnread = notifications.any((n) => !n.isRead);
-              if (notifications.isEmpty) {
-                return _EmptyState(l10n: l10n, isDark: isDark);
-              }
-              // Group: unread first
-              final unread =
-                  notifications.where((n) => !n.isRead).toList();
-              final read =
-                  notifications.where((n) => n.isRead).toList();
+            // Group: unread first
+            final unread = notifications.where((n) => !n.isRead).toList();
+            final read = notifications.where((n) => n.isRead).toList();
 
-              return Column(
-                children: [
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
-                      child: TextButton.icon(
-                        onPressed: hasUnread
-                            ? () => context
-                                .read<NotificationCubit>()
-                                .markAllAsRead()
-                            : null,
-                        icon: Icon(
-                          Icons.done_all_rounded,
-                          size: 18,
+            return Column(
+              children: [
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+                    child: TextButton.icon(
+                      onPressed: hasUnread
+                          ? () => context
+                              .read<NotificationCubit>()
+                              .markAllAsRead()
+                          : null,
+                      icon: Icon(
+                        Icons.done_all_rounded,
+                        size: 18,
+                        color: hasUnread
+                            ? const Color(0xFF005C45)
+                            : Colors.grey.shade400,
+                      ),
+                      label: Text(
+                        l10n.markAllAsRead,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
                           color: hasUnread
                               ? const Color(0xFF005C45)
                               : Colors.grey.shade400,
                         ),
-                        label: Text(
-                          l10n.markAllAsRead,
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: hasUnread
-                                ? const Color(0xFF005C45)
-                                : Colors.grey.shade400,
-                          ),
-                        ),
                       ),
                     ),
                   ),
-                  Expanded(
+                ),
+                Expanded(
+                  child: RefreshIndicator(
+                    color: const Color(0xFF005C45),
+                    onRefresh: () async =>
+                        context.read<NotificationCubit>().fetchNotifications(),
                     child: ListView(
+                      physics: const AlwaysScrollableScrollPhysics(),
                       padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
                       children: [
                         if (unread.isNotEmpty) ...[
@@ -150,12 +158,41 @@ class NotificationsScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                ],
-              );
-            }
-            return const SizedBox.shrink();
-          },
-        ),
+                ),
+              ],
+            );
+          }
+          return const SizedBox.shrink();
+        },
+      ),
+    );
+  }
+}
+
+class _OfflineNotificationsView extends StatelessWidget {
+  final String message;
+  final VoidCallback onRetry;
+
+  const _OfflineNotificationsView({required this.message, required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return RefreshIndicator(
+      color: const Color(0xFF005C45),
+      onRefresh: () async => onRetry(),
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: [
+          const SizedBox(height: 70),
+          ConnectionLostStateView(
+            title: 'Connection Lost!',
+            subtitle: message,
+            buttonLabel: l10n.retry,
+            onRetry: onRetry,
+          ),
+        ],
       ),
     );
   }

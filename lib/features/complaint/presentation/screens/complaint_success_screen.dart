@@ -2,9 +2,15 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 
 class ComplaintSuccessScreen extends StatelessWidget {
+  final String? complaintId;
+  final String? message;
+  final bool isQueued;
 
   const ComplaintSuccessScreen({
-    super.key
+    super.key,
+    this.complaintId,
+    this.message,
+    this.isQueued = false,
   });
 
   @override
@@ -21,14 +27,17 @@ class ComplaintSuccessScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(
-                Icons.check_circle,
-                color: Colors.green,
+              Icon(
+                isQueued ? Icons.cloud_upload_outlined : Icons.check_circle,
+                color: isQueued ? Colors.orange : Colors.green,
                 size: 100,
               ),
               const SizedBox(height: 24),
               Text(
-                l10n.complaintSubmittedSuccessfully,
+                message ??
+                    (isQueued
+                        ? 'No internet connection. Your complaint was saved and will be submitted automatically when you are back online.'
+                        : l10n.complaintSubmittedSuccessfully),
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -38,13 +47,20 @@ class ComplaintSuccessScreen extends StatelessWidget {
               const SizedBox(height: 16),
 
               Text(
-                '${l10n.statusSubmitted}',
+                isQueued ? 'Waiting to sync' : l10n.statusSubmitted,
                 style: TextStyle(
                   fontSize: 16,
-                  color: Colors.blue,
+                  color: isQueued ? Colors.orange : Colors.blue,
                   fontWeight: FontWeight.w500,
                 ),
               ),
+              if (complaintId != null && complaintId!.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                Text(
+                  '${l10n.complaintId} $complaintId',
+                  textAlign: TextAlign.center,
+                ),
+              ],
               const SizedBox(height: 48),
               ElevatedButton(
                 onPressed: () {

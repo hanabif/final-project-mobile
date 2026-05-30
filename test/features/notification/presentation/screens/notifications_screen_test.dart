@@ -145,7 +145,7 @@ void main() {
     verify(() => mockNotificationCubit.markAllAsRead()).called(1);
   });
 
-  testWidgets('shows error snackbar when state is NotificationError', (
+  testWidgets('shows connection lost view when state is NotificationError', (
     tester,
   ) async {
     // We need to emit the error state via a stream if the listener is to pick it up properly,
@@ -159,7 +159,7 @@ void main() {
     await tester.pumpWidget(createTestableWidget(const NotificationsScreen()));
     await tester.pump(); // Start the listener
 
-    expect(find.text('Error loading'), findsOneWidget);
+    expect(find.text('Connection Lost!'), findsOneWidget);
   });
 }
 

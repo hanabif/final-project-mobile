@@ -33,6 +33,7 @@ import '../../../features/complaint/data/datasources/complaint_remote_datasource
 import '../../../features/complaint/data/repositories/complaint_repository_impl.dart';
 import '../../../features/complaint/domain/repositories/complaint_repository.dart';
 import '../../../features/complaint/domain/usecases/submit_complaint_usecase.dart';
+import '../../../features/complaint/domain/usecases/sync_pending_complaints_usecase.dart';
 import '../../../features/complaint/domain/usecases/get_complaint_status_usecase.dart';
 import '../../../features/complaint/domain/usecases/get_user_complaints_usecase.dart';
 import '../../../features/complaint/domain/usecases/get_complaint_detail_usecase.dart';
@@ -101,7 +102,7 @@ Future<void> init() async {
 
   // Auth - Repository
   sl.registerLazySingleton<AuthRepository>(
-    () => AuthRepositoryImpl(sl(), sl()),
+    () => AuthRepositoryImpl(sl(), sl(), sl()),
   );
 
   // Complaint - Repository
@@ -115,7 +116,7 @@ Future<void> init() async {
 
   // Notification - Repository
   sl.registerLazySingleton<NotificationRepository>(
-    () => NotificationRepositoryImpl(sl()),
+    () => NotificationRepositoryImpl(sl(), sl<SharedPreferences>()),
   );
 
   // Auth - Use cases
@@ -140,6 +141,7 @@ Future<void> init() async {
 
   // Complaint - Use cases
   sl.registerLazySingleton(() => SubmitComplaintUseCase(sl()));
+  sl.registerLazySingleton(() => SyncPendingComplaintsUseCase(sl()));
   sl.registerLazySingleton(() => GetComplaintStatusUseCase(sl()));
   sl.registerLazySingleton(() => GetUserComplaintsUseCase(sl()));
   sl.registerLazySingleton(() => GetComplaintDetailUseCase(sl()));
@@ -175,9 +177,16 @@ Future<void> init() async {
     () => HomeCubit(
       getCitizenAnalyticsUseCase: sl(),
       getOrganizationsUseCase: sl(),
+      networkInfo: sl(),
     ),
   );
-  sl.registerFactory(() => ComplaintCubit(submitComplaintUseCase: sl()));
+  sl.registerFactory(
+    () => ComplaintCubit(
+      submitComplaintUseCase: sl(),
+      syncPendingComplaintsUseCase: sl(),
+      connectivity: sl(),
+    ),
+  );
   sl.registerFactory(() => ComplaintListCubit(getUserComplaintsUseCase: sl()));
   sl.registerLazySingleton(
     () => OrganizationsCubit(getOrganizationsUseCase: sl()),
@@ -193,6 +202,7 @@ Future<void> init() async {
       sl<GetNotificationsUseCase>(),
       sl<MarkAllNotificationsAsReadUseCase>(),
       sl<MarkNotificationAsReadUseCase>(),
+      sl(),
     ),
   );
   sl.registerLazySingleton(
@@ -201,6 +211,7 @@ Future<void> init() async {
       getCitizenAnalyticsUseCase: sl(),
       updateProfileUseCase: sl(),
       changePasswordUseCase: sl(),
+      networkInfo: sl(),
     ),
   );
 

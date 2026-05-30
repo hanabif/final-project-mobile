@@ -24,6 +24,9 @@
   "home": "Home",
   "report": "Report",
   "profile": "Profile",
+  "bottomNavComplaints": "Complaints",
+  "callCenter": "Call Center",
+  "callCenterContacts": "Call Center Contacts",
   "yourVoiceMatters": "Your voice matters",
   "reportIssuesInYourCommunity": "Report issues in your community and help us improve services.",
   "fileReport": "File Report",
@@ -64,7 +67,7 @@
   "markAsRead": "Mark as read",
   
   
-  "myReports": "My Reports",
+  "myReports": "My Complaints",
   "complaintDetails": "Complaint Details",
   "complaintProgress": "Complaint Progress",
   "issueDescription": "Issue Description",

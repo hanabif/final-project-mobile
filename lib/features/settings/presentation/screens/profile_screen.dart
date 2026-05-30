@@ -7,6 +7,7 @@ import '../../../../core/di/injection_container.dart';
 import '../../../../core/widgets/custom_app_bar.dart';
 import '../../../../core/widgets/modern_bottom_navigation_bar.dart';
 import '../../../../core/widgets/password_strength_indicator.dart';
+import '../../../../core/widgets/connection_lost_state_view.dart';
 import '../../../../core/utils/qr_complaint_parser.dart';
 import '../../../../core/utils/password_validator.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -77,8 +78,17 @@ class ProfileScreen extends StatelessWidget {
                           color: Color(0xFF005C45)),
                     );
                   }
+                  if (profileState is ProfileOffline) {
+                    return _OfflineProfileView(
+                      message: profileState.message,
+                      onRetry: () => context.read<ProfileCubit>().loadProfileData(forceRefresh: true),
+                    );
+                  }
                   if (profileState is ProfileError) {
-                    return Center(child: Text(profileState.message));
+                    return _OfflineProfileView(
+                      message: profileState.message,
+                      onRetry: () => context.read<ProfileCubit>().loadProfileData(forceRefresh: true),
+                    );
                   }
                   if (settingsState is SettingsError) {
                     return Center(child: Text(settingsState.message));
@@ -97,22 +107,21 @@ class ProfileScreen extends StatelessWidget {
                           _ProfileHeaderCard(user: user, isDark: isDark),
                           const SizedBox(height: 20),
 
-                          // ── My Complaints ──────────────────────────────
-                          _SectionLabel(
-                              label: l10n.myComplaints, isDark: isDark),
-                          const SizedBox(height: 10),
-                          _ActionTile(
-                            icon: Icons.list_alt_rounded,
+                            // ── Call Center ────────────────────────────────
+                            _SectionLabel(label: l10n.callCenter, isDark: isDark),
+                            const SizedBox(height: 10),
+                            _ActionTile(
+                            icon: Icons.phone_in_talk_rounded,
                             iconColor: const Color(0xFF3B82F6),
-                            label: l10n.viewAllComplaints,
+                            label: l10n.callCenterContacts,
                             trailing: const Icon(
-                                Icons.arrow_forward_ios_rounded,
-                                size: 14),
+                              Icons.arrow_forward_ios_rounded,
+                              size: 14),
                             isDark: isDark,
                             onTap: () => Navigator.pushNamed(
-                                context, RouteNames.complaintList),
-                          ),
-                          const SizedBox(height: 20),
+                              context, RouteNames.callCenter),
+                            ),
+                            const SizedBox(height: 20),
 
                           // ── Account Settings ───────────────────────────
                           _SectionLabel(
@@ -901,11 +910,13 @@ class _BottomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ModernBottomNavigationBar(
-      currentIndex: 2,
+      currentIndex: 3,
       onHomeTap: () => Navigator.pushNamedAndRemoveUntil(
           context, RouteNames.home, (route) => false),
       onReportTap: () =>
           Navigator.pushNamed(context, RouteNames.complaintForm),
+      onComplaintsTap: () =>
+          Navigator.pushNamed(context, RouteNames.complaintList),
       onProfileTap: () {},
     );
   }
@@ -930,16 +941,41 @@ class _FloatingQRButton extends StatelessWidget {
             arguments: {
               'organizationId': qrData.organizationId,
               'title': qrData.title,
-              'description': qrData.description,
-              'latitude': qrData.latitude,
-              'longitude': qrData.longitude,
-              'locationLabel': qrData.locationLabel,
             },
           );
         }
       },
       backgroundColor: const Color(0xFF005C45),
       child: const Icon(Icons.qr_code_scanner_rounded, color: Colors.white, size: 28),
+    );
+  }
+}
+
+class _OfflineProfileView extends StatelessWidget {
+  final String message;
+  final VoidCallback onRetry;
+
+  const _OfflineProfileView({required this.message, required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return RefreshIndicator(
+      color: const Color(0xFF005C45),
+      onRefresh: () async => onRetry(),
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.fromLTRB(0, 40, 0, 0),
+        children: [
+          ConnectionLostStateView(
+            title: 'Connection Lost!',
+            subtitle: message,
+            buttonLabel: l10n.retry,
+            onRetry: onRetry,
+          ),
+        ],
+      ),
     );
   }
 }

@@ -1,8 +1,10 @@
 import 'package:bloc/bloc.dart';
+import '../../../../core/network/network_info.dart';
 import '../../domain/usecases/get_notifications_usecase.dart';
 import '../../domain/usecases/mark_all_notifications_as_read_usecase.dart';
 import '../../domain/usecases/mark_notification_as_read_usecase.dart';
 import '../../domain/entities/notification_item.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:equatable/equatable.dart';
 
 part 'notification_state.dart';
@@ -11,11 +13,13 @@ class NotificationCubit extends Cubit<NotificationState> {
   final GetNotificationsUseCase getNotificationsUseCase;
   final MarkAllNotificationsAsReadUseCase markAllNotificationsAsReadUseCase;
   final MarkNotificationAsReadUseCase markNotificationAsReadUseCase;
+  final NetworkInfo networkInfo;
 
   NotificationCubit(
     this.getNotificationsUseCase,
     this.markAllNotificationsAsReadUseCase,
     this.markNotificationAsReadUseCase,
+    this.networkInfo,
   ) : super(NotificationInitial());
 
   void addNotification(NotificationItem notification) {
@@ -38,7 +42,13 @@ class NotificationCubit extends Cubit<NotificationState> {
       final notifications = await getNotificationsUseCase();
       emit(NotificationLoaded(notifications));
     } catch (e) {
-      emit(NotificationError('Failed to load notifications'));
+      final isConnected = await networkInfo.isConnected;
+      if (!isConnected) {
+        emit(NotificationOffline('No internet connection. Showing saved notifications when available.'));
+        return;
+      }
+
+      emit(NotificationError('Unable to load notifications right now.'));
     }
   }
 
@@ -62,8 +72,14 @@ class NotificationCubit extends Cubit<NotificationState> {
       }
       await markAllNotificationsAsReadUseCase();
     } catch (e) {
+      final isConnected = await networkInfo.isConnected;
+      if (!isConnected) {
+        await fetchNotifications();
+        return;
+      }
+
       await fetchNotifications();
-      emit(NotificationError('Failed to update notifications'));
+      emit(NotificationError('Unable to update notifications right now.'));
     }
   }
 
@@ -92,10 +108,15 @@ class NotificationCubit extends Cubit<NotificationState> {
       await markNotificationAsReadUseCase(id);
       // No need to fetchNotifications() here as we already updated it locally
     } catch (e) {
+      final isConnected = await networkInfo.isConnected;
+      if (!isConnected) {
+        await fetchNotifications();
+        return;
+      }
+
       print('DEBUG: Error marking notification as read: $e');
-      // If failed, we might want to reload to be sure or just show error
       await fetchNotifications();
-      emit(NotificationError('Failed to update notification status: $e'));
+      emit(NotificationError('Unable to update notification status right now.'));
     }
   }
 }

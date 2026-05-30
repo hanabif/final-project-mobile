@@ -20,9 +20,12 @@
   "newPassword": "Jecha Iccitii Haaraa",
   "confirmPassword": "Jecha Iccitii Mirkaneessi",
 
-  "home": "Mana",
+  "home": "Home",
   "report": "Gabaasi",
   "profile": "Profaayilii",
+  "bottomNavComplaints": "Complaints",
+  "callCenter": "Call Center",
+  "callCenterContacts": "Call Center Contacts",
   "yourVoiceMatters": "Sagaleen kee ni dhaga'ama",
   "reportIssuesInYourCommunity": "Rakkoowwan hawaasa kee keessatti gabaasi tajaajila fooyyessuuf nu gargaari.",
   "fileReport": "Gabaasa Galchi",
