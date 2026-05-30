@@ -941,10 +941,6 @@ class _FloatingQRButton extends StatelessWidget {
             arguments: {
               'organizationId': qrData.organizationId,
               'title': qrData.title,
-              'description': qrData.description,
-              'latitude': qrData.latitude,
-              'longitude': qrData.longitude,
-              'locationLabel': qrData.locationLabel,
             },
           );
         }

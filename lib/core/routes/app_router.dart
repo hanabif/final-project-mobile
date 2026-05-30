@@ -118,22 +118,28 @@ class AppRouter {
         );
 
       case RouteNames.complaintForm:
-  final args = settings.arguments as Map<String, dynamic>?;
-  return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => BlocProvider<OrganizationsCubit>.value(
-      value: sl<OrganizationsCubit>(),
-      child: ComplaintFormScreen(
-        organizationId: args?['organizationId'],
-        title: args?['title'],
-        description: args?['description'],
-        latitude: args?['latitude'],
-        longitude: args?['longitude'],
-      ),
-    ),
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      return FadeTransition(opacity: animation, child: child);
-    },
-  );
+        String? organizationId;
+        String? title;
+        if (settings.arguments is String) {
+          organizationId = settings.arguments as String;
+        } else if (settings.arguments is Map) {
+          final args = settings.arguments as Map<String, dynamic>;
+          organizationId = args['organizationId'] as String?;
+          title = args['title'] as String?;
+        }
+
+        return PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) => BlocProvider<OrganizationsCubit>.value(
+            value: sl<OrganizationsCubit>(),
+            child: ComplaintFormScreen(
+              organizationId: organizationId,
+              title: title,
+            ),
+          ),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+        );
       case RouteNames.profile:
         return MaterialPageRoute(
           builder: (_) => const ProfileScreen(),
@@ -167,9 +173,9 @@ class AppRouter {
         );
 
       case RouteNames.qrScanner:
-  return MaterialPageRoute(
-    builder: (_) => const QRScannerModal(),
-  );
+        return MaterialPageRoute(
+          builder: (_) => const QRScannerModal(),
+        );
       default:
         return MaterialPageRoute(
           builder: (_) => const Scaffold(

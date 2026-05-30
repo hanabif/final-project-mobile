@@ -71,10 +71,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         arguments: {
           'organizationId': qrData.organizationId,
           'title': qrData.title,
-          'description': qrData.description,
-          'latitude': qrData.latitude,
-          'longitude': qrData.longitude,
-          'locationLabel': qrData.locationLabel,
         },
       );
       _refreshData();
