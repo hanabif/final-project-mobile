@@ -12,6 +12,7 @@ import '../../features/complaint/presentation/screens/complaint_status_screen.da
 import '../../features/complaint/presentation/screens/complaint_list_screen.dart';
 import '../../features/complaint/presentation/cubits/organizations_cubit.dart';
 import '../../features/settings/presentation/screens/profile_screen.dart';
+import '../../features/settings/presentation/screens/about_screen.dart';
 import '../../features/auth/presentation/pages/forgot_password_page.dart';
 import '../../features/auth/presentation/pages/verify_code_page.dart';
 import '../../features/auth/presentation/pages/reset_password_page.dart';
@@ -113,6 +114,11 @@ class AppRouter {
       case RouteNames.profile:
         return MaterialPageRoute(
           builder: (_) => const ProfileScreen(),
+        );
+
+      case RouteNames.about:
+        return MaterialPageRoute(
+          builder: (_) => const AboutScreen(),
         );
       
       case RouteNames.forgotPassword:

@@ -221,6 +221,27 @@ class AppLocalizationsOm extends AppLocalizations {
   String get changePassword => 'Jecha Iccitii Jijjiiri';
 
   @override
+  String get about => 'Waa\'ee';
+
+  @override
+  String get aboutServiceTitle => 'Waa\'ee CityVoice';
+
+  @override
+  String get aboutServiceShort => 'Xumura keessatti';
+
+  @override
+  String get aboutServiceShortDescription =>
+      'Rakkoowwan galchuuf, adeemsa isaanii hordofuu fi odeeffannoo argachuuf karaa salphaa.';
+
+  @override
+  String get aboutServiceOverview =>
+      'CityVoice namoonni rakkoolee tajaajila hawaasaa gabaasuu, adeemsa komii hordofuu, fi odeeffannoo dhaabbata itti gaafatamtu irraa bakka tokkotti argachuu akka danda\'an gargaara.';
+
+  @override
+  String get aboutServiceFocus =>
+      'Rakkoowwan gabaasi, adeemsa hordofi, fi dhaabbata itti gaafatamtu waliin walitti hidhami.';
+
+  @override
   String get emailVerification => 'Mirkaneessa Imeelii';
 
   @override

@@ -18,6 +18,20 @@ class NotificationCubit extends Cubit<NotificationState> {
     this.markNotificationAsReadUseCase,
   ) : super(NotificationInitial());
 
+  void addNotification(NotificationItem notification) {
+    if (state is NotificationLoaded) {
+      final currentNotifications = (state as NotificationLoaded).notifications;
+      final updatedNotifications = <NotificationItem>[
+        notification,
+        ...currentNotifications.where((item) => item.id != notification.id),
+      ];
+      emit(NotificationLoaded(updatedNotifications));
+      return;
+    }
+
+    emit(NotificationLoaded([notification]));
+  }
+
   Future<void> fetchNotifications() async {
     emit(NotificationLoading());
     try {

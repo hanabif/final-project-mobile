@@ -55,7 +55,6 @@ class _ComplaintListScreenState extends State<ComplaintListScreen>
 
   void _refreshComplaints() {
     if (mounted) {
-      debugPrint('🔄 Refreshing complaint list on screen resume');
       Future.delayed(const Duration(milliseconds: 800), () {
         if (mounted) {
           sl<ComplaintListCubit>().fetchComplaints(forceRefresh: true);

@@ -19,12 +19,13 @@ class QRComplaintData {
 
   factory QRComplaintData.fromJson(Map<String, dynamic> json) {
     return QRComplaintData(
-      organizationId: json['organizationId']?.toString() ?? '',
-      title: json['title']?.toString() ?? '',
-      description: json['description']?.toString() ?? '',
-      latitude: _toDouble(json['latitude']),
-      longitude: _toDouble(json['longitude']),
-      locationLabel: json['locationLabel']?.toString(),
+      organizationId:
+          (json['organizationId'] ?? json['orgId'])?.toString() ?? '',
+      title: (json['title'] ?? json['ttl'])?.toString() ?? '',
+      description: (json['description'] ?? json['dsc'])?.toString() ?? '',
+      latitude: _toDouble(json['latitude'] ?? json['lat']),
+      longitude: _toDouble(json['longitude'] ?? json['lng']),
+      locationLabel: (json['locationLabel'] ?? json['lbl'])?.toString(),
     );
   }
 
@@ -51,19 +52,21 @@ class QRComplaintParser {
     try {
       // Try parsing as JSON
       final decoded = jsonDecode(qrContent) as Map<String, dynamic>;
-      
+
       // DEBUG: See what we actually got
-    print("DEBUG: Scanned JSON: $decoded");
+      print("DEBUG: Scanned JSON: $decoded");
 
-    // Use flexible keys (handles both 'organizationId' and 'orgId')
-    final orgId = decoded['organizationId'] ?? decoded['orgId'];
-    final title = decoded['title'] ?? decoded['ttl'];
-    final desc  = decoded['description'] ?? decoded['dsc'];
+      // Use flexible keys (handles both 'organizationId' and 'orgId')
+      final orgId = decoded['organizationId'] ?? decoded['orgId'];
+      final title = decoded['title'] ?? decoded['ttl'];
+      final desc = decoded['description'] ?? decoded['dsc'];
 
-    if (orgId == null || title == null || desc == null) {
-      print("DEBUG: Parser failed - Missing required fields (orgId, title, or description)");
-      return null;
-    }
+      if (orgId == null || title == null || desc == null) {
+        print(
+          "DEBUG: Parser failed - Missing required fields (orgId, title, or description)",
+        );
+        return null;
+      }
 
       return QRComplaintData.fromJson(decoded);
     } catch (e) {

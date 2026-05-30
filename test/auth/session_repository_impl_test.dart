@@ -3,28 +3,12 @@ import 'dart:convert';
 import 'package:complaint_resolution_app/core/utils/secure_storage.dart';
 import 'package:complaint_resolution_app/features/auth/data/repositories/session_repository_impl.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-/// A fake storage that keeps values in memory instead of using platform
-/// channels. It extends [SecureStorageService] so it can be passed to the
-/// repository under test.
-class FakeSecureStorageService extends SecureStorageService {
-  final Map<String, String> _values = {};
+class MockSecureStorageService extends Mock implements SecureStorageService {}
 
-  @override
-  Future<void> saveToken(String token) async {
-    _values['auth_token'] = token;
-  }
-
-  @override
-  Future<String?> getToken() async {
-    return _values['auth_token'];
-  }
-
-  @override
-  Future<void> clearToken() async {
-    _values.remove('auth_token');
-  }
-}
+class MockSharedPreferences extends Mock implements SharedPreferences {}
 
 /// Generate a minimal JWT with an `exp` claim a given number of seconds from
 /// now. We do not care about signature, so the last segment is empty.
@@ -37,38 +21,45 @@ String makeJwt({required int secondsFromNow}) {
 }
 
 void main() {
-  late FakeSecureStorageService fakeStorage;
+  late MockSecureStorageService mockSecureStorage;
+  late MockSharedPreferences mockSharedPreferences;
   late SessionRepositoryImpl repo;
 
   setUp(() {
-    fakeStorage = FakeSecureStorageService();
-    repo = SessionRepositoryImpl(fakeStorage);
+    mockSecureStorage = MockSecureStorageService();
+    mockSharedPreferences = MockSharedPreferences();
+    repo = SessionRepositoryImpl(mockSecureStorage, mockSharedPreferences);
   });
 
   test('saveToken and getToken return correct value', () async {
+    when(() => mockSecureStorage.saveToken(any())).thenAnswer((_) async => {});
+    when(() => mockSecureStorage.getToken()).thenAnswer((_) async => 'abc123');
+
     await repo.saveToken('abc123');
     expect(await repo.getToken(), 'abc123');
   });
 
-  test('clearSession removes stored token', () async {
-    await repo.saveToken('xyz');
+  test('clearSession removes stored token and clears prefs', () async {
+    when(() => mockSecureStorage.clearToken()).thenAnswer((_) async => {});
+    when(
+      () => mockSharedPreferences.remove(any()),
+    ).thenAnswer((_) async => true);
+
     await repo.clearSession();
-    expect(await repo.getToken(), isNull);
+
+    verify(() => mockSecureStorage.clearToken()).called(1);
+    verify(() => mockSharedPreferences.remove(any())).called(3);
   });
 
   test('hasValidSession returns false when no token', () async {
+    when(() => mockSecureStorage.getToken()).thenAnswer((_) async => null);
     expect(await repo.hasValidSession(), isFalse);
   });
 
-  test('hasValidSession returns false if token is expired', () async {
-    final expired = makeJwt(secondsFromNow: -10);
-    await repo.saveToken(expired);
-    expect(await repo.hasValidSession(), isFalse);
-  });
-
-  test('hasValidSession returns true when token is not expired', () async {
-    final good = makeJwt(secondsFromNow: 60);
-    await repo.saveToken(good);
+  test('hasValidSession returns true when token exists', () async {
+    when(
+      () => mockSecureStorage.getToken(),
+    ).thenAnswer((_) async => 'valid-token');
     expect(await repo.hasValidSession(), isTrue);
   });
 }

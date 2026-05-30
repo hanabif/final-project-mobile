@@ -147,6 +147,20 @@ class ProfileScreen extends StatelessWidget {
                                 context.read<ProfileCubit>(),
                               ),
                             ),
+                            _Divider(isDark: isDark),
+                            _ActionTile(
+                              icon: Icons.info_outline_rounded,
+                              iconColor: const Color(0xFF3B82F6),
+                              label: l10n.about,
+                              isDark: isDark,
+                              trailing: const Icon(
+                                  Icons.arrow_forward_ios_rounded,
+                                  size: 14),
+                              onTap: () => Navigator.pushNamed(
+                                context,
+                                RouteNames.about,
+                              ),
+                            ),
                           ]),
                           const SizedBox(height: 20),
 

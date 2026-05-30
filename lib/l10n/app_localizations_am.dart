@@ -220,6 +220,27 @@ class AppLocalizationsAm extends AppLocalizations {
   String get changePassword => 'የይለፍ ቃል ቀይር';
 
   @override
+  String get about => 'ስለ';
+
+  @override
+  String get aboutServiceTitle => 'ስለ ሲቲቮይስ';
+
+  @override
+  String get aboutServiceShort => 'በአጭሩ';
+
+  @override
+  String get aboutServiceShortDescription =>
+      'ችግሮችን ለማስገባት፣ ሂደቱን ለመከታተል እና መረጃ ለመቀበል ቀላል መንገድ።';
+
+  @override
+  String get aboutServiceOverview =>
+      'ሲቲቮይስ ሰዎች የማህበረሰብ አገልግሎት ችግሮችን እንዲያስገቡ፣ የቅሬታ ሂደቱን እንዲከታተሉ እና ከተጠያቂው ድርጅት ዝመና እንዲያገኙ በአንድ ቦታ ይረዳል።';
+
+  @override
+  String get aboutServiceFocus =>
+      'ችግሮችን ያስገቡ፣ ሂደቱን ይከታተሉ እና ከተጠያቂው ድርጅት ጋር ተያይዞ ይቆዩ።';
+
+  @override
   String get emailVerification => 'ኢሜል ማረጋገጫ';
 
   @override

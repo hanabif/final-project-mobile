@@ -8,9 +8,30 @@ class NotificationRepositoryImpl implements NotificationRepository {
   NotificationRepositoryImpl(this.remoteDataSource);
 
   @override
-  Future<void> registerDeviceToken(String token) async {
+  Future<void> registerDevice({
+    required String fcmToken,
+    required String deviceId,
+    required String deviceName,
+    required String devicePlatform,
+    required String appVersion,
+  }) async {
     try {
-      await remoteDataSource.registerDeviceToken(token);
+      await remoteDataSource.registerDevice(
+        fcmToken: fcmToken,
+        deviceId: deviceId,
+        deviceName: deviceName,
+        devicePlatform: devicePlatform,
+        appVersion: appVersion,
+      );
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> unregisterDevice(String deviceId) async {
+    try {
+      await remoteDataSource.unregisterDevice(deviceId);
     } catch (e) {
       rethrow;
     }
